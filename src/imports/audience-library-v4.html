@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Audience Library — v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Jua&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F3F1; --ink:#262329; --muted:#6E6A73; --faint:#A6A2AA; --xfaint:#C5C1C9;
+    --line:#ECEAE6; --line2:#F2F0EC; --card:#FFFFFF;
+    --purple:#7C3AED; --purple-d:#5B27B4; --purple-soft:#F3EEFD; --purple-line:#E4D9FB; --purple-tint:#F8F5FE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px}
+  .jua{font-family:'Jua',system-ui,sans-serif;font-weight:400}
+  .mono{font-family:'DM Mono',monospace}
+  .wrap{width:1280px;margin:0 auto;padding:0 0 70px}
+  .optlabel{display:flex;align-items:center;gap:12px;margin:46px 28px 14px}
+  .optlabel .pill{background:var(--ink);color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+  .optlabel .desc{color:var(--muted);font-size:14px}
+  .screen{background:var(--card);border:1px solid var(--line);border-radius:18px;margin:0 28px;overflow:hidden;position:relative}
+
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;padding:26px 30px 0}
+  .h1{font-size:27px;line-height:1.1;margin:0}
+  .sub{color:var(--muted);font-size:13.5px;margin:7px 0 0}
+  .createbtn{display:inline-flex;align-items:center;gap:7px;background:var(--purple);color:#fff;border:none;font-family:inherit;font-weight:600;font-size:14px;padding:10px 15px;border-radius:10px;cursor:pointer}
+  .createbtn .plus{font-size:17px;line-height:1;margin-top:-1px}
+  .controls{display:flex;align-items:center;gap:9px;padding:20px 30px 6px;flex-wrap:wrap}
+  .search{flex:1;min-width:240px;display:flex;align-items:center;gap:9px;background:#FAF9F7;border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:var(--faint);font-size:13.5px}
+  .search .mag{width:14px;height:14px;border:1.8px solid var(--faint);border-radius:50%;position:relative;flex:none}
+  .search .mag::after{content:"";position:absolute;width:5px;height:1.8px;background:var(--faint);right:-3px;bottom:1px;transform:rotate(45deg);border-radius:2px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13.5px;color:var(--ink);cursor:pointer;white-space:nowrap}
+  .chip b{font-weight:600}.chip .ca{color:var(--faint);font-size:10px}
+
+  /* column header */
+  .colh{display:flex;align-items:center;gap:12px;padding:8px 30px 8px;color:var(--faint);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+  .colh .c-grip{width:14px;flex:none}.colh .c-name{flex:1}
+  .colh .c-seg{width:168px;flex:none}.colh .c-size{width:96px;text-align:right;flex:none}
+  .colh .c-loc{width:158px;text-align:right;flex:none}.colh .c-chev{width:18px;flex:none}
+
+  /* group header */
+  .grp{display:flex;align-items:center;gap:9px;padding:12px 30px;background:#FBFAF8;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+  .grp .tw{color:var(--faint);font-size:11px}
+  .grp .gi{width:15px;height:15px;border-radius:5px;background:#EDEAE5;flex:none}
+  .grp .nm{font-size:13.5px;font-weight:600}.grp .ct{color:var(--faint);font-size:13px}
+  .grp .add{margin-left:auto;color:var(--xfaint);font-size:16px}
+  .grp.drop{background:var(--purple-tint)}
+
+  /* row */
+  .row{display:flex;align-items:center;gap:12px;padding:0 30px;height:48px;cursor:pointer;position:relative}
+  .row:hover{background:#FBFAF8}
+  .row:hover .chev{color:var(--purple)}
+  .row.sel{background:var(--purple-tint)}
+  .grip{width:14px;flex:none;color:var(--xfaint);font-size:13px;opacity:0;cursor:grab;letter-spacing:-1px}
+  .row:hover .grip{opacity:1}
+  .name{flex:1;display:flex;align-items:center;gap:9px;min-width:0}
+  .name .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .name .t{font-size:14px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .d-val{background:#7C3AED}.d-freq{background:#1D9E75}.d-new{background:#639922}.d-laps{background:#BA7517}.d-mkt{background:#D85A30}.d-loy{background:#378ADD}.d-cust{background:#993556}
+  .seg{width:168px;flex:none}
+  .pill-seg{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:3px 9px;background:#fff}
+  .pill-seg .cv{color:var(--xfaint);font-size:9px;margin-left:1px}
+  .size{width:96px;text-align:right;flex:none;font-size:14px;font-weight:600}
+  .size .u{font-size:11.5px;font-weight:400;color:var(--faint);margin-left:4px}
+  .loc{width:158px;flex:none;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .loc .pin{color:var(--xfaint);font-size:11px}
+  .chev{width:18px;flex:none;text-align:right;color:var(--xfaint);font-size:18px;line-height:1}
+
+  /* dragging state */
+  .row.dragging{background:#fff;border:1px solid var(--purple-line);border-radius:10px;box-shadow:0 14px 30px rgba(40,37,45,.16);height:46px;margin:0 22px;z-index:5;position:relative}
+  .row.dragging .grip{opacity:1;color:var(--purple);cursor:grabbing}
+  .dropline{height:0;border-top:2px solid var(--purple);margin:0 30px;position:relative}
+  .dropline::before{content:"";position:absolute;left:-4px;top:-4px;width:7px;height:7px;border-radius:50%;background:var(--purple)}
+  .ghostgap{height:48px;background:repeating-linear-gradient(90deg,transparent,transparent 6px,#F2EFF8 6px,#F2EFF8 12px);opacity:.5}
+
+  /* menus / insets */
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 28px;align-items:start}
+  .mini{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative}
+  .ml{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+  .annot{font-size:12.5px;color:var(--muted);margin-top:14px;display:flex;gap:7px;line-height:1.5}
+  .annot .n{color:var(--purple-d);font-weight:600}
+
+  .menu{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 12px 30px rgba(40,37,45,.13);padding:8px;width:240px}
+  .mfield{display:flex;align-items:center;gap:8px;border:1px solid var(--purple-line);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13.5px}
+  .mfield .car{width:1px;height:15px;background:var(--purple)}
+  .mfield .ph{color:var(--ink)}
+  .mh{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;padding:6px 8px 4px}
+  .mi{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;font-size:13.5px;cursor:pointer}
+  .mi:hover{background:#F6F4F1}
+  .mi.create{color:var(--purple-d);font-weight:600}
+  .mi.create .plus{width:18px;height:18px;border-radius:5px;background:var(--purple-soft);display:flex;align-items:center;justify-content:center;font-size:13px}
+  .mi.on{background:var(--purple-soft);color:var(--purple-d);font-weight:600}
+  .mi .ck2{margin-left:auto;color:var(--purple);font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ MAIN TABLE ============ -->
+<div class="optlabel"><span class="pill">Table · v4</span><span class="desc">Name-first column · whole row opens the audience · drag to move · no auto-tag chips.</span></div>
+<div class="screen">
+  <div class="topbar">
+    <div><h1 class="h1 jua">Audiences</h1><p class="sub">32 audiences · 16 categories</p></div>
+    <button class="createbtn"><span class="plus">+</span> Create audience</button>
+  </div>
+  <div class="controls">
+    <div class="search"><span class="mag"></span> Search audiences…</div>
+    <div class="chip">Group by: <b>Category</b> <span class="ca">▾</span></div>
+    <div class="chip">Segment <span class="ca">▾</span></div>
+    <div class="chip">Sort: Largest <span class="ca">▾</span></div>
+  </div>
+
+  <div class="colh"><span class="c-grip"></span><span class="c-name">Name</span><span class="c-seg">Segment</span><span class="c-size">Size</span><span class="c-loc">Location</span><span class="c-chev"></span></div>
+
+  <div class="grp"><span class="tw">▾</span><span class="gi"></span><span class="nm">Eating Places</span><span class="ct">2</span><span class="add">+</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-val"></span><span class="t">Premium diners — Melbourne</span></span><span class="seg"><span class="pill-seg"><span class="dot d-val"></span>High value <span class="cv">▾</span></span></span><span class="size">184,200<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>Greater Melbourne</span><span class="chev">›</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-freq"></span><span class="t">Takeaway regulars</span></span><span class="seg"><span class="pill-seg"><span class="dot d-freq"></span>Frequent <span class="cv">▾</span></span></span><span class="size">421,800<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>Greater Melbourne</span><span class="chev">›</span></div>
+
+  <div class="grp"><span class="tw">▾</span><span class="gi"></span><span class="nm">Airline Travelers</span><span class="ct">3</span><span class="add">+</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-val"></span><span class="t">Big-ticket flyers</span></span><span class="seg"><span class="pill-seg"><span class="dot d-val"></span>High value <span class="cv">▾</span></span></span><span class="size">338,900<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-freq"></span><span class="t">Frequent flyers</span></span><span class="seg"><span class="pill-seg"><span class="dot d-freq"></span>Frequent <span class="cv">▾</span></span></span><span class="size">704,500<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-cust"></span><span class="t">Lapsed business class</span></span><span class="seg"><span class="pill-seg"><span class="dot d-cust"></span>Win-back VIP <span class="cv">▾</span></span></span><span class="size">92,600<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+
+  <div class="grp"><span class="tw">▾</span><span class="gi"></span><span class="nm">Home Improvement</span><span class="ct">2</span><span class="add">+</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-val"></span><span class="t">Big renovators</span></span><span class="seg"><span class="pill-seg"><span class="dot d-val"></span>High value <span class="cv">▾</span></span></span><span class="size">263,100<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>VIC + NSW</span><span class="chev">›</span></div>
+  <div class="row"><span class="grip">⠿</span><span class="name"><span class="dot d-freq"></span><span class="t">Weekend DIYers</span></span><span class="seg"><span class="pill-seg"><span class="dot d-freq"></span>Frequent <span class="cv">▾</span></span></span><span class="size">529,400<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>VIC + NSW</span><span class="chev">›</span></div>
+  <div style="height:14px"></div>
+</div>
+
+<!-- ============ INSETS ============ -->
+<div class="optlabel"><span class="pill">Move &amp; segment</span><span class="desc">Drag a row into another category · the segment is select-or-create, not a fixed list.</span></div>
+<div class="twocol">
+  <!-- drag to move -->
+  <div class="mini">
+    <div class="ml">Drag to move between categories</div>
+    <div class="grp" style="border-radius:8px;border:1px solid var(--line2);margin-bottom:0"><span class="tw">▾</span><span class="gi"></span><span class="nm">Eating Places</span><span class="ct">1</span></div>
+    <div class="row" style="height:44px;padding:0 8px"><span class="grip" style="opacity:1">⠿</span><span class="name"><span class="dot d-freq"></span><span class="t">Takeaway regulars</span></span><span class="chev">›</span></div>
+    <div class="ghostgap" style="height:8px;margin:0 8px"></div>
+    <!-- dragging row -->
+    <div class="row dragging" style="margin:8px 0"><span class="grip">⠿</span><span class="name"><span class="dot d-val"></span><span class="t">Premium diners — Melbourne</span></span><span class="chev" style="color:var(--purple)">›</span></div>
+    <div class="grp drop" style="border-radius:8px;border:1px solid var(--purple-line);margin-top:8px"><span class="tw">▾</span><span class="gi"></span><span class="nm">Fine Dining</span><span class="ct">drop here</span></div>
+    <div class="dropline" style="margin:6px 8px"></div>
+    <div class="annot"><span class="n">Grab the ⠿ handle</span> on any row and drop it into another category to recategorise it instantly.</div>
+  </div>
+
+  <!-- segment: select or create -->
+  <div class="mini">
+    <div class="ml">Segment — pick one or create your own</div>
+    <div class="row sel" style="border-radius:8px;height:42px;padding:0 10px"><span class="name"><span class="dot d-cust"></span><span class="t">Lapsed business class</span></span><span class="pill-seg" style="border-color:var(--purple-line);background:var(--purple-soft);color:var(--purple-d)"><span class="dot d-cust"></span>Win-back VIP <span class="cv" style="color:var(--purple)">▾</span></span></div>
+    <div class="menu" style="margin-top:8px">
+      <div class="mfield"><span class="ph">Win-back VIP</span><span class="car"></span></div>
+      <div class="mi create"><span class="plus">+</span>Create “Win-back VIP”</div>
+      <div class="mh">Or pick a standard segment</div>
+      <div class="mi"><span class="dot d-val"></span>High value</div>
+      <div class="mi"><span class="dot d-freq"></span>Frequent</div>
+      <div class="mi"><span class="dot d-loy"></span>Loyal / Returning</div>
+      <div class="mi"><span class="dot d-laps"></span>Lapsed</div>
+      <div class="mi"><span class="dot d-mkt"></span>In-market</div>
+    </div>
+    <div class="annot"><span class="n">Type to create</span> a custom segment, or select one of the standard tags. Custom segments become reusable across audiences.</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

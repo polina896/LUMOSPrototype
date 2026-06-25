@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wireframe — Audience Side Panel (compressed)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F3F1;
+    --panel: #FFFFFF;
+    --panel-soft: #FAFAF8;
+    --border: #E5E5E2;
+    --text: #1A1A1A;
+    --text-muted: #6B6B6B;
+    --text-faint: #9A9A9A;
+    --accent: #6B3C72;
+    --accent-soft: #F1E9FF;
+    --accent-tint: #BEBDE7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family:'Jua', sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.5; padding:32px; }
+
+  .intro { max-width:900px; margin-bottom:22px; }
+  .intro .eyebrow { color:var(--text-faint); font-size:12px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+  .intro h1 { font-size:20px; margin-bottom:6px; }
+  .intro p { color:var(--text-muted); font-size:13px; }
+  .intro .flow { color:var(--accent); }
+
+  .panel { width:440px; background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; max-height:920px; }
+
+  .bar { display:flex; align-items:center; gap:10px; padding:10px 18px; border-bottom:1px solid var(--border); flex:none; }
+  .tab-top { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-muted); padding:5px 9px; border-radius:8px; }
+  .tab-top.active { background:var(--accent-soft); color:var(--accent); }
+  .tab-top svg { width:15px; height:15px; }
+  .bar-actions { margin-left:auto; display:flex; gap:6px; }
+  .ibtn { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--panel); color:var(--text-muted); display:flex; align-items:center; justify-content:center; }
+  .ibtn svg { width:16px; height:16px; }
+  .save-top { display:flex; align-items:center; gap:6px; font-size:12.5px; font-family:inherit; color:var(--accent); background:var(--panel); border:1px solid var(--accent); border-radius:8px; padding:5px 11px; cursor:pointer; }
+  .save-top svg { width:14px; height:14px; }
+
+  .hero-bar { background:var(--accent); color:#fff; padding:13px 20px; flex:none; }
+  .hero-bar .name { font-size:18px; display:flex; align-items:center; gap:10px; }
+  .draft-pill { font-size:11px; padding:2px 9px; border-radius:7px; background:rgba(255,255,255,.22); }
+  .hero-bar .meta { font-size:12px; opacity:.9; margin-top:2px; }
+
+  .body { overflow-y:auto; padding:0 20px 16px; }
+
+  .section { padding:15px 0; border-bottom:1px solid var(--border); }
+  .section:last-of-type { border-bottom:none; }
+  .sec-head { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+  .sec-no { width:21px; height:21px; border-radius:6px; background:var(--accent-soft); color:var(--accent); font-size:12px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .sec-title { font-size:15px; }
+  .sec-aside { margin-left:auto; color:var(--text-faint); font-size:11px; }
+
+  /* underlined tabs */
+  .tabs { display:flex; gap:18px; margin-bottom:12px; border-bottom:1px solid var(--border); }
+  .tab { font-family:inherit; font-size:12.5px; color:var(--text-faint); background:none; border:none; border-bottom:2px solid transparent; padding:0 1px 8px; margin-bottom:-1px; cursor:pointer; }
+  .tab:hover { color:var(--text-muted); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .tabpanel { display:none; }
+  .tabpanel.active { display:block; }
+
+  /* condensed inline takeaway */
+  .tk-inline { display:flex; gap:7px; align-items:flex-start; background:var(--accent-soft); border-radius:10px; padding:8px 11px; margin-top:11px; font-size:12px; line-height:1.5; color:var(--text); }
+  .tk-inline svg { width:13px; height:13px; color:var(--accent); flex:none; margin-top:2px; }
+  .tk-inline b { color:var(--accent); }
+
+  /* section-level targeting insight (above tabs) */
+  .sec-insight { display:flex; gap:8px; align-items:flex-start; font-size:12.5px; line-height:1.5; color:var(--text); margin-bottom:12px; }
+  .sec-insight svg { width:15px; height:15px; color:var(--accent); flex:none; margin-top:2px; }
+  .sec-insight b { color:var(--accent); }
+
+  /* §1 the read */
+  .headline { font-size:17px; line-height:1.3; margin-bottom:12px; }
+  .headline b { color:var(--accent); }
+  .pillars { display:flex; flex-direction:column; gap:7px; }
+  .pillar { display:flex; gap:11px; align-items:baseline; }
+  .pillar .num { color:var(--accent); font-size:16px; flex:none; min-width:52px; }
+  .pillar .txt { font-size:12.5px; color:var(--text-muted); }
+  .pillar .txt b { color:var(--text); }
+
+  /* §2 demographics — compact */
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .gcard { border:1px solid var(--border); border-radius:10px; padding:8px 10px; background:var(--panel-soft); display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .gcard .gtext .gl { color:var(--text-faint); font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; }
+  .gcard .gtext .gv { font-size:14px; }
+  .idx { display:inline-flex; align-items:center; gap:3px; font-size:11px; padding:2px 6px; border-radius:6px; background:var(--accent-soft); color:var(--accent); flex:none; }
+  .idx svg { width:9px; height:9px; }
+  .idx.flat { background:var(--panel); border:1px solid var(--border); color:var(--text-faint); }
+
+  /* bars */
+  .lbl { color:var(--text-faint); font-size:10px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; }
+  .bars { display:flex; flex-direction:column; gap:7px; }
+  .bar-row { display:flex; align-items:center; gap:10px; }
+  .bar-name { font-size:12px; width:118px; flex:none; }
+  .bar-track { flex:1; height:7px; border-radius:5px; background:var(--panel-soft); border:1px solid var(--border); overflow:hidden; }
+  .bar-fill { display:block; height:100%; background:var(--accent-tint); }
+  .bar-fill.lead { background:var(--accent); }
+  .bar-val { width:38px; text-align:right; font-size:12px; color:var(--text-muted); flex:none; }
+
+  .bhv { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .bhv li { display:flex; gap:8px; font-size:12.5px; color:var(--text); line-height:1.4; }
+  .bhv svg { width:12px; height:12px; color:var(--accent); flex:none; margin-top:4px; }
+
+  /* §3 map — shorter */
+  .map { position:relative; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--panel-soft); }
+  .map svg { display:block; width:100%; height:auto; }
+  .map-legend { position:absolute; right:9px; bottom:8px; display:flex; align-items:center; gap:5px; font-size:9.5px; color:var(--text-faint); background:rgba(255,255,255,.85); padding:2px 6px; border-radius:6px; }
+  .leg-grad { width:40px; height:6px; border-radius:4px; background:linear-gradient(90deg, var(--accent-soft), var(--accent)); }
+  .map-cap { position:absolute; left:9px; top:8px; font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); }
+  .district-line { font-size:11.5px; color:var(--text-muted); margin-top:9px; line-height:1.5; }
+  .district-line b { color:var(--accent); }
+
+  /* map controls */
+  .map-ctrl { position:absolute; top:8px; right:9px; display:flex; flex-direction:column; background:rgba(255,255,255,.92); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .map-ctrl button { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:none; border:none; border-bottom:1px solid var(--border); color:var(--text-muted); cursor:pointer; }
+  .map-ctrl button:last-child { border-bottom:none; }
+  .map-ctrl button:hover { color:var(--accent); }
+  .map-ctrl svg { width:14px; height:14px; }
+  .map-expand { display:inline-flex; align-items:center; gap:6px; margin-top:9px; font-size:12px; color:var(--accent); background:none; border:none; cursor:pointer; font-family:inherit; }
+  .map-expand svg { width:13px; height:13px; }
+
+  /* messaging thought starters */
+  .msg { list-style:none; display:flex; flex-direction:column; gap:11px; }
+  .msg li { display:flex; gap:9px; font-size:12.5px; line-height:1.45; color:var(--text-muted); }
+  .msg li > svg { width:13px; height:13px; color:var(--accent); flex:none; margin-top:3px; }
+  .msg b { color:var(--text); }
+
+  .cmp { display:flex; gap:10px; }
+  .cmp-col { flex:1; }
+  .cmp-col .ch { font-size:10px; color:var(--text-faint); letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+  .cmp-chip { display:block; font-size:12px; padding:5px 9px; border-radius:8px; background:var(--panel-soft); border:1px solid var(--border); margin-bottom:5px; }
+  .cmp-chip b { color:var(--accent); }
+
+  /* §4 how to win — tight list */
+  .win { display:flex; flex-direction:column; }
+  .win-row { display:flex; gap:11px; padding:5px 0; }
+  .win-key { width:54px; flex:none; color:var(--accent); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; padding-top:2px; }
+  .win-val { font-size:12.5px; color:var(--text); line-height:1.4; }
+  .win-val.avoid { color:var(--text-muted); }
+  .win-row.star .win-val { color:var(--accent); }
+  .win-row.star { padding-bottom:8px; margin-bottom:4px; border-bottom:1px solid var(--border); }
+  .brief-link { display:inline-flex; align-items:center; gap:5px; margin-top:11px; color:var(--accent); font-size:12px; background:none; border:none; cursor:pointer; font-family:inherit; }
+  .brief-link svg { width:13px; height:13px; }
+
+  /* footer */
+  .foot { border-top:1px solid var(--border); padding:11px 18px; display:flex; gap:10px; flex:none; }
+  .btn { border-radius:8px; padding:10px 14px; font-family:inherit; font-size:13.5px; display:flex; align-items:center; justify-content:center; gap:7px; border:1px solid var(--border); cursor:pointer; }
+  .btn svg { width:15px; height:15px; }
+  .btn-primary { background:var(--accent); color:#fff; border-color:var(--accent); flex:1.4; }
+  .btn-ghost { background:var(--panel); color:var(--text); flex:1; }
+
+  .note { max-width:900px; margin-top:24px; padding-top:16px; border-top:1px solid var(--border); color:var(--text-muted); font-size:13px; line-height:1.7; }
+  .note b { color:var(--text); }
+  .note .k { color:var(--accent); }
+</style>
+</head>
+<body>
+  <div class="intro">
+    <div class="eyebrow">Lumos · Data Explorer · Audience side panel</div>
+    <h1>Compressed preview — ~35% tighter</h1>
+    <p><span class="flow">The read → Who they are (tabs) → Where they live (tabs) → How to win them</span>. Trimmed to first-glance essentials; depth still lives behind the tabs and the full page.</p>
+  </div>
+
+  <div class="panel">
+    <div class="bar">
+      <div class="tab-top active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Preview</div>
+      <div class="tab-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.2-3.2"/></svg>Data Explorer</div>
+      <div class="bar-actions">
+        <button class="save-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16l-6-4-6 4V4z"/></svg>Save</button>
+        <button class="ibtn" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M8 11l4 4 4-4M5 20h14"/></svg></button>
+        <button class="ibtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+      </div>
+    </div>
+
+    <div class="hero-bar">
+      <div class="name">Premium Sedan Intenders <span class="draft-pill">Draft</span></div>
+      <div class="meta">~284k people · Premium Automotive · Index 245</div>
+    </div>
+
+    <div class="body">
+
+      <!-- THE READ (untitled headline) -->
+      <div class="section">
+        <p class="headline">Singapore's most <b>brand-loyal</b> premium-sedan buyers — they shortlist on reputation, then buy when the <b>bonus lands</b>.</p>
+        <div class="pillars">
+          <div class="pillar"><span class="num">2.45×</span><span class="txt">more likely to be <b>in-market</b> than the average Singaporean</span></div>
+          <div class="pillar"><span class="num">4 in 5</span><span class="txt">shortlist by <b>brand reputation</b> before they price-compare</span></div>
+        </div>
+      </div>
+
+      <!-- 2. WHO THEY ARE -->
+      <div class="section" data-tabset>
+        <div class="sec-head"><span class="sec-no">1</span><span class="sec-title">Who they are</span><span class="sec-aside">Indexed vs national</span></div>
+        <div class="tabs">
+          <button class="tab active" data-tab="demo">Demographics</button>
+          <button class="tab" data-tab="income">Income</button>
+          <button class="tab" data-tab="segments">Segments</button>
+          <button class="tab" data-tab="behav">Behaviours</button>
+        </div>
+
+        <div class="tabpanel active" data-panel="demo">
+          <div class="grid">
+            <div class="gcard"><div class="gtext"><div class="gl">Core age</div><div class="gv">35–49</div></div><span class="idx"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.6×</span></div>
+            <div class="gcard"><div class="gtext"><div class="gl">Gender</div><div class="gv">62% male</div></div><span class="idx flat">0.9×</span></div>
+            <div class="gcard"><div class="gtext"><div class="gl">Occupation</div><div class="gv">Professional</div></div><span class="idx"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.4×</span></div>
+            <div class="gcard"><div class="gtext"><div class="gl">Life stage</div><div class="gv">Est. family</div></div><span class="idx"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.5×</span></div>
+          </div>
+          <div class="tk-inline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2"/></svg><span>A <b>mid-career, family-stage professional</b> core — affluent enough for premium, settled enough to buy considered.</span></div>
+        </div>
+
+        <div class="tabpanel" data-panel="income">
+          <div class="lbl">Household income · vs national</div>
+          <div class="bars">
+            <div class="bar-row"><span class="bar-name">&lt; $60k</span><span class="bar-track"><span class="bar-fill" style="width:18%"></span></span><span class="bar-val">0.3×</span></div>
+            <div class="bar-row"><span class="bar-name">$60–120k</span><span class="bar-track"><span class="bar-fill" style="width:42%"></span></span><span class="bar-val">0.8×</span></div>
+            <div class="bar-row"><span class="bar-name">$120–160k</span><span class="bar-track"><span class="bar-fill lead" style="width:78%"></span></span><span class="bar-val">1.6×</span></div>
+            <div class="bar-row"><span class="bar-name">$160k+</span><span class="bar-track"><span class="bar-fill lead" style="width:100%"></span></span><span class="bar-val">2.1×</span></div>
+          </div>
+          <div class="tk-inline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2"/></svg><span>The <b>most affluent auto audience</b> Lumos tracks — $160k+ households index 2.1×, well above the premium-auto benchmark (~1.3×). Lead on reassurance, not price.</span></div>
+        </div>
+
+        <div class="tabpanel" data-panel="segments">
+          <div class="lbl">Leading segments · vs national</div>
+          <div class="bars">
+            <div class="bar-row"><span class="bar-name">Affluent Professionals</span><span class="bar-track"><span class="bar-fill lead" style="width:100%"></span></span><span class="bar-val">1.7×</span></div>
+            <div class="bar-row"><span class="bar-name">Established Families</span><span class="bar-track"><span class="bar-fill lead" style="width:94%"></span></span><span class="bar-val">1.6×</span></div>
+            <div class="bar-row"><span class="bar-name">Luxury Lifestyle</span><span class="bar-track"><span class="bar-fill lead" style="width:94%"></span></span><span class="bar-val">1.6×</span></div>
+            <div class="bar-row"><span class="bar-name">Business Travellers</span><span class="bar-track"><span class="bar-fill" style="width:88%"></span></span><span class="bar-val">1.5×</span></div>
+          </div>
+        </div>
+
+        <div class="tabpanel" data-panel="behav">
+          <ul class="bhv">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>Visits showrooms / configurators 2–3× a month while considering</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>Researches specs across digital touchpoints before a dealer visit</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>Responsive to test-drive invites &amp; ownership-privilege messaging</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3. WHERE THEY -->
+      <div class="section" data-tabset>
+        <div class="sec-head"><span class="sec-no">2</span><span class="sec-title">Where they live</span></div>
+        <div class="sec-insight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Where they <b>live</b> and where they <b>buy</b> sit ~12 km apart — so the footprints for <b>awareness</b> (home) and <b>conversion</b> (dealership) barely overlap. Target them as two zones.</span></div>
+        <div class="tabs">
+          <button class="tab active" data-tab="live">Live</button>
+          <button class="tab" data-tab="transact">Transact</button>
+        </div>
+
+        <div class="tabpanel active" data-panel="live">
+          <div class="map">
+            <span class="map-cap">Home districts</span>
+            <div class="map-ctrl">
+              <button title="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg></button>
+              <button title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 12h12"/></svg></button>
+              <button title="Open full"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H5v4M15 4h4v4M9 20H5v-4M15 20h4v-4"/></svg></button>
+            </div>
+            <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+              <rect width="400" height="150" fill="#FAFAF8"/>
+              <polygon points="60,57 120,45 150,74 110,98 65,90" fill="#6B3C72"/>
+              <polygon points="150,74 120,45 185,37 215,66 180,94 110,98" fill="#8A5C90"/>
+              <polygon points="215,66 185,37 255,45 270,82 230,98 180,94" fill="#BEBDE7"/>
+              <polygon points="270,82 255,45 320,62 330,103 285,115 230,98" fill="#6B3C72"/>
+              <polygon points="180,94 230,98 285,115 250,139 175,135 130,123 110,98" fill="#D9CCE3"/>
+              <polygon points="330,103 320,62 360,78 355,123 285,115" fill="#F1E9FF"/>
+              <text x="100" y="78" font-family="Jua" font-size="10" fill="#fff">D10</text>
+              <text x="158" y="74" font-family="Jua" font-size="10" fill="#fff">D11</text>
+              <text x="216" y="78" font-family="Jua" font-size="9" fill="#4a2a50">D9</text>
+              <text x="286" y="92" font-family="Jua" font-size="10" fill="#fff">D15</text>
+              <text x="193" y="122" font-family="Jua" font-size="9" fill="#4a2a50">D21</text>
+            </svg>
+            <div class="map-legend">Low<span class="leg-grad"></span>High</div>
+          </div>
+          <button class="map-expand">View expanded map <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6"/></svg></button>
+        </div>
+
+        <div class="tabpanel" data-panel="transact">
+          <div class="map">
+            <span class="map-cap">Dealership zones</span>
+            <div class="map-ctrl">
+              <button title="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg></button>
+              <button title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 12h12"/></svg></button>
+              <button title="Open full"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H5v4M15 4h4v4M9 20H5v-4M15 20h4v-4"/></svg></button>
+            </div>
+            <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+              <rect width="400" height="150" fill="#FAFAF8"/>
+              <polygon points="60,57 120,45 150,74 110,98 65,90" fill="#F1E9FF"/>
+              <polygon points="150,74 120,45 185,37 215,66 180,94 110,98" fill="#D9CCE3"/>
+              <polygon points="215,66 185,37 255,45 270,82 230,98 180,94" fill="#6B3C72"/>
+              <polygon points="270,82 255,45 320,62 330,103 285,115 230,98" fill="#8A5C90"/>
+              <polygon points="180,94 230,98 285,115 250,139 175,135 130,123 110,98" fill="#6B3C72"/>
+              <polygon points="330,103 320,62 360,78 355,123 285,115" fill="#BEBDE7"/>
+              <text x="218" y="78" font-family="Jua" font-size="10" fill="#fff">D14</text>
+              <text x="288" y="92" font-family="Jua" font-size="9" fill="#fff">D9</text>
+              <text x="190" y="122" font-family="Jua" font-size="10" fill="#fff">D3</text>
+            </svg>
+            <div class="map-legend">Low<span class="leg-grad"></span>High</div>
+          </div>
+          <button class="map-expand">View expanded map <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6"/></svg></button>
+        </div>
+      </div>
+
+      <!-- 3. HOW TO WIN THEM -->
+      <div class="section" data-tabset>
+        <div class="sec-head"><span class="sec-no">3</span><span class="sec-title">How to win them</span></div>
+        <div class="tabs">
+          <button class="tab active" data-tab="brief">Brief</button>
+          <button class="tab" data-tab="channels">Channels</button>
+          <button class="tab" data-tab="rivals">Competition</button>
+          <button class="tab" data-tab="messaging">Messaging</button>
+        </div>
+
+        <div class="tabpanel active" data-panel="brief">
+          <div class="win">
+            <div class="win-row star"><span class="win-key">North star</span><span class="win-val">Speak to <b>arrival</b>, not aspiration — reassure the choice, never discount it</span></div>
+            <div class="win-row"><span class="win-key">Say</span><span class="win-val">Achievement &amp; ownership privilege; proof over promotions</span></div>
+            <div class="win-row"><span class="win-key">Show</span><span class="win-val">Understated premium — quiet confidence, not flash</span></div>
+            <div class="win-row"><span class="win-key">Where</span><span class="win-val">LinkedIn + premium OOH in D9–11 &amp; D15; skip hard-sell email</span></div>
+            <div class="win-row"><span class="win-key">When</span><span class="win-val">Build into year-end bonus &amp; Chinese New Year</span></div>
+            <div class="win-row"><span class="win-key">Avoid</span><span class="win-val avoid">Discount urgency — they barely deal-seek (0.4×)</span></div>
+          </div>
+          <button class="brief-link">Turn this into a brief <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+
+        <div class="tabpanel" data-panel="channels">
+          <div class="lbl">Reachable share · top channels</div>
+          <div class="bars">
+            <div class="bar-row"><span class="bar-name">LinkedIn / Digital</span><span class="bar-track"><span class="bar-fill lead" style="width:100%"></span></span><span class="bar-val">34%</span></div>
+            <div class="bar-row"><span class="bar-name">YouTube pre-roll</span><span class="bar-track"><span class="bar-fill" style="width:82%"></span></span><span class="bar-val">28%</span></div>
+            <div class="bar-row"><span class="bar-name">OOH / Premium print</span><span class="bar-track"><span class="bar-fill" style="width:65%"></span></span><span class="bar-val">22%</span></div>
+            <div class="bar-row"><span class="bar-name">Email / CRM</span><span class="bar-track"><span class="bar-fill" style="width:47%"></span></span><span class="bar-val">16%</span></div>
+          </div>
+        </div>
+
+        <div class="tabpanel" data-panel="rivals">
+          <div class="lbl">Share of consideration · in this segment</div>
+          <div class="bars">
+            <div class="bar-row"><span class="bar-name">BMW</span><span class="bar-track"><span class="bar-fill lead" style="width:100%"></span></span><span class="bar-val">38%</span></div>
+            <div class="bar-row"><span class="bar-name">Mercedes-Benz</span><span class="bar-track"><span class="bar-fill" style="width:84%"></span></span><span class="bar-val">32%</span></div>
+            <div class="bar-row"><span class="bar-name">Audi</span><span class="bar-track"><span class="bar-fill" style="width:47%"></span></span><span class="bar-val">18%</span></div>
+            <div class="bar-row"><span class="bar-name">Lexus</span><span class="bar-track"><span class="bar-fill" style="width:32%"></span></span><span class="bar-val">12%</span></div>
+          </div>
+        </div>
+
+        <div class="tabpanel" data-panel="messaging">
+          <div class="lbl">Messaging thought starters</div>
+          <ul class="msg">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg><span><b>Prestige lead:</b> "Precision engineered for Singapore's most discerning drivers"</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg><span><b>Heritage play:</b> "Meridian — where performance meets refined living"</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg><span><b>Experience hook:</b> "Book your private test drive — feel the difference"</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg><span><b>Ownership privilege:</b> "Meridian ownership. Exclusive benefits from day one."</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="foot">
+      <button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16l-6-4-6 4V4z"/></svg>Save audience</button>
+      <button class="btn btn-ghost">Open full <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Cut for the first look</b> — banner source line, §1 "why that's true" label + 3rd proof point (it duplicated the headline &amp; §4), §3 takeaway box (→ one-line district caption). <b>Compressed</b> — denser demographic cards, shorter map, §2 takeaway inlined to one line. <b>§4 reworked</b> — the north-star box folded into the top of a tight borderless say/show/where/when/avoid list; Ask is now a small link. Depth is unchanged behind the tabs and "Open full".
+  </div>
+
+<script>
+  document.querySelectorAll('[data-tabset]').forEach(function(set){
+    var tabs = set.querySelectorAll('.tab');
+    var panels = set.querySelectorAll('.tabpanel');
+    tabs.forEach(function(tab){
+      tab.addEventListener('click', function(){
+        tabs.forEach(function(t){ t.classList.remove('active'); });
+        panels.forEach(function(p){ p.classList.remove('active'); });
+        tab.classList.add('active');
+        set.querySelector('[data-panel="'+tab.getAttribute('data-tab')+'"]').classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>
