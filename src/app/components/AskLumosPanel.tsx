@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { Sparkles, ArrowUp } from 'lucide-react';
 
 // ── Ask Lumos — docked page-level panel ──────────────────────────────────────
@@ -12,7 +12,7 @@ import { Sparkles, ArrowUp } from 'lucide-react';
 // asks about a single chart. They are meant to share one thread; for now the
 // panel keeps a local thread stub so the loop is demonstrable without a backend.
 
-type Msg = { role: 'you' | 'lumos'; text: string };
+export type AskMsg = { role: 'you' | 'lumos'; text: string };
 
 // One starter per intent — understand / activate / compare. Kept quiet and
 // easy to ignore; they reference this audience's real distinctive signals.
@@ -28,9 +28,21 @@ function stubAnswer(q: string, audience: string): string {
   return `Looking at ${audience} for the current tab and filters: ${q} — here's where the grounded answer appears, drawn from this audience's live data.`;
 }
 
-export default function AskLumosPanel({ audienceName }: { audienceName: string }) {
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [draft, setDraft] = useState('');
+// Thread + draft are owned by the parent (AudienceProfileViewer) so the
+// conversation survives the panel being collapsed and re-opened.
+export default function AskLumosPanel({
+  audienceName,
+  messages,
+  setMessages,
+  draft,
+  setDraft,
+}: {
+  audienceName: string;
+  messages: AskMsg[];
+  setMessages: Dispatch<SetStateAction<AskMsg[]>>;
+  draft: string;
+  setDraft: Dispatch<SetStateAction<string>>;
+}) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 

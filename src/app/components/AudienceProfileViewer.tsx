@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
-import AskLumosPanel from "./AskLumosPanel";
+import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import Screen2Mobility from "@/imports/Screen2Mobility-1";
 import Screen3Temporal from "@/imports/Screen3Temporal";
 import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
@@ -24,6 +24,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const [activeTab, setActiveTab] = useState<DeepDiveTab>('profile');
   // Ask Lumos docks open by default — interrogating the audience is the primary verb.
   const [askOpen, setAskOpen] = useState(true);
+  // Thread + draft live here (not in the panel) so the conversation survives a collapse.
+  const [askMessages, setAskMessages] = useState<AskMsg[]>([]);
+  const [askDraft, setAskDraft] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Short name for the panel's answer scope (strip the " — Singapore" suffix).
@@ -187,8 +190,16 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
       </div>
     </div>
 
-      {/* ── Ask Lumos docked panel — toggled by the header button ── */}
-      {askOpen && <AskLumosPanel audienceName={askName} />}
+      {/* ── Ask Lumos docked panel — toggled by the header button; thread persists across collapse ── */}
+      {askOpen && (
+        <AskLumosPanel
+          audienceName={askName}
+          messages={askMessages}
+          setMessages={setAskMessages}
+          draft={askDraft}
+          setDraft={setAskDraft}
+        />
+      )}
     </div>
   );
 }
