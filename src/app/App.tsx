@@ -7,6 +7,7 @@ import DataExplorerPanel from './components/DataExplorerPanel';
 import AudienceDetailPanel from './components/AudienceDetailPanel';
 import AudienceLibrary from './components/AudienceLibrary';
 import AudienceProfileViewer from './components/AudienceProfileViewer';
+import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
 export type Screen = 'blank' | 'planning' | 'clarifying' | 'insights' | 'profiles' | 'deep-dive' | 'result';
@@ -37,6 +38,13 @@ export default function App() {
   const [profileViewerName, setProfileViewerName] = useState<string | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]);
   const [activeAnalysisId, setActiveAnalysisId] = useState<string | null>(null);
+  // Modules pinned into the main chat composer via the inline "Ask" affordance.
+  const [chatContext, setChatContext] = useState<ModuleRef[]>([]);
+
+  const addChatContext = (ref: ModuleRef) =>
+    setChatContext((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
+  const removeChatContext = (id: string) =>
+    setChatContext((prev) => prev.filter((r) => r.id !== id));
 
   const openAudience = (id: string, name: string) => {
     const size = AUDIENCE_SIZE_MAP[id] ?? '';
@@ -106,6 +114,9 @@ export default function App() {
           selectedAudienceId={selectedAudienceId}
           setSelectedAudienceId={setSelectedAudienceId}
           onNewAnalysis={handleNewAnalysis}
+          chatContext={chatContext}
+          onRemoveChatContext={removeChatContext}
+          onClearChatContext={() => setChatContext([])}
         />
       )}
 
@@ -135,6 +146,7 @@ export default function App() {
                 audienceId={selectedAudienceId}
                 screen={screen}
                 onClose={() => setSelectedAudienceId(null)}
+                onAskInChat={addChatContext}
               />
             </div>
           )}

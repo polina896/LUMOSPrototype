@@ -4,7 +4,7 @@ import { AUDIENCES, type AudienceId } from '../audienceData';
 import type { Screen } from '../App';
 import DataExplorerPanel from './DataExplorerPanel';
 import DataSourcesPopover from './DataSourcesPopover';
-import { Module } from './ModuleAsk';
+import { Module, type ModuleRef } from './ModuleAsk';
 
 // ── Per-audience extended data ───────────────────────────────────────────────
 
@@ -551,7 +551,7 @@ function ExpandedMapModal({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function AudienceDetailPanel({ audienceId, screen, onClose }: { audienceId: AudienceId; screen: Screen; onClose?: () => void }) {
+export default function AudienceDetailPanel({ audienceId, screen, onClose, onAskInChat }: { audienceId: AudienceId; screen: Screen; onClose?: () => void; onAskInChat?: (ref: ModuleRef) => void }) {
   const [mainTab, setMainTab] = useState<'preview' | 'data'>('preview');
   const [whoTab, setWhoTab] = useState('Demographics');
   const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
@@ -637,7 +637,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose }: { a
           <div className="flex-1 overflow-y-auto bg-[#fafaf9] px-5">
 
             {/* THE READ */}
-            <Module id={`aud:${audienceId}:read`} type="text" label="The read" state={[audience.name]}>
+            <Module id={`aud:${audienceId}:read`} label="The read" audience={audience.name} onAsk={onAskInChat}>
               <div className="py-4 border-b border-[#e5e5e2]">
                 <p className="font-['Jua',sans-serif] text-[16px] text-[#1a1a1a] leading-[1.35] mb-3 pr-12">
                   {ext?.headline ?? audience.description}
@@ -656,7 +656,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose }: { a
             </Module>
 
             {/* §1 WHO THEY ARE */}
-            <Module id={`aud:${audienceId}:who`} type="chart" label="Who they are" state={[whoTab, audience.name]}>
+            <Module id={`aud:${audienceId}:who`} label="Who they are" audience={audience.name} state={[whoTab]} onAsk={onAskInChat}>
             <div className="py-4 border-b border-[#e5e5e2]">
               <SectionHead num="1" title="Who they are" aside="Indexed vs national" reserveAsk />
               <Tabs options={['Demographics', 'Income', 'Segments', 'Interests', 'Behaviours']} active={whoTab} onChange={setWhoTab} />
@@ -737,7 +737,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose }: { a
             </Module>
 
             {/* §2 WHERE THEY ARE — geo intelligence */}
-            <Module id={`aud:${audienceId}:where`} type="map" label="Where they are" state={[whereMode, dayType, audience.name]}>
+            <Module id={`aud:${audienceId}:where`} label="Where they are" audience={audience.name} state={[whereMode, dayType]} onAsk={onAskInChat}>
             <div className="py-4 border-b border-[#e5e5e2]">
               <SectionHead num="2" title="Where they are" aside="Geo intelligence" reserveAsk />
 
@@ -791,7 +791,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose }: { a
             </Module>
 
             {/* §3 HOW TO WIN THEM */}
-            <Module id={`aud:${audienceId}:how`} type="recommendation" label="How to win them" state={[howTab, audience.name]}>
+            <Module id={`aud:${audienceId}:how`} label="How to win them" audience={audience.name} state={[howTab]} onAsk={onAskInChat}>
             <div className="py-4">
               <SectionHead num="3" title="How to win them" reserveAsk />
               <Tabs options={['Brief', 'Channels', 'Competition', 'Messaging']} active={howTab} onChange={setHowTab} />
