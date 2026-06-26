@@ -3,25 +3,29 @@ import { X, Plus, GripVertical, Sparkles } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-type SectionType = 'AI Summary' | 'Ranking' | 'Line Graph' | 'Table' | 'Bar Chart' | 'Text Block';
+export type SectionType = 'AI Summary' | 'Ranking' | 'Line Graph' | 'Table' | 'Bar Chart' | 'Text Block';
 
-interface Section {
+export interface Section {
   id: string;
   title: string;
   types: SectionType[];
   description: string;
 }
 
+export interface EditorTemplate {
+  name: string;
+  aiPrompt: string;
+  docType: string;
+  sections: Section[];
+}
+
 interface TemplateEditorModalProps {
-  /** Pass an existing template to edit; undefined = create new */
-  initial?: {
-    name: string;
-    aiPrompt: string;
-    docType: string;
-    sections: Section[];
-  };
+  /** Pass an existing template to edit or remix; undefined = create new */
+  initial?: EditorTemplate;
+  /** Override the header label (e.g. "Remix Template"). Defaults based on `initial`. */
+  heading?: string;
   onClose: () => void;
-  onSave: (template: { name: string; aiPrompt: string; docType: string; sections: Section[] }) => void;
+  onSave: (template: EditorTemplate) => void;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -146,7 +150,7 @@ function PreviewPane({ name, sections }: { name: string; sections: Section[] }) 
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function TemplateEditorModal({ initial, onClose, onSave }: TemplateEditorModalProps) {
+export default function TemplateEditorModal({ initial, heading, onClose, onSave }: TemplateEditorModalProps) {
   const [name, setName] = useState(initial?.name ?? '');
   const [aiPrompt, setAiPrompt] = useState(initial?.aiPrompt ?? '');
   const [docType, setDocType] = useState(initial?.docType ?? 'Audience Strategy');
@@ -207,7 +211,7 @@ export default function TemplateEditorModal({ initial, onClose, onSave }: Templa
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[#e5e5e2] shrink-0">
           <h1 className="font-['Jua',sans-serif] text-[15px] text-[#1a1a1a] uppercase tracking-wide">
-            {initial ? 'Edit Template' : 'Create New Template'}
+            {heading ?? (initial ? 'Edit Template' : 'Create New Template')}
           </h1>
           <div className="flex items-center gap-3">
             <button
