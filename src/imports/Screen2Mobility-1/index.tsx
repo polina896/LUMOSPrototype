@@ -1412,35 +1412,69 @@ function Container72() {
   );
 }
 
-function Container73() {
+// First takeaway point — residential concentration (unchanged copy).
+function TakeawayBullet1() {
   return (
-    <div className="relative shrink-0 w-full" data-name="Container">
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] w-full" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-          <p>
-            <span className="leading-[18.6px]">{`Five residential towns carry most of the audience — `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[18.6px] text-[#6b3c72]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-              259xxx (3.8×)
-            </span>
-            <span className="leading-[18.6px]">{`, `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[18.6px] text-[#6b3c72]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-              308xxx (3.4×)
-            </span>
-            <span className="leading-[18.6px]">{`, `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[18.6px] text-[#6b3c72]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-              529xxx (3.1×)
-            </span>
-            <span className="leading-[18.6px]">{`, `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[18.6px] text-[#6b3c72]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-              738xxx (2.8×)
-            </span>
-            <span className="leading-[18.6px]">{` and `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[18.6px] text-[#6b3c72]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
-              520xxx (2.6×)
-            </span>
-            <span className="leading-[18.6px]">.</span>
-          </p>
-        </div>
+    <div className="content-stretch flex gap-[8px] items-start relative shrink-0 w-full" data-name="point">
+      <div className="font-['Jua:Regular',sans-serif] leading-[18.6px] text-[#6b3c72] text-[12px] shrink-0">•</div>
+      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] w-full" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <p className="leading-[18.6px]">
+          <span>{`Five residential towns carry most of the audience — `}</span>
+          <span className="text-[#6b3c72]">259xxx (3.8×)</span>
+          <span>{`, `}</span>
+          <span className="text-[#6b3c72]">308xxx (3.4×)</span>
+          <span>{`, `}</span>
+          <span className="text-[#6b3c72]">529xxx (3.1×)</span>
+          <span>{`, `}</span>
+          <span className="text-[#6b3c72]">738xxx (2.8×)</span>
+          <span>{` and `}</span>
+          <span className="text-[#6b3c72]">520xxx (2.6×)</span>
+          <span>.</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Second takeaway point — the mode + weekday/weekend difference.
+function TakeawayBullet2() {
+  return (
+    <div className="content-stretch flex gap-[8px] items-start relative shrink-0 w-full" data-name="point">
+      <div className="font-['Jua:Regular',sans-serif] leading-[18.6px] text-[#6b3c72] text-[12px] shrink-0">•</div>
+      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] w-full" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <p className="leading-[18.6px]">
+          <span>{`Daytime pulls to the `}</span>
+          <span className="text-[#6b3c72]">{`CBD & one-north`}</span>
+          <span>{`, while weekend spend spreads to `}</span>
+          <span className="text-[#6b3c72]">{`Orchard & lifestyle malls`}</span>
+          <span>{` — home, work and play split across three zones.`}</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Mode (Residential / Daytime / Transaction) + day-part (Weekday / Weekend) switchers.
+// Presentational pills matching the rest of this imported screen — Residential · Weekday active.
+function SegPill({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div className={`flex items-center justify-center rounded-[6px] px-[12px] py-[5px] ${active ? 'bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.06)]' : ''}`}>
+      <span className={`font-['Jua:Regular',sans-serif] text-[12px] leading-[16px] whitespace-nowrap ${active ? 'text-[#6b3c72]' : 'text-[#6b6b6b]'}`}>{label}</span>
+    </div>
+  );
+}
+
+function ModeSwitchers() {
+  return (
+    <div className="content-stretch flex gap-[12px] items-center justify-between relative shrink-0 w-full" data-name="Mode + day-part controls">
+      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
+        <SegPill label="Residential" active={true} />
+        <SegPill label="Daytime" active={false} />
+        <SegPill label="Transaction" active={false} />
+      </div>
+      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
+        <SegPill label="Weekday" active={true} />
+        <SegPill label="Weekend" active={false} />
       </div>
     </div>
   );
@@ -1452,7 +1486,8 @@ function BackgroundVerticalBorder() {
       <div aria-hidden className="absolute border-[#6b3c72] border-l-3 border-solid inset-0 pointer-events-none rounded-[10px]" />
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[6px] items-start pl-[16px] pr-[13px] py-[12px] relative size-full">
         <Container72 />
-        <Container73 />
+        <TakeawayBullet1 />
+        <TakeawayBullet2 />
       </div>
     </div>
   );
@@ -1464,8 +1499,9 @@ function WhereTheyLive() {
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[14px]" />
       <div className="content-stretch flex flex-col gap-[12px] items-start p-[17px] relative size-full">
         <Container42 />
-        <Container47 />
         <BackgroundVerticalBorder />
+        <ModeSwitchers />
+        <Container47 />
       </div>
     </div>
   );
@@ -2020,7 +2056,7 @@ function WhereTheyTransact() {
 
 function Container41() {
   return (
-    <div className="gap-x-[12px] gap-y-[12px] grid grid-cols-[repeat(2,minmax(0,1fr))] grid-rows-[__359.59px_288.19px] h-[673.78px] pt-[14px] relative shrink-0 w-full" data-name="Container">
+    <div className="gap-x-[12px] gap-y-[12px] grid grid-cols-[repeat(2,minmax(0,1fr))] grid-rows-[auto_288.19px] pt-[14px] relative shrink-0 w-full" data-name="Container">
       <WhereTheyLive />
       <CatchmentWithTrendToggle />
       <WhereTheyTransact />
