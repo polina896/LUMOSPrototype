@@ -76,28 +76,27 @@ get this?") — the answer is both inline _and_ in the left thread, visibly link
 
 ## 3. Recommended interaction model (end to end)
 
+> **Implemented direction (chosen):** rather than spawning a separate mini-chat
+> per module, the Ask affordance **pins the module as a quoted reference onto the
+> single, page-level composer**. One conversation; the section travels into it as
+> context. This keeps the interface lighter and avoids fragmenting the dialogue
+> across many little windows. (The earlier anchored-popover variant is kept in §10
+> as the considered alternative.)
+
 1. Every module renders a persistent **Ask** pill at a consistent anchor
    (top-right of the module's header row).
-2. User clicks it. The module gets a **focus ring** (brand purple `#6b3c72`,
-   2px, `rounded-[10px]`) and a small **scope header** appears: _"Ask about
-   Where they are"_.
-3. A compact **anchored composer** (Radix `Popover`) opens against the module.
-   It shows:
-   - the scope chip + inherited-state chips (read-only): `Daytime` · `Weekend` ·
-     `EV Upgrade Shoppers` — so the user _sees_ what's carried.
-   - 4–6 one-tap verb buttons: **Explain · Rewrite · Change · Expand · How was
-     this derived?**
-   - a free-text input ("Ask or change anything about this…").
-4. User taps a verb or types, then submits.
-5. The system routes by intent (§5):
-   - **read** (explain / reasoning) → ephemeral answer card anchored under the
-     module + mirrored thread message.
-   - **edit** (rewrite / change) → module updates in place with a
-     before/after revert affordance + thread log entry.
-   - **drill-down** (expand / supporting data / "show on a map") → module
-     deepens inline, or a new **linked** module is proposed.
-6. The acted-on module **briefly pulses** its focus ring so the eye returns to
-   it. The thread entry carries its module chip for later traceability.
+2. User clicks it. The pill briefly confirms (**✦ Ask → ✓ Added**) and the module
+   gives a short **focus-ring pulse** so it's clear what was captured.
+3. A **quoted chip** is added to the main chat composer carrying the module's
+   identity + live state: `✦ Where they are · EV Upgrade Shoppers · Daytime ·
+   Weekend`. The composer **auto-focuses** and its placeholder retargets:
+   _"Ask about 'Where they are'…"_.
+4. The user types their follow-up — clarify, refine, drill-down, reasoning — in
+   the one composer, with the section(s) attached. Multiple modules can be pinned
+   at once (placeholder reads _"Ask about 2 sections…"_); duplicates are ignored.
+5. On send, the message goes to the thread with its module chip(s) attached for
+   traceability, and the pinned context clears. Each chip has an ✕ to unpin
+   before sending.
 
 ---
 
@@ -134,39 +133,44 @@ clearly belongs to one module" while staying out of the existing overflow's lane
 
 ---
 
-## 5. Recommended composer pattern — anchored popover, scoped
+## 5. Recommended composer pattern — pin into the one page-level composer
 
-**Recommendation: an anchored mini-composer (Radix `Popover`) attached to the
-module**, not a side panel and not a global bottom bar that "locks on."
+**Recommendation (implemented): the module is quoted into the existing main chat
+composer**, rather than each module getting its own mini-composer. The user keeps
+typing in one place, with the section(s) attached as removable context chips.
 
-Why:
-- **Spatial truth.** Anchoring keeps "what I'm asking about" and "where I ask"
-  in the same place — the core of the whole feature. A side panel or bottom bar
-  re-introduces the very disconnection we're removing.
-- **Scales across types.** A popover anchors equally to a text block, a chart, a
-  `MapSVG`, a `BarRow` group, or an audience card.
-- **Reuses what exists.** `Popover`, `DropdownMenu`, `Tooltip`, `Textarea`,
-  `Button` are already in `src/app/components/ui/`.
+Why this over a per-module popover:
+- **One conversation, not many.** A separate composer per module fragments the
+  dialogue and competes with the page chat (§4). Pinning keeps a single thread.
+- **Lighter interface.** No second input surface, no inline answer cards to
+  manage or dismiss. The affordance is just "attach this here."
+- **Reuses what exists.** The composer already renders removable chips (the
+  `addedAudiences` pattern in `InputBar`); module quotes ride the same rail.
 
-Composer contents (top → bottom):
-- **Scope header**: `✦ Ask about "Where they are"` + ✕.
-- **Inherited context chips** (read-only): the `state` snapshot, so context is
-  visible, not magic.
-- **Verb row**: Explain · Rewrite · Change · Expand · How derived? (verbs filter
-  by module `type` — e.g. "Rewrite" only on text/recommendations; "Change
-  metric" / "Break down by…" on charts; "Show on map" on geo-capable modules).
-- **Free text** input + send.
-
-**When the answer is long or conversational**, the popover hands off: it shows a
-one-line "Answered in chat ↓" confirmation and the full response lands in the
-thread (still chip-linked). The popover is for _input_ and _short_ answers;
-the thread absorbs depth. This keeps the interface uncluttered (principle §9).
+Composer behavior when a module is pinned:
+- A **quoted chip** appears above the input: `✦ {label} · {audience} · {state…}`,
+  each with an ✕ to unpin. The `state` snapshot makes inherited context visible,
+  not magic.
+- The input **auto-focuses** and the **placeholder retargets** to the scope
+  (_"Ask about 'Where they are'…"_, or _"Ask about N sections…"_ for several).
+- The user expresses intent in natural language — explain / rewrite / change /
+  expand / how-derived are all just phrasings of the follow-up, so no per-type
+  verb menu is needed. (A verb quick-row remains an easy future add per §10.)
+- On send, the chips clear; the message carries them as attached context.
 
 ---
 
-## 6. Recommended response pattern — primary-inline, always thread-mirrored
+## 6. Response pattern
 
-**Recommendation: route by intent, but always leave a linked thread record.**
+**Implemented:** answers come back in the **single chat thread**, where the
+sent message carries the module chip(s) it was about — so every response is
+traceable to its source module without a separate per-module answer surface.
+
+The richer intent-routing below (update-in-place, revision preview, inline
+expansion) is the **forward-looking design** for when responses can act on the
+module directly; it's documented as the target, not all wired yet.
+
+**Target: route by intent, but always leave a linked thread record.**
 
 | Intent | Primary surface | Thread record |
 |---|---|---|

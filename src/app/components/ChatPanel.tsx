@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, ArrowRight, ScanSearch, ChevronDown, ChevronRight, Paperclip, Users, X, Send } from 'lucide-react';
+import { Mic, ArrowRight, ScanSearch, ChevronDown, ChevronRight, Paperclip, Users, X, Send, Sparkles } from 'lucide-react';
 import DataSourcesPopover from './DataSourcesPopover';
+import type { ModuleRef } from './ModuleAsk';
 
 const CLARIFY_QUESTIONS = [
   {
@@ -211,6 +212,9 @@ interface ChatPanelProps {
   selectedAudienceId: AudienceId | null;
   setSelectedAudienceId: (id: AudienceId | null) => void;
   onNewAnalysis?: (type: 'brief' | 'upload', title: string) => void;
+  chatContext?: ModuleRef[];
+  onRemoveChatContext?: (id: string) => void;
+  onClearChatContext?: () => void;
 }
 
 // ─── Screen ordering helper ───────────────────────────────────────────────────
@@ -234,6 +238,9 @@ export default function ChatPanel({
   selectedAudienceId,
   setSelectedAudienceId,
   onNewAnalysis,
+  chatContext = [],
+  onRemoveChatContext,
+  onClearChatContext,
 }: ChatPanelProps) {
   const [homeTab, setHomeTab] = useState<'brief' | 'upload'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -899,7 +906,12 @@ export default function ChatPanel({
           {/* Input bar */}
           <div className="px-8 py-5 border-t border-gray-200">
             <div className="max-w-[700px]">
-              <InputBar placeholder="Reply to Lumos" />
+              <InputBar
+                placeholder="Reply to Lumos"
+                contextRefs={chatContext}
+                onRemoveContext={onRemoveChatContext}
+                onClearContext={onClearChatContext}
+              />
             </div>
           </div>
         </div>
@@ -1426,12 +1438,48 @@ function Pill({ text }: { text: string }) {
   );
 }
 
-function InputBar({ placeholder }: { placeholder: string }) {
+function InputBar({
+  placeholder,
+  contextRefs = [],
+  onRemoveContext,
+  onClearContext,
+}: {
+  placeholder: string;
+  contextRefs?: ModuleRef[];
+  onRemoveContext?: (id: string) => void;
+  onClearContext?: () => void;
+}) {
   const [showAudiencePicker, setShowAudiencePicker] = useState(false);
   const [addedAudiences, setAddedAudiences] = useState<typeof SAVED_AUDIENCES>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // When a module is pinned from the output, focus the composer so the user can
+  // just start typing their question about it.
+  useEffect(() => {
+    if (contextRefs.length > 0) inputRef.current?.focus();
+  }, [contextRefs.length]);
 
   return (
     <div className="bg-white border border-[#ccc] rounded-lg shadow-sm">
+      {/* Quoted modules pinned via the inline "Ask" affordance */}
+      {contextRefs.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 px-3 pt-2.5 pb-1">
+          {contextRefs.map((r) => (
+            <span key={r.id} className="flex items-center gap-2 pl-1.5 pr-2 py-1.5 bg-[#6b3c72] rounded-[8px] shadow-sm">
+              <span className="w-[22px] h-[22px] rounded-[6px] bg-white/20 flex items-center justify-center shrink-0">
+                <Sparkles className="w-3 h-3 text-white" />
+              </span>
+              <span className="flex flex-col leading-[1.15] min-w-0">
+                <span className="font-['Jua',sans-serif] text-[12px] text-white truncate">{r.label}</span>
+                <span className="font-['Jua',sans-serif] text-[10px] text-white/70 truncate">{[r.audience, ...r.state].join(' · ')}</span>
+              </span>
+              <button onClick={() => onRemoveContext?.(r.id)} className="ml-1 hover:opacity-80 shrink-0" title="Remove">
+                <X className="w-3.5 h-3.5 text-white/80" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
       {addedAudiences.length > 0 && (
         <div className="flex flex-wrap gap-1.5 px-3 pt-2.5 pb-1">
           {addedAudiences.map((a) => (
@@ -1446,7 +1494,7 @@ function InputBar({ placeholder }: { placeholder: string }) {
         </div>
       )}
       <div className="px-4 py-3">
-        <input type="text" placeholder={placeholder} className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] placeholder:opacity-50" />
+        <input ref={inputRef} type="text" placeholder={contextRefs.length > 0 ? `Ask about ${contextRefs.length === 1 ? `“${contextRefs[0].label}”` : `${contextRefs.length} sections`}…` : placeholder} className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] placeholder:opacity-50" />
       </div>
       <div className="flex items-center justify-between px-2 pb-2">
         <div className="relative">
@@ -1475,7 +1523,10 @@ function InputBar({ placeholder }: { placeholder: string }) {
           <button className="p-2 hover:bg-gray-100 rounded transition-colors">
             <Mic className="w-4 h-4 text-[#595959]" />
           </button>
-          <button className="p-2.5 bg-[#4d6bf0] opacity-30 rounded-full hover:opacity-50 transition-opacity">
+          <button
+            onClick={() => { if (inputRef.current) inputRef.current.value = ''; onClearContext?.(); }}
+            className="p-2.5 bg-[#4d6bf0] opacity-30 rounded-full hover:opacity-50 transition-opacity"
+          >
             <ArrowRight className="w-4 h-4 text-white" />
           </button>
         </div>
