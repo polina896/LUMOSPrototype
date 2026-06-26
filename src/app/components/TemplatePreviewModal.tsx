@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { KEY_SECTIONS, DESCRIPTIONS } from './templateRemix';
 
 interface TemplatePreviewModalProps {
   template: {
@@ -12,36 +13,6 @@ interface TemplatePreviewModalProps {
   onUse: () => void;
   onRemix?: () => void;
 }
-
-// ── Per-template section definitions ────────────────────────────────────────
-
-const KEY_SECTIONS: Record<string, string[]> = {
-  't1': ['AI Summary', 'Top Audiences by Reach', 'Growth Audiences', 'Campaign Recommendations', 'End'],
-  't2': ['Messaging Angles', 'Proof Points by Segment', 'Tone of Voice Guide', 'End'],
-  't3': ['Segment Profiles Side-by-Side', 'Reach & Index Comparison', 'Behavioural Overlap', 'End'],
-  't4': ['Channel Allocation Matrix', 'Budget by Segment', 'Timing Calendar', 'Rationale Notes', 'End'],
-  't5': ['Executive Summary', 'Market Opportunity', 'Audience Findings', 'Next Steps', 'End'],
-  't6': ['Campaign Objectives', 'Messaging Per Segment', 'Channel Mix', 'Success Metrics', 'End'],
-  't7': ['Segment Profile', 'Demographic Deep Dive', 'Spend & Lifestyle Signals', 'Brand Affinity', 'Recommendations', 'End'],
-  't8': ['Growth Opportunity Overview', 'Segment Index Scores', 'Activation Priorities', 'End'],
-  't9': ['Channel Recommendations', 'Reach Estimates', 'Cost Guidance', 'End'],
-  'm1': ['Launch Objectives', 'Singapore Segment Matrix', 'Channel Plan', 'Test-Drive Strategy', 'End'],
-  'm2': ['EV Intender Profile', 'Green Plan Messaging', 'Digital Activation', 'End'],
-};
-
-const DESCRIPTIONS: Record<string, string> = {
-  't1': 'Use this template to build a full audience strategy with segment profiles, geo concentration, growth signals, and campaign recommendations.',
-  't2': 'Use this template to map messaging angles, proof points, and tone of voice across all target audiences and channels.',
-  't3': 'Use this template for a side-by-side comparison of 2–4 audience segments across reach, demographics, and behaviours.',
-  't4': 'Use this template to plan channel mix, timing, and budget allocation by segment with rationale for each recommendation.',
-  't5': 'Use this template for a board-ready summary of market opportunity, audience findings, and strategic next steps.',
-  't6': 'Use this template to produce a creative and channel brief per segment, including objectives, messaging, and success metrics.',
-  't7': 'Use this template for a single-segment deep dive covering demographics, spend patterns, lifestyle signals, and brand affinity.',
-  't8': 'Use this template to identify the highest-growth audience segments with index scores and activation recommendations.',
-  't9': 'Use this template to recommend channel allocation per audience with reach estimates and cost guidance.',
-  'm1': 'Custom launch brief template for premium automotive audiences in the Singapore market.',
-  'm2': 'Activation playbook for EV intender segments with Singapore Green Plan messaging angles.',
-};
 
 // ── Preview content per template ─────────────────────────────────────────────
 

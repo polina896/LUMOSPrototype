@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Search, Plus, BarChart2, GitCompare, MessageSquare, Map, TrendingUp, FileText, Layers } from 'lucide-react';
 import TemplatePreviewModal from './TemplatePreviewModal';
-import TemplateEditorModal from './TemplateEditorModal';
+import TemplateEditorModal, { type EditorTemplate } from './TemplateEditorModal';
 import UseTemplateModal from './UseTemplateModal';
+import { buildRemixTemplate } from './templateRemix';
 
 interface Template {
   id: string;
@@ -107,6 +108,11 @@ export default function TemplateGalleryPanel({ onBack }: TemplateGalleryPanelPro
   const [previewTemplate, setPreviewTemplate] = useState<(typeof LUMOS_TEMPLATES)[0] | null>(null);
   const [useTemplate, setUseTemplate] = useState<(typeof LUMOS_TEMPLATES)[0] | null>(null);
   const [showEditor, setShowEditor] = useState(false);
+  // When set, the editor opens pre-filled from a remixed template; null = blank "New Template".
+  const [editorInitial, setEditorInitial] = useState<EditorTemplate | null>(null);
+
+  const openNewTemplate = () => { setEditorInitial(null); setShowEditor(true); };
+  const closeEditor = () => { setShowEditor(false); setEditorInitial(null); };
 
   const templates = activeTab === 'lumos' ? LUMOS_TEMPLATES : MY_TEMPLATES;
   const filtered = search.trim()
@@ -131,7 +137,7 @@ export default function TemplateGalleryPanel({ onBack }: TemplateGalleryPanelPro
           Templates
         </h1>
         <button
-          onClick={() => setShowEditor(true)}
+          onClick={openNewTemplate}
           className="flex items-center gap-2 px-4 py-2 bg-[#6b3c72] hover:bg-[#5c2375] text-white rounded-lg font-['Jua',sans-serif] text-[13px] transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
@@ -234,7 +240,11 @@ export default function TemplateGalleryPanel({ onBack }: TemplateGalleryPanelPro
           template={previewTemplate}
           onClose={() => setPreviewTemplate(null)}
           onUse={() => { setUseTemplate(previewTemplate); setPreviewTemplate(null); }}
-          onRemix={() => { setPreviewTemplate(null); setShowEditor(true); }}
+          onRemix={() => {
+            setEditorInitial(buildRemixTemplate(previewTemplate));
+            setPreviewTemplate(null);
+            setShowEditor(true);
+          }}
         />
       )}
 
@@ -250,8 +260,10 @@ export default function TemplateGalleryPanel({ onBack }: TemplateGalleryPanelPro
       {/* Template editor modal */}
       {showEditor && (
         <TemplateEditorModal
-          onClose={() => setShowEditor(false)}
-          onSave={() => setShowEditor(false)}
+          initial={editorInitial ?? undefined}
+          heading={editorInitial ? 'Remix Template' : undefined}
+          onClose={closeEditor}
+          onSave={closeEditor}
         />
       )}
     </div>

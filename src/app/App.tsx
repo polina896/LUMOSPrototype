@@ -7,6 +7,7 @@ import DataExplorerPanel from './components/DataExplorerPanel';
 import AudienceDetailPanel from './components/AudienceDetailPanel';
 import AudienceLibrary from './components/AudienceLibrary';
 import AudienceProfileViewer from './components/AudienceProfileViewer';
+import CompareFlow, { type SavedAudience } from './components/CompareFlow';
 import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
@@ -46,6 +47,19 @@ export default function App() {
   const removeChatContext = (id: string) =>
     setChatContext((prev) => prev.filter((r) => r.id !== id));
 
+  const [compareActive, setCompareActive] = useState(false);
+  const [compareSeed, setCompareSeed] = useState<SavedAudience[]>([]);
+  const [comparePrompt, setComparePrompt] = useState('');
+
+  const startCompare = (seed: SavedAudience[], prompt: string) => {
+    setCompareSeed(seed);
+    setComparePrompt(prompt);
+    setCompareActive(true);
+    setShowDataExplorer(false);
+    setShowAudiences(false);
+    setShowDocuments(false);
+  };
+
   const openAudience = (id: string, name: string) => {
     const size = AUDIENCE_SIZE_MAP[id] ?? '';
     setProfileViewerId(id);
@@ -71,24 +85,31 @@ export default function App() {
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
       <Sidebar
         showDataExplorer={showDataExplorer}
-        onToggleDataExplorer={() => { setShowDataExplorer((v) => !v); setShowAudiences(false); setShowDocuments(false); closeDeepDive(); }}
+        onToggleDataExplorer={() => { setShowDataExplorer((v) => !v); setShowAudiences(false); setShowDocuments(false); setCompareActive(false); closeDeepDive(); }}
         showAudiences={showAudiences}
         onToggleAudiences={() => {
           const next = !showAudiences;
           setShowAudiences(next);
           setShowDataExplorer(false);
           setShowDocuments(false);
+          setCompareActive(false);
           if (!next) closeDeepDive();
         }}
         showDocuments={showDocuments}
-        onToggleDocuments={() => { setShowDocuments((v) => !v); setShowAudiences(false); setShowDataExplorer(false); closeDeepDive(); }}
+        onToggleDocuments={() => { setShowDocuments((v) => !v); setShowAudiences(false); setShowDataExplorer(false); setCompareActive(false); closeDeepDive(); }}
         recentAnalyses={recentAnalyses}
         activeAnalysisId={activeAnalysisId}
         onSelectAnalysis={(id) => setActiveAnalysisId(id)}
       />
 
       {/* Main content area */}
-      {showDocuments ? (
+      {compareActive ? (
+        <CompareFlow
+          seed={compareSeed}
+          seedPrompt={comparePrompt}
+          onExit={() => setCompareActive(false)}
+        />
+      ) : showDocuments ? (
         <DocumentsPanel />
       ) : showAudiences ? (
         profileViewerId ? (
@@ -117,10 +138,11 @@ export default function App() {
           chatContext={chatContext}
           onRemoveChatContext={removeChatContext}
           onClearChatContext={() => setChatContext([])}
+          onStartCompare={startCompare}
         />
       )}
 
-      {!showAudiences && !showDocuments && showDataExplorer ? (
+      {!compareActive && !showAudiences && !showDocuments && showDataExplorer ? (
         <>
           {/* DataExplorer list — narrows when detail panel is open */}
           <div className={`flex-shrink-0 border-l border-[#d3d3d0] bg-[#f5f5f3] overflow-hidden flex flex-col transition-all duration-200 ${selectedAudienceId ? 'w-[300px]' : 'w-[400px]'}`}>
@@ -151,7 +173,7 @@ export default function App() {
             </div>
           )}
         </>
-      ) : !showAudiences && !showDocuments ? (
+      ) : !compareActive && !showAudiences && !showDocuments ? (
         <ArtifactPanel
           screen={screen}
           setOnAddTextBlock={setOnAddTextBlock}
