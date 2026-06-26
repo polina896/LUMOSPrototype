@@ -28,6 +28,7 @@ export function Module({
   onAsk,
   children,
   className = '',
+  pillPosition = 'top-3 right-0',
 }: {
   id: string;
   label: string;
@@ -36,6 +37,7 @@ export function Module({
   onAsk?: (ref: ModuleRef) => void;
   children: React.ReactNode;
   className?: string;
+  pillPosition?: string;
 }) {
   const [added, setAdded] = useState(false);
 
@@ -56,7 +58,7 @@ export function Module({
       <button
         onClick={pin}
         title={`Ask about “${label}” — adds it to the chat as context`}
-        className={`absolute top-3 right-0 z-20 flex items-center gap-1 px-2 py-[3px] rounded-full font-['Jua',sans-serif] text-[11px] transition-colors ${
+        className={`absolute ${pillPosition} z-20 flex items-center gap-1 px-2 py-[3px] rounded-full font-['Jua',sans-serif] text-[11px] transition-colors ${
           added ? 'bg-[#6b3c72] text-white' : 'bg-[#f1e9ff] text-[#6b3c72] hover:bg-[#e7dbf6]'
         }`}
       >

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
+import { Module, type ModuleRef } from "./ModuleAsk";
 import Screen2Mobility from "@/imports/Screen2Mobility-1";
 import Screen3Temporal from "@/imports/Screen3Temporal";
 import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
@@ -27,10 +28,18 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   // Thread + draft live here (not in the panel) so the conversation survives a collapse.
   const [askMessages, setAskMessages] = useState<AskMsg[]>([]);
   const [askDraft, setAskDraft] = useState('');
+  // Sections pinned into the panel via the per-tile ✦ Ask pill.
+  const [askContext, setAskContext] = useState<ModuleRef[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Short name for the panel's answer scope (strip the " — Singapore" suffix).
   const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
+
+  // A section's ✦ Ask pill pins it into the Ask Lumos panel (opening it if needed).
+  const pinToAsk = (ref: ModuleRef) => {
+    setAskContext((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
+    setAskOpen(true);
+  };
 
   const handleTabClick = (tab: DeepDiveTab) => {
     setActiveTab(tab);
@@ -183,9 +192,17 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         ref={scrollRef}
         className="kc-deep-dive flex-1 overflow-y-auto overflow-x-auto"
       >
-        {activeTab === 'profile'  && <AudienceProfileContent />}
-        {activeTab === 'mobility' && <Screen2Mobility />}
-        {activeTab === 'temporal' && <Screen3Temporal />}
+        {activeTab === 'profile'  && <AudienceProfileContent onAsk={pinToAsk} audience={askName} />}
+        {activeTab === 'mobility' && (
+          <Module id="profile:mobility" label="Mobility & Movement" audience={askName} onAsk={pinToAsk} pillPosition="top-1 right-1">
+            <Screen2Mobility />
+          </Module>
+        )}
+        {activeTab === 'temporal' && (
+          <Module id="profile:temporal" label="Temporal & Seasonal" audience={askName} onAsk={pinToAsk} pillPosition="top-1 right-1">
+            <Screen3Temporal />
+          </Module>
+        )}
         {activeTab === 'digital'  && <Screen4DigitalTwin />}
       </div>
     </div>
@@ -198,6 +215,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           setMessages={setAskMessages}
           draft={askDraft}
           setDraft={setAskDraft}
+          context={askContext}
+          onRemoveContext={(id) => setAskContext((prev) => prev.filter((r) => r.id !== id))}
+          onClearContext={() => setAskContext([])}
         />
       )}
     </div>

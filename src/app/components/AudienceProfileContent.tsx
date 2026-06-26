@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { RotateCcw, MessageSquare } from 'lucide-react';
+import { Module, type ModuleRef } from './ModuleAsk';
+
+type AskFn = (ref: ModuleRef) => void;
 
 // ── Design tokens ───────────────────────────────────────────────────────────
 const CARD = 'bg-white rounded-[14px] border border-[#e5e5e2]';
@@ -97,7 +100,7 @@ function GlobalFilterBar() {
 
 // ── AI Takeaway hero ────────────────────────────────────────────────────────
 
-function TakeawayHero() {
+function TakeawayHero({ onAsk, audience }: { onAsk?: AskFn; audience: string }) {
   return (
     <div className="rounded-[14px] border border-[#bebde7] relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #f7f1ff 0%, #fbfaff 100%)' }}>
       <div className="p-5 flex flex-col gap-3">
@@ -151,7 +154,10 @@ function TakeawayHero() {
             <RotateCcw className="w-[13px] h-[13px]" />
             <span className="font-['Jua',sans-serif] text-[11px] font-normal">Regenerate</span>
           </button>
-          <button className="flex items-center gap-1.5 text-[#6b3c72] hover:opacity-70 transition-opacity">
+          <button
+            onClick={() => onAsk?.({ id: 'profile:takeaway', label: 'Headline takeaway', audience, state: [] })}
+            className="flex items-center gap-1.5 text-[#6b3c72] hover:opacity-70 transition-opacity"
+          >
             <MessageSquare className="w-[13px] h-[13px]" />
             <span className="font-['Jua',sans-serif] text-[11px] font-normal">Ask a follow-up</span>
           </button>
@@ -171,7 +177,7 @@ function DemographicsCard() {
     { label: 'Life stage', value: 'Homeowners 61%', index: '1.9×', trend: 'up' as const },
   ];
   return (
-    <SectionCard className="flex-1 min-w-0">
+    <SectionCard className="h-full min-w-0">
       <SectionHeader title="Demographics & occupation" subtitle="Indexed vs national" />
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (
@@ -196,7 +202,7 @@ function IncomeCard() {
     { label: '$200k+', value: '1.4×', pct: 93 },
   ];
   return (
-    <SectionCard className="flex-1 min-w-0">
+    <SectionCard className="h-full min-w-0">
       <SectionHeader title="Income & affluence" subtitle="HH-income bands vs benchmark" />
       <div className="flex flex-col gap-3">
         {bands.map((b) => (
@@ -223,7 +229,7 @@ function LifestageCard() {
     { pct: 23, color: '#e0cce4', label: 'Other', index: null },
   ];
   return (
-    <SectionCard className="flex-1 min-w-0">
+    <SectionCard className="h-full min-w-0">
       <SectionHeader title="Lifestage mix" subtitle="Helix-style segments" />
       {/* Segmented bar */}
       <div className="flex rounded-md overflow-hidden h-5 w-full mb-4">
@@ -325,7 +331,7 @@ function TopSegmentsSection() {
   ];
   return (
     <SectionCard>
-      <div className="flex items-start justify-between gap-3 mb-4">
+      <div className="flex items-start justify-between gap-3 mb-4 pr-[52px]">
         <div className="flex flex-col gap-0.5">
           <span className={SECTION_TITLE}>Top segments by index</span>
           <span className={SECTION_SUB}>Leading buyergraphic segments · vs national baseline</span>
@@ -362,22 +368,31 @@ function TopSegmentsSection() {
 
 // ── Root export ─────────────────────────────────────────────────────────────
 
-export default function AudienceProfileContent() {
+export default function AudienceProfileContent({ onAsk, audience = 'Urban Upgrade Drivers — Singapore' }: { onAsk?: AskFn; audience?: string } = {}) {
+  // Wrap a section so it carries the always-visible ✦ Ask pill that pins it
+  // into the Ask Lumos panel.
+  const ask = (id: string, label: string, node: React.ReactNode, className = '') => (
+    <Module id={`profile:${id}`} label={label} audience={audience} onAsk={onAsk} pillPosition="top-3 right-3" className={className}>
+      {node}
+    </Module>
+  );
+
   return (
     <div className="flex flex-col gap-[14px]">
       <GlobalFilterBar />
 
-      <TakeawayHero />
+      <TakeawayHero onAsk={onAsk} audience={audience} />
 
       {/* Three-column row */}
       <div className="flex gap-[12px] items-stretch">
-        <DemographicsCard />
-        <IncomeCard />
-        <LifestageCard />
+        {ask('demographics', 'Demographics & occupation', <DemographicsCard />, 'flex-1 min-w-0')}
+        {ask('income', 'Income & affluence', <IncomeCard />, 'flex-1 min-w-0')}
+        {ask('lifestage', 'Lifestage mix', <LifestageCard />, 'flex-1 min-w-0')}
       </div>
 
-      <TopSegmentsSection />
+      {ask('segments', 'Top segments by index', <TopSegmentsSection />)}
 
+      {ask('purchase', 'Purchase patterns', (
       <SplitSection
         title="Purchase patterns"
         subtitle="What they buy · category spend indexed"
@@ -391,7 +406,9 @@ export default function AudienceProfileContent() {
         ]}
         footer="Dealership / in-person 72%  ·  Online 28%"
       />
+      ))}
 
+      {ask('weekend', 'Weekend & lifestyle signals', (
       <SplitSection
         title="Weekend & lifestyle signals"
         subtitle="What they do outside work · venue visitation"
@@ -404,8 +421,9 @@ export default function AudienceProfileContent() {
           { label: 'Premium fitness & wellness', value: '1.5×', pct: 65, trend: 'flat' },
         ]}
       />
+      ))}
 
-      <BrandAffinitySection />
+      {ask('brand', 'Interests & brand affinity', <BrandAffinitySection />)}
     </div>
   );
 }
