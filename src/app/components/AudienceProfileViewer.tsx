@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
+import AskLumosPanel from "./AskLumosPanel";
 import Screen2Mobility from "@/imports/Screen2Mobility-1";
 import Screen3Temporal from "@/imports/Screen3Temporal";
 import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
@@ -19,9 +20,14 @@ const TABS: { key: DeepDiveTab; label: string }[] = [
   { key: 'digital',  label: 'Digital Twin'        },
 ];
 
-export default function AudienceProfileViewer(_props: AudienceProfileViewerProps) {
+export default function AudienceProfileViewer(props: AudienceProfileViewerProps) {
   const [activeTab, setActiveTab] = useState<DeepDiveTab>('profile');
+  // Ask Lumos docks open by default — interrogating the audience is the primary verb.
+  const [askOpen, setAskOpen] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Short name for the panel's answer scope (strip the " — Singapore" suffix).
+  const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
 
   const handleTabClick = (tab: DeepDiveTab) => {
     setActiveTab(tab);
@@ -29,6 +35,7 @@ export default function AudienceProfileViewer(_props: AudienceProfileViewerProps
   };
 
   return (
+    <div className="flex-1 flex min-w-0 overflow-hidden">
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafaf8]">
       <style>{`
         /* ── Hide built-in nav sidebar ── */
@@ -108,12 +115,18 @@ export default function AudienceProfileViewer(_props: AudienceProfileViewerProps
             </svg>
             <span className="font-['Jua',sans-serif] text-[12px] text-[#1a1a1a] leading-[18px]">Export</span>
           </button>
-          {/* Ask Lumos */}
-          <button className="flex items-center gap-[6px] bg-[#6b3c72] border border-[#6b3c72] rounded-lg px-3 py-2 hover:bg-[#5a3261] transition-colors">
+          {/* Ask Lumos — toggles the docked panel (filled when open, outline when closed) */}
+          <button
+            onClick={() => setAskOpen((v) => !v)}
+            aria-pressed={askOpen}
+            className={`flex items-center gap-[6px] border border-[#6b3c72] rounded-lg px-3 py-2 transition-colors ${
+              askOpen ? 'bg-[#6b3c72] hover:bg-[#5a3261]' : 'bg-white hover:bg-[#f5f0ff]'
+            }`}
+          >
             <svg viewBox="0 0 14 14" width="14" height="14" fill="none">
-              <path d="M7 1.75L8.16667 4.66667L11.0833 5.83333L8.16667 7L7 9.91667L5.83333 7L2.91667 5.83333L5.83333 4.66667L7 1.75Z" stroke="white" strokeWidth="1.16667" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 1.75L8.16667 4.66667L11.0833 5.83333L8.16667 7L7 9.91667L5.83333 7L2.91667 5.83333L5.83333 4.66667L7 1.75Z" stroke={askOpen ? 'white' : '#6B3C72'} strokeWidth="1.16667" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="font-['Jua',sans-serif] text-[12px] text-white leading-[18px]">Ask Lumos</span>
+            <span className={`font-['Jua',sans-serif] text-[12px] leading-[18px] ${askOpen ? 'text-white' : 'text-[#6b3c72]'}`}>Ask Lumos</span>
           </button>
         </div>
       </div>
@@ -172,6 +185,10 @@ export default function AudienceProfileViewer(_props: AudienceProfileViewerProps
         {activeTab === 'temporal' && <Screen3Temporal />}
         {activeTab === 'digital'  && <Screen4DigitalTwin />}
       </div>
+    </div>
+
+      {/* ── Ask Lumos docked panel — toggled by the header button ── */}
+      {askOpen && <AskLumosPanel audienceName={askName} />}
     </div>
   );
 }
