@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-63y8z7pj7c";
 
 function Paragraph() {
@@ -1455,26 +1456,207 @@ function TakeawayBullet2() {
 }
 
 // Mode (Residential / Daytime / Transaction) + day-part (Weekday / Weekend) switchers.
-// Presentational pills matching the rest of this imported screen — Residential · Weekday active.
-function SegPill({ label, active }: { label: string; active: boolean }) {
+function SegPill({ label, active, onClick }: { label: string; active: boolean; onClick?: () => void }) {
   return (
-    <div className={`flex items-center justify-center rounded-[6px] px-[12px] py-[5px] ${active ? 'bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.06)]' : ''}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center justify-center rounded-[6px] px-[12px] py-[5px] transition-colors ${active ? 'bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.06)]' : 'hover:bg-[#ececea]'}`}
+    >
       <span className={`font-['Jua:Regular',sans-serif] text-[12px] leading-[16px] whitespace-nowrap ${active ? 'text-[#6b3c72]' : 'text-[#6b6b6b]'}`}>{label}</span>
+    </button>
+  );
+}
+
+function ModeSwitchers({ whereMode, setWhereMode, dayType, setDayType }: { whereMode: GeoModeKey; setWhereMode: (m: GeoModeKey) => void; dayType: DayKey; setDayType: (d: DayKey) => void }) {
+  return (
+    <div className="content-stretch flex gap-[12px] items-center justify-between relative shrink-0 w-full" data-name="Mode + day-part controls">
+      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
+        {(['Residential', 'Daytime', 'Transaction'] as GeoModeKey[]).map((m) => (
+          <SegPill key={m} label={m} active={whereMode === m} onClick={() => setWhereMode(m)} />
+        ))}
+      </div>
+      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
+        {(['Weekday', 'Weekend'] as DayKey[]).map((d) => (
+          <SegPill key={d} label={d} active={dayType === d} onClick={() => setDayType(d)} />
+        ))}
+      </div>
     </div>
   );
 }
 
-function ModeSwitchers() {
+// ── Interactive geo data ────────────────────────────────────────────────────
+// Mirrors the Data-Explorer sidebar: switching mode / day-part swaps the heatmap
+// fills, hover chip and top postcodes. The blob SHAPES stay fixed (same as the
+// sidebar) — only the data driving them changes.
+type GeoModeKey = 'Residential' | 'Daytime' | 'Transaction';
+type DayKey = 'Weekday' | 'Weekend';
+type GeoView = {
+  fills: string[]; // 7 colours, one per heat blob (light = low density, dark = high)
+  hover: { code: string; mix: string };
+  postLabel: string;
+  postcodes: { code: string; place: string; idx: string; w: number }[];
+};
+
+const HEAT_PATHS = [
+  svgPaths.p32b8db80, svgPaths.p758700, svgPaths.p34f49800,
+  svgPaths.p39bc5600, svgPaths.pbae8c40, svgPaths.pf0a5400, svgPaths.p2a414000,
+];
+
+const GEO_UUD: Record<GeoModeKey, Record<DayKey, GeoView>> = {
+  Residential: {
+    Weekday: {
+      fills: ['#9A6BA1', '#6B3C72', '#CDB6D2', '#B890BD', '#6B3C72', '#D8C6DC', '#EFE7F1'],
+      hover: { code: '308xxx', mix: '38% Premium Drivers · 24% Young Pros' },
+      postLabel: 'Top home postcodes',
+      postcodes: [
+        { code: '259xxx', place: 'Buona Vista', idx: '3.8×', w: 1.0 },
+        { code: '308xxx', place: 'Bishan', idx: '3.4×', w: 0.9 },
+        { code: '529xxx', place: 'Tampines', idx: '3.1×', w: 0.82 },
+        { code: '738xxx', place: 'Woodlands', idx: '2.8×', w: 0.74 },
+        { code: '520xxx', place: 'Ang Mo Kio', idx: '2.6×', w: 0.68 },
+      ],
+    },
+    Weekend: {
+      fills: ['#B890BD', '#6B3C72', '#9A6BA1', '#CDB6D2', '#6B3C72', '#EFE7F1', '#D8C6DC'],
+      hover: { code: '308xxx', mix: '41% Families · 22% Premium Drivers' },
+      postLabel: 'Top home postcodes',
+      postcodes: [
+        { code: '308xxx', place: 'Bishan', idx: '3.6×', w: 1.0 },
+        { code: '529xxx', place: 'Tampines', idx: '3.3×', w: 0.9 },
+        { code: '259xxx', place: 'Buona Vista', idx: '3.0×', w: 0.8 },
+        { code: '820xxx', place: 'Punggol', idx: '2.7×', w: 0.72 },
+        { code: '738xxx', place: 'Woodlands', idx: '2.5×', w: 0.66 },
+      ],
+    },
+  },
+  Daytime: {
+    Weekday: {
+      fills: ['#6B3C72', '#9A6BA1', '#6B3C72', '#D8C6DC', '#B890BD', '#CDB6D2', '#EFE7F1'],
+      hover: { code: '048xxx', mix: '52% Office workers · 19% Premium Drivers' },
+      postLabel: 'Top daytime postcodes',
+      postcodes: [
+        { code: '048xxx', place: 'Raffles Place', idx: '4.1×', w: 1.0 },
+        { code: '138xxx', place: 'one-north', idx: '3.6×', w: 0.88 },
+        { code: '018xxx', place: 'Marina Bay', idx: '3.2×', w: 0.78 },
+        { code: '088xxx', place: 'Tanjong Pagar', idx: '2.9×', w: 0.71 },
+        { code: '486xxx', place: 'Changi Business', idx: '2.5×', w: 0.61 },
+      ],
+    },
+    Weekend: {
+      fills: ['#9A6BA1', '#B890BD', '#6B3C72', '#6B3C72', '#CDB6D2', '#D8C6DC', '#EFE7F1'],
+      hover: { code: '238xxx', mix: '44% Shoppers · 21% Visitors' },
+      postLabel: 'Top daytime postcodes',
+      postcodes: [
+        { code: '238xxx', place: 'Orchard', idx: '3.4×', w: 1.0 },
+        { code: '138xxx', place: 'one-north', idx: '2.8×', w: 0.82 },
+        { code: '600xxx', place: 'Jurong East', idx: '2.6×', w: 0.76 },
+        { code: '018xxx', place: 'Marina Bay', idx: '2.4×', w: 0.71 },
+        { code: '529xxx', place: 'Tampines', idx: '2.2×', w: 0.65 },
+      ],
+    },
+  },
+  Transaction: {
+    Weekday: {
+      fills: ['#6B3C72', '#CDB6D2', '#9A6BA1', '#B890BD', '#6B3C72', '#EFE7F1', '#D8C6DC'],
+      hover: { code: '238xxx', mix: '36% Premium retail · 27% Dining' },
+      postLabel: 'Top spend postcodes',
+      postcodes: [
+        { code: '238xxx', place: 'Orchard', idx: '3.9×', w: 1.0 },
+        { code: '308xxx', place: 'Bishan', idx: '3.1×', w: 0.79 },
+        { code: '048xxx', place: 'Raffles Place', idx: '2.9×', w: 0.74 },
+        { code: '529xxx', place: 'Tampines', idx: '2.7×', w: 0.69 },
+        { code: '259xxx', place: 'Buona Vista', idx: '2.5×', w: 0.64 },
+      ],
+    },
+    Weekend: {
+      fills: ['#6B3C72', '#6B3C72', '#B890BD', '#9A6BA1', '#D8C6DC', '#CDB6D2', '#EFE7F1'],
+      hover: { code: '238xxx', mix: '48% Weekend leisure · 23% Families' },
+      postLabel: 'Top spend postcodes',
+      postcodes: [
+        { code: '238xxx', place: 'Orchard', idx: '4.2×', w: 1.0 },
+        { code: '098xxx', place: 'HarbourFront', idx: '3.5×', w: 0.83 },
+        { code: '529xxx', place: 'Tampines', idx: '3.2×', w: 0.76 },
+        { code: '600xxx', place: 'Jurong East', idx: '2.9×', w: 0.69 },
+        { code: '308xxx', place: 'Bishan', idx: '2.6×', w: 0.62 },
+      ],
+    },
+  },
+};
+
+// Dark heatmap — fixed blob shapes, fills driven by the active view (like the sidebar).
+function MapHeat({ view, caption }: { view: GeoView; caption: string }) {
   return (
-    <div className="content-stretch flex gap-[12px] items-center justify-between relative shrink-0 w-full" data-name="Mode + day-part controls">
-      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
-        <SegPill label="Residential" active={true} />
-        <SegPill label="Daytime" active={false} />
-        <SegPill label="Transaction" active={false} />
+    <div className="bg-[#23262f] col-1 h-[200px] justify-self-stretch relative rounded-[10px] row-1 shrink-0" data-name="Background+Border">
+      <div className="overflow-clip relative rounded-[inherit] size-full">
+        <div className="absolute inset-[1px_0.69px_1px_1px]" data-name="SVG">
+          <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 692.48 197.999">
+            <g clipPath="url(#clip_heat)">
+              <path d="M0 83.1594L692.48 75.2394" stroke="white" strokeOpacity="0.1" strokeWidth="3.9509" />
+              <path d="M332.39 0L367.014 197.999" stroke="white" strokeOpacity="0.1" strokeWidth="3.9509" />
+              <path d="M0 130.679L692.48 138.599" stroke="white" strokeOpacity="0.07" strokeWidth="3.29242" />
+              <path d={svgPaths.p1392ff80} fill="#7896AF" fillOpacity="0.16" />
+              {HEAT_PATHS.map((d, i) => (
+                <path key={i} d={d} fill={view.fills[i]} stroke="white" strokeOpacity="0.22" strokeWidth="1.31697" style={{ transition: 'fill 240ms ease' }} />
+              ))}
+            </g>
+            <defs>
+              <clipPath id="clip_heat"><rect fill="white" height="197.999" width="692.48" /></clipPath>
+            </defs>
+          </svg>
+        </div>
+        <div className="absolute left-[10px] top-[8px] font-['Jua:Regular',sans-serif] text-[9.5px] tracking-[0.6px] uppercase text-[rgba(255,255,255,0.5)] leading-[15px]">{caption}</div>
+        <div className="absolute content-stretch flex flex-col inset-[43.06%_40.51%_49.44%_49%] items-start">
+          <div className="font-['Jua:Regular',sans-serif] text-[10px] text-[rgba(255,255,255,0.45)] tracking-[0.4px] leading-[15px] whitespace-nowrap">SINGAPORE</div>
+        </div>
+        <div className="absolute content-stretch flex flex-col items-center right-[8.19px] top-[9px]">
+          <div className="font-['Jua:Regular',sans-serif] text-[8px] text-[rgba(255,255,255,0.55)] leading-[12px] py-px">High</div>
+          <div className="bg-[#6b3c72] h-[11px] w-[12px]" />
+          <div className="bg-[#9a6ba1] h-[11px] w-[12px]" />
+          <div className="bg-[#b890bd] h-[11px] w-[12px]" />
+          <div className="bg-[#d8c6dc] h-[11px] w-[12px]" />
+          <div className="bg-[#efe7f1] h-[11px] w-[12px]" />
+          <div className="font-['Jua:Regular',sans-serif] text-[8px] text-[rgba(255,255,255,0.55)] leading-[12px] py-px">Low</div>
+        </div>
+        <div className="absolute bg-[rgba(255,255,255,0.94)] bottom-[9px] flex flex-col items-start px-[8px] py-[4px] right-[8.48px] rounded-[7px]">
+          <p className="font-['Jua:Regular',sans-serif] text-[10px] text-[#6b6b6b] leading-[15px] whitespace-nowrap">
+            <span>{`Hover ${view.hover.code} → `}</span>
+            <span className="text-[#1a1a1a]">{view.hover.mix}</span>
+          </p>
+        </div>
       </div>
-      <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
-        <SegPill label="Weekday" active={true} />
-        <SegPill label="Weekend" active={false} />
+      <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[10px]" />
+    </div>
+  );
+}
+
+function Postcodes({ view }: { view: GeoView }) {
+  return (
+    <div className="content-stretch flex flex-col gap-[9px] items-start col-2 justify-self-stretch row-1 self-start shrink-0 pt-[2px]" data-name="Top postcodes">
+      <div className="font-['Jua:Regular',sans-serif] text-[10px] tracking-[1px] uppercase text-[#9a9a9a] leading-[15px] w-full">{view.postLabel}</div>
+      {view.postcodes.map((p, i) => (
+        <div key={p.code + p.place} className="grid grid-cols-[120px_minmax(0,1fr)_48px] gap-[10px] items-center w-full">
+          <div className="overflow-clip">
+            <p className="font-['Jua:Regular',sans-serif] text-[12px] text-[#1a1a1a] leading-[18px] whitespace-nowrap">{`${p.code} ${p.place}`}</p>
+          </div>
+          <div className="bg-[#f3f3f1] h-[16px] rounded-[6px] overflow-clip relative">
+            <div className="absolute left-0 top-0 bottom-0 rounded-[6px]" style={{ width: `${Math.round(p.w * 100)}%`, background: i < 2 ? '#6b3c72' : '#bebde7', transition: 'width 240ms ease' }} />
+          </div>
+          <div className="text-right">
+            <p className="font-['Jua:Regular',sans-serif] text-[12px] text-[#6b3c72] leading-[18px] whitespace-nowrap">{p.idx}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MapAndPostcodes({ view, caption }: { view: GeoView; caption: string }) {
+  return (
+    <div className="h-[200px] relative shrink-0 w-full" data-name="Container">
+      <div className="gap-x-[14px] gap-y-[14px] grid grid-cols-[minmax(0,1.40fr)_minmax(0,1fr)] grid-rows-[200px] relative size-full">
+        <MapHeat view={view} caption={caption} />
+        <Postcodes view={view} />
       </div>
     </div>
   );
@@ -1494,14 +1676,17 @@ function BackgroundVerticalBorder() {
 }
 
 function WhereTheyLive() {
+  const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
+  const [dayType, setDayType] = useState<DayKey>('Weekday');
+  const view = GEO_UUD[whereMode][dayType];
   return (
     <div className="bg-white col-[1/span_2] justify-self-stretch relative rounded-[14px] row-1 self-start shrink-0" data-name="Where they live">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[14px]" />
       <div className="content-stretch flex flex-col gap-[12px] items-start p-[17px] relative size-full">
         <Container42 />
         <BackgroundVerticalBorder />
-        <ModeSwitchers />
-        <Container47 />
+        <ModeSwitchers whereMode={whereMode} setWhereMode={setWhereMode} dayType={dayType} setDayType={setDayType} />
+        <MapAndPostcodes view={view} caption={`${whereMode} · ${dayType}`} />
       </div>
     </div>
   );
