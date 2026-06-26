@@ -211,6 +211,7 @@ interface ChatPanelProps {
   selectedAudienceId: AudienceId | null;
   setSelectedAudienceId: (id: AudienceId | null) => void;
   onNewAnalysis?: (type: 'brief' | 'upload', title: string) => void;
+  onStartCompare?: (seed: never[], prompt: string) => void;
 }
 
 // ─── Screen ordering helper ───────────────────────────────────────────────────
@@ -234,8 +235,9 @@ export default function ChatPanel({
   selectedAudienceId,
   setSelectedAudienceId,
   onNewAnalysis,
+  onStartCompare,
 }: ChatPanelProps) {
-  const [homeTab, setHomeTab] = useState<'brief' | 'upload'>('brief');
+  const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
   // Clarifying flow (one-by-one floating widget)
@@ -489,17 +491,26 @@ export default function ChatPanel({
 
             {/* Tabs */}
             <div className="flex gap-3 justify-center">
-              {(['brief', 'upload'] as const).map((tab) => (
+              {([
+                { tab: 'brief', label: 'Start from scratch' },
+                { tab: 'upload', label: 'Enrich your audience data' },
+                { tab: 'compare', label: 'Compare audiences' },
+              ] as const).map(({ tab, label }) => (
                 <button
                   key={tab}
                   onClick={() => { setHomeTab(tab); setUploadedFile(null); }}
-                  className={`px-5 py-2.5 font-['Geist',sans-serif] text-[14px] font-medium transition-all rounded-full ${
+                  className={`relative px-5 py-2.5 font-['Geist',sans-serif] text-[14px] font-medium transition-all rounded-full ${
                     homeTab === tab
                       ? 'bg-[#4d6bf0] text-white shadow-md'
                       : 'bg-white text-[#666] border border-[#e0e0e0] hover:border-[#4d6bf0] hover:text-[#4d6bf0]'
                   }`}
                 >
-                  {tab === 'brief' ? 'Start from scratch' : 'Enrich your audience data'}
+                  {label}
+                  {tab === 'compare' && (
+                    <span className={`ml-2 align-middle inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide ${
+                      homeTab === 'compare' ? 'bg-white/25 text-white' : 'bg-[#eef0ff] text-[#4d6bf0]'
+                    }`}>New</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -544,7 +555,12 @@ export default function ChatPanel({
             )}
 
             {/* Input box */}
-            <HomeInputBox homeTab={homeTab} uploadedFile={uploadedFile} onStart={handleStart} />
+            <HomeInputBox
+              homeTab={homeTab}
+              uploadedFile={uploadedFile}
+              onStart={handleStart}
+              onStartCompare={(prompt) => onStartCompare?.([], prompt)}
+            />
 
             {/* Suggestion pills */}
             <div className="flex flex-wrap gap-2 justify-center">
@@ -554,10 +570,16 @@ export default function ChatPanel({
                   <Pill text="Identify new-to-brand intenders for a premium sedan launch" />
                   <Pill text="Help me build a test-drive campaign for Meridian Motors" />
                 </>
-              ) : (
+              ) : homeTab === 'upload' ? (
                 <>
                   <Pill text="Help me understand which segments have the most growth potential" />
                   <Pill text="Help me unlock new strategies based on my owner data" />
+                </>
+              ) : (
+                <>
+                  <Pill text="Compare Premium Sedan Intenders vs EV Upgrade Shoppers" />
+                  <Pill text="Where do my two audiences overlap, and where do they differ?" />
+                  <Pill text="Compare the same audience across Singapore and Malaysia" />
                 </>
               )}
             </div>
@@ -1488,13 +1510,23 @@ function HomeInputBox({
   homeTab,
   uploadedFile,
   onStart,
+  onStartCompare,
 }: {
-  homeTab: 'brief' | 'upload';
+  homeTab: 'brief' | 'upload' | 'compare';
   uploadedFile: string | null;
   onStart: () => void;
+  onStartCompare?: (prompt: string) => void;
 }) {
   const [showAudiencePicker, setShowAudiencePicker] = useState(false);
   const [addedAudiences, setAddedAudiences] = useState<typeof SAVED_AUDIENCES>([]);
+  const [compareText, setCompareText] = useState('');
+  const isCompare = homeTab === 'compare';
+
+  const placeholder = isCompare
+    ? 'Compare these two audiences… (optional — you can pick them next)'
+    : homeTab === 'brief'
+      ? 'Describe your audience challenge or goal...'
+      : 'Add context or instructions for the enrichment...';
 
   return (
     <div className="bg-white border border-[#ccc] rounded-lg shadow-[0px_0px_30px_rgba(95,49,0,0.08)] p-4">
@@ -1512,17 +1544,27 @@ function HomeInputBox({
         </div>
       )}
       <div className="px-2 py-3">
-        <textarea
-          key={homeTab}
-          rows={3}
-          placeholder={homeTab === 'brief' ? 'Describe your audience challenge or goal...' : 'Add context or instructions for the enrichment...'}
-          defaultValue={
-            homeTab === 'brief'
-              ? 'We are launching Meridian Motors in Singapore and want to identify the best audience segments to target for test-drive bookings and brand awareness. Help me select the right audiences and build campaign recommendations.'
-              : 'We have an owner database of 8,400 registered Meridian owners in Singapore with vehicle purchase history over the last 36 months. We want to understand who these owners are — purchase patterns, service frequency, upgrade timing, and who else in the market looks like them.'
-          }
-          className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] resize-none"
-        />
+        {isCompare ? (
+          <textarea
+            rows={3}
+            value={compareText}
+            onChange={(e) => setCompareText(e.target.value)}
+            placeholder={placeholder}
+            className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] resize-none"
+          />
+        ) : (
+          <textarea
+            key={homeTab}
+            rows={3}
+            placeholder={placeholder}
+            defaultValue={
+              homeTab === 'brief'
+                ? 'We are launching Meridian Motors in Singapore and want to identify the best audience segments to target for test-drive bookings and brand awareness. Help me select the right audiences and build campaign recommendations.'
+                : 'We have an owner database of 8,400 registered Meridian owners in Singapore with vehicle purchase history over the last 36 months. We want to understand who these owners are — purchase patterns, service frequency, upgrade timing, and who else in the market looks like them.'
+            }
+            className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] resize-none"
+          />
+        )}
       </div>
       <div className="flex items-center justify-between mt-2">
         <div className="relative">
@@ -1547,15 +1589,25 @@ function HomeInputBox({
           <button className="p-2 hover:bg-gray-100 rounded transition-colors">
             <Mic className="w-4 h-4 text-[#595959]" />
           </button>
-          <button
-            onClick={onStart}
-            disabled={homeTab === 'upload' && !uploadedFile}
-            className={`p-2.5 rounded-full transition-colors ${
-              homeTab === 'upload' && !uploadedFile ? 'bg-[#d0d0d0] cursor-not-allowed' : 'bg-[#4d6bf0] hover:bg-[#3d5be0]'
-            }`}
-          >
-            <ArrowRight className="w-4 h-4 text-white" />
-          </button>
+          {isCompare ? (
+            <button
+              onClick={() => onStartCompare?.(compareText)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#4d6bf0] hover:bg-[#3d5be0] text-white font-['Geist',sans-serif] text-[13px] font-medium transition-colors"
+            >
+              Set up comparison
+              <ArrowRight className="w-4 h-4 text-white" />
+            </button>
+          ) : (
+            <button
+              onClick={onStart}
+              disabled={homeTab === 'upload' && !uploadedFile}
+              className={`p-2.5 rounded-full transition-colors ${
+                homeTab === 'upload' && !uploadedFile ? 'bg-[#d0d0d0] cursor-not-allowed' : 'bg-[#4d6bf0] hover:bg-[#3d5be0]'
+              }`}
+            >
+              <ArrowRight className="w-4 h-4 text-white" />
+            </button>
+          )}
         </div>
       </div>
     </div>
