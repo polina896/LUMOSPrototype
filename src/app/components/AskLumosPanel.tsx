@@ -1,5 +1,6 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import { Sparkles, ArrowUp } from 'lucide-react';
+import { Sparkles, ArrowUp, X } from 'lucide-react';
+import type { ModuleRef } from './ModuleAsk';
 
 // ── Ask Lumos — docked page-level panel ──────────────────────────────────────
 // Opens by default on the right of the audience detail page (toggled by the
@@ -36,26 +37,38 @@ export default function AskLumosPanel({
   setMessages,
   draft,
   setDraft,
+  context = [],
+  onRemoveContext,
+  onClearContext,
 }: {
   audienceName: string;
   messages: AskMsg[];
   setMessages: Dispatch<SetStateAction<AskMsg[]>>;
   draft: string;
   setDraft: Dispatch<SetStateAction<string>>;
+  context?: ModuleRef[];
+  onRemoveContext?: (id: string) => void;
+  onClearContext?: () => void;
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
   // Focus the composer on open so it reads as ready to type into.
   useEffect(() => { inputRef.current?.focus(); }, []);
+  // Re-focus whenever a section is pinned in.
+  useEffect(() => { if (context.length) inputRef.current?.focus(); }, [context.length]);
   // Keep the latest message in view.
   useEffect(() => { threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight }); }, [messages]);
 
   const submit = (text: string) => {
     const q = text.trim();
-    if (!q) return;
-    setMessages((m) => [...m, { role: 'you', text: q }, { role: 'lumos', text: stubAnswer(q, audienceName) }]);
+    if (!q && context.length === 0) return;
+    // Prefix any pinned sections so the question is visibly scoped to them.
+    const scope = context.length ? `[${context.map((c) => c.label).join(', ')}] ` : '';
+    const shown = `${scope}${q}`.trim();
+    setMessages((m) => [...m, { role: 'you', text: shown }, { role: 'lumos', text: stubAnswer(shown, audienceName) }]);
     setDraft('');
+    onClearContext?.();
     inputRef.current?.focus();
   };
 
@@ -126,6 +139,27 @@ export default function AskLumosPanel({
       {/* ── Composer (pinned bottom) ── */}
       <div className="flex-none px-4 pt-[14px] pb-4 bg-white border-t border-[#efeaf2]">
         <div className="flex flex-col rounded-[16px] border-[1.5px] border-[#ddd0e4] bg-white overflow-hidden shadow-[0_6px_22px_rgba(108,60,114,0.07)] focus-within:border-[#6b3c72] transition-colors">
+          {/* Pinned sections — attached via the per-tile ✦ Ask pill */}
+          {context.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 px-3 pt-3">
+              {context.map((r) => (
+                <span key={r.id} className="flex items-center gap-2 pl-1.5 pr-2 py-1.5 bg-[#6b3c72] rounded-[8px]">
+                  <span className="w-[22px] h-[22px] rounded-[6px] bg-white/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </span>
+                  <span className="flex flex-col leading-[1.15] min-w-0">
+                    <span className="font-['Jua',sans-serif] text-[12px] text-white truncate">{r.label}</span>
+                    {r.state.length > 0 && (
+                      <span className="font-['Inter',sans-serif] text-[10px] text-white/70 truncate">{r.state.join(' · ')}</span>
+                    )}
+                  </span>
+                  <button onClick={() => onRemoveContext?.(r.id)} className="ml-1 hover:opacity-80 shrink-0" title="Remove" aria-label="Remove">
+                    <X className="w-3.5 h-3.5 text-white/80" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
           <textarea
             ref={inputRef}
             value={draft}
@@ -134,7 +168,7 @@ export default function AskLumosPanel({
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(draft); }
             }}
             rows={empty ? 3 : 1}
-            placeholder="Ask about this audience…"
+            placeholder={context.length ? `Ask about ${context.length === 1 ? `“${context[0].label}”` : `${context.length} sections`}…` : 'Ask about this audience…'}
             className="resize-none bg-transparent outline-none px-4 pt-4 pb-2 font-['Inter',sans-serif] text-[14px] leading-[1.5] text-[#322e38] placeholder:text-[#ada6b5] min-h-[44px] max-h-[140px]"
           />
           <div className="flex items-center px-[10px] pb-[10px] pt-2">
@@ -144,9 +178,9 @@ export default function AskLumosPanel({
             </span>
             <button
               onClick={() => submit(draft)}
-              disabled={!draft.trim()}
+              disabled={!draft.trim() && context.length === 0}
               className={`ml-auto w-[34px] h-[34px] rounded-full flex items-center justify-center transition-colors ${
-                draft.trim() ? 'bg-[#6b3c72] text-white' : 'bg-[#ece7ef] text-[#bcbcbc]'
+                draft.trim() || context.length ? 'bg-[#6b3c72] text-white' : 'bg-[#ece7ef] text-[#bcbcbc]'
               }`}
             >
               <ArrowUp className="w-4 h-4" />
