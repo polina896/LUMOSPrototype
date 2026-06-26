@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, ArrowRight, ScanSearch, ChevronDown, ChevronRight, Paperclip, Users, X, Send, Sparkles } from 'lucide-react';
+import { Mic, ArrowRight, ScanSearch, ChevronDown, ChevronRight, Paperclip, Users, X, Send, Sparkles, Check } from 'lucide-react';
 import DataSourcesPopover from './DataSourcesPopover';
 import type { ModuleRef } from './ModuleAsk';
 
@@ -1473,16 +1473,33 @@ function InputBar({
 }) {
   const [showAudiencePicker, setShowAudiencePicker] = useState(false);
   const [addedAudiences, setAddedAudiences] = useState<typeof SAVED_AUDIENCES>([]);
+  const [justPinned, setJustPinned] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevCount = useRef(0);
 
-  // When a module is pinned from the output, focus the composer so the user can
-  // just start typing their question about it.
+  // When a module is pinned from the output (the composer is often across the
+  // screen from the pin), focus it AND flash a confirmation so it's obvious the
+  // click landed here.
   useEffect(() => {
-    if (contextRefs.length > 0) inputRef.current?.focus();
+    if (contextRefs.length > prevCount.current) {
+      inputRef.current?.focus();
+      setJustPinned(true);
+      const t = window.setTimeout(() => setJustPinned(false), 1600);
+      prevCount.current = contextRefs.length;
+      return () => window.clearTimeout(t);
+    }
+    prevCount.current = contextRefs.length;
   }, [contextRefs.length]);
 
   return (
-    <div className="bg-white border border-[#ccc] rounded-lg shadow-sm">
+    <div className={`relative bg-white border rounded-lg shadow-sm transition-all duration-300 ${justPinned ? 'border-[#6b3c72] ring-2 ring-[#6b3c72]/40' : 'border-[#ccc]'}`}>
+      {/* Confirmation badge — fires when a section is pinned from elsewhere */}
+      {justPinned && (
+        <div className="absolute -top-3 left-3 z-10 flex items-center gap-1 px-2 py-0.5 bg-[#6b3c72] rounded-full shadow-sm">
+          <Check className="w-3 h-3 text-white" />
+          <span className="font-['Jua',sans-serif] text-[11px] text-white">Added to chat</span>
+        </div>
+      )}
       {/* Quoted modules pinned via the inline "Ask" affordance */}
       {contextRefs.length > 0 && (
         <div className="flex flex-wrap gap-1.5 px-3 pt-2.5 pb-1">
