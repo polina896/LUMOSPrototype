@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { RotateCcw, MessageSquare } from 'lucide-react';
+import { AskPill, type ModuleRef } from './ModuleAsk';
+
+// Shared shape for wiring a section's inline "Ask" into the docked chat.
+type AskProps = { onAsk?: (ref: ModuleRef) => void; audience: string };
+const askRef = (audience: string, section: string, label: string, state: string[] = []): ModuleRef => ({
+  id: `aud:${audience}:profile:${section}`,
+  label,
+  audience,
+  state,
+});
 
 // ── Design tokens ───────────────────────────────────────────────────────────
 const CARD = 'bg-white rounded-[14px] border border-[#e5e5e2]';
@@ -15,7 +25,7 @@ function SectionCard({ children, className = '' }: { children: React.ReactNode; 
   return <div className={`${CARD} p-[17px] ${className}`}>{children}</div>;
 }
 
-function SectionHeader({ title, subtitle, pill }: { title: string; subtitle: string; pill?: { label: string; color: string; bg: string } }) {
+function SectionHeader({ title, subtitle, pill, ask }: { title: string; subtitle: string; pill?: { label: string; color: string; bg: string }; ask?: ModuleRef & { onAsk?: (ref: ModuleRef) => void } }) {
   return (
     <div className="flex items-start gap-2 mb-4">
       {pill && (
@@ -27,6 +37,11 @@ function SectionHeader({ title, subtitle, pill }: { title: string; subtitle: str
         <span className={SECTION_TITLE}>{title}</span>
         <span className={SECTION_SUB}>{subtitle}</span>
       </div>
+      {ask?.onAsk && (
+        <div className="ml-auto pl-2">
+          <AskPill id={ask.id} label={ask.label} audience={ask.audience} state={ask.state} onAsk={ask.onAsk} />
+        </div>
+      )}
     </div>
   );
 }
@@ -163,7 +178,7 @@ function TakeawayHero() {
 
 // ── Demographics card ───────────────────────────────────────────────────────
 
-function DemographicsCard() {
+function DemographicsCard({ onAsk, audience }: AskProps) {
   const stats = [
     { label: 'Core age', value: '32–52', index: '1.6×', trend: 'up' as const },
     { label: 'Female share', value: '42%', index: '0.9×', trend: 'flat' as const },
@@ -172,7 +187,7 @@ function DemographicsCard() {
   ];
   return (
     <SectionCard className="flex-1 min-w-0">
-      <SectionHeader title="Demographics & occupation" subtitle="Indexed vs national" />
+      <SectionHeader title="Demographics & occupation" subtitle="Indexed vs national" ask={{ ...askRef(audience, 'demographics', 'Demographics & occupation'), onAsk }} />
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (
           <div key={s.label} className="bg-[#fafaf8] rounded-[10px] border border-[#e5e5e2] px-3 py-3 flex flex-col gap-1.5">
@@ -188,7 +203,7 @@ function DemographicsCard() {
 
 // ── Income & Affluence card ─────────────────────────────────────────────────
 
-function IncomeCard() {
+function IncomeCard({ onAsk, audience }: AskProps) {
   const bands = [
     { label: '<$80k', value: '0.6×', pct: 40 },
     { label: '$80–120k', value: '0.9×', pct: 60 },
@@ -197,7 +212,7 @@ function IncomeCard() {
   ];
   return (
     <SectionCard className="flex-1 min-w-0">
-      <SectionHeader title="Income & affluence" subtitle="HH-income bands vs benchmark" />
+      <SectionHeader title="Income & affluence" subtitle="HH-income bands vs benchmark" ask={{ ...askRef(audience, 'income', 'Income & affluence'), onAsk }} />
       <div className="flex flex-col gap-3">
         {bands.map((b) => (
           <div key={b.label} className="flex items-center gap-3">
@@ -215,7 +230,7 @@ function IncomeCard() {
 
 // ── Lifestage mix card ──────────────────────────────────────────────────────
 
-function LifestageCard() {
+function LifestageCard({ onAsk, audience }: AskProps) {
   const segments = [
     { pct: 31, color: '#6b3c72', label: 'Established Professionals', index: '2.1×' },
     { pct: 27, color: '#9b6ba0', label: 'Aspirational Climbers', index: '1.7×' },
@@ -224,7 +239,7 @@ function LifestageCard() {
   ];
   return (
     <SectionCard className="flex-1 min-w-0">
-      <SectionHeader title="Lifestage mix" subtitle="Helix-style segments" />
+      <SectionHeader title="Lifestage mix" subtitle="Helix-style segments" ask={{ ...askRef(audience, 'lifestage', 'Lifestage mix'), onAsk }} />
       {/* Segmented bar */}
       <div className="flex rounded-md overflow-hidden h-5 w-full mb-4">
         {segments.map((s) => (
@@ -252,16 +267,19 @@ function LifestageCard() {
 interface SplitSectionProps {
   title: string;
   subtitle: string;
+  section: string;
   pill?: { label: string; color: string; bg: string };
   takeawayCopy: string;
   bars: { label: string; value: string; pct: number; trend?: 'up' | 'down' | 'flat' }[];
   footer?: string;
+  onAsk?: (ref: ModuleRef) => void;
+  audience: string;
 }
 
-function SplitSection({ title, subtitle, pill, takeawayCopy, bars, footer }: SplitSectionProps) {
+function SplitSection({ title, subtitle, section, pill, takeawayCopy, bars, footer, onAsk, audience }: SplitSectionProps) {
   return (
     <SectionCard>
-      <SectionHeader title={title} subtitle={subtitle} pill={pill} />
+      <SectionHeader title={title} subtitle={subtitle} pill={pill} ask={{ ...askRef(audience, section, title), onAsk }} />
       <div className="flex gap-4 min-w-0">
         {/* Takeaway panel */}
         <div className={`${TAKEAWAY_PANEL} w-[220px] shrink-0`}>
@@ -284,7 +302,7 @@ function SplitSection({ title, subtitle, pill, takeawayCopy, bars, footer }: Spl
 
 // ── Brand affinity (2-column grid of bars) ──────────────────────────────────
 
-function BrandAffinitySection() {
+function BrandAffinitySection({ onAsk, audience }: AskProps) {
   const brands = [
     { label: 'CarousellAuto', value: '2.4×', pct: 100 },
     { label: 'BMW', value: '2.0×', pct: 83 },
@@ -293,7 +311,7 @@ function BrandAffinitySection() {
   ];
   return (
     <SectionCard>
-      <SectionHeader title="Interests & brand affinity" subtitle="Categories & brands they over-index for" />
+      <SectionHeader title="Interests & brand affinity" subtitle="Categories & brands they over-index for" ask={{ ...askRef(audience, 'brand-affinity', 'Interests & brand affinity'), onAsk }} />
       <div className="flex gap-4 min-w-0">
         {/* Takeaway panel */}
         <div className={`${TAKEAWAY_PANEL} w-[220px] shrink-0`}>
@@ -315,7 +333,7 @@ function BrandAffinitySection() {
 
 // ── Top segments with tabs ───────────────────────────────────────────────────
 
-function TopSegmentsSection() {
+function TopSegmentsSection({ onAsk, audience }: AskProps) {
   const [view, setView] = useState<'snapshot' | 'trend'>('snapshot');
   const segments = [
     { label: 'Premium Vehicle Owners', value: '2.1×', pct: 100, trend: 'up' as const },
@@ -330,17 +348,20 @@ function TopSegmentsSection() {
           <span className={SECTION_TITLE}>Top segments by index</span>
           <span className={SECTION_SUB}>Leading buyergraphic segments · vs national baseline</span>
         </div>
-        {/* Tab toggle — no Ask CTA */}
-        <div className="flex items-center gap-px border border-[#e5e5e2] rounded-[8px] overflow-hidden bg-white shrink-0">
-          {(['snapshot', 'trend'] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setView(t)}
-              className={`font-['Jua',sans-serif] text-[11px] px-3 py-1.5 capitalize transition-colors ${view === t ? 'bg-[#f1e9ff] text-[#6b3c72]' : 'text-[#6b6b6b] hover:bg-[#f5f5f3]'}`}
-            >
-              {t === 'snapshot' ? 'Snapshot' : 'Trend'}
-            </button>
-          ))}
+        {/* Snapshot/Trend toggle + inline Ask */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-px border border-[#e5e5e2] rounded-[8px] overflow-hidden bg-white">
+            {(['snapshot', 'trend'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setView(t)}
+                className={`font-['Jua',sans-serif] text-[11px] px-3 py-1.5 capitalize transition-colors ${view === t ? 'bg-[#f1e9ff] text-[#6b3c72]' : 'text-[#6b6b6b] hover:bg-[#f5f5f3]'}`}
+              >
+                {t === 'snapshot' ? 'Snapshot' : 'Trend'}
+              </button>
+            ))}
+          </div>
+          <AskPill {...askRef(audience, 'top-segments', 'Top segments by index', [view])} onAsk={onAsk} />
         </div>
       </div>
       <div className="flex gap-4 min-w-0">
@@ -362,7 +383,8 @@ function TopSegmentsSection() {
 
 // ── Root export ─────────────────────────────────────────────────────────────
 
-export default function AudienceProfileContent() {
+export default function AudienceProfileContent({ onAsk, audienceName = 'Urban Upgrade Drivers' }: { onAsk?: (ref: ModuleRef) => void; audienceName?: string }) {
+  const audience = audienceName;
   return (
     <div className="flex flex-col gap-[14px]">
       <GlobalFilterBar />
@@ -371,16 +393,19 @@ export default function AudienceProfileContent() {
 
       {/* Three-column row */}
       <div className="flex gap-[12px] items-stretch">
-        <DemographicsCard />
-        <IncomeCard />
-        <LifestageCard />
+        <DemographicsCard onAsk={onAsk} audience={audience} />
+        <IncomeCard onAsk={onAsk} audience={audience} />
+        <LifestageCard onAsk={onAsk} audience={audience} />
       </div>
 
-      <TopSegmentsSection />
+      <TopSegmentsSection onAsk={onAsk} audience={audience} />
 
       <SplitSection
         title="Purchase patterns"
         subtitle="What they buy · category spend indexed"
+        section="purchase-patterns"
+        onAsk={onAsk}
+        audience={audience}
         pill={{ label: 'Transactional', color: '#2471a3', bg: '#e8f4fd' }}
         takeawayCopy="Urban Upgrade Drivers over-index on premium automotive (2.4×) and financial services (1.8×). Average household spend is $148k, split 72% in-person / 28% online. Business travel and health & wellness are secondary spend pillars."
         bars={[
@@ -395,6 +420,9 @@ export default function AudienceProfileContent() {
       <SplitSection
         title="Weekend & lifestyle signals"
         subtitle="What they do outside work · venue visitation"
+        section="weekend-lifestyle"
+        onAsk={onAsk}
+        audience={audience}
         pill={{ label: 'Behavioural', color: '#1e8449', bg: '#eafaf1' }}
         takeawayCopy="Car show & expo attendance over-indexes highest at 2.3×. Fine dining and golf courses cluster together. Premium fitness and wellness rounds out the top four. Weekend activities skew toward premium, experiential occasions."
         bars={[
@@ -405,7 +433,7 @@ export default function AudienceProfileContent() {
         ]}
       />
 
-      <BrandAffinitySection />
+      <BrandAffinitySection onAsk={onAsk} audience={audience} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import { Sparkles, ArrowUp } from 'lucide-react';
+import { Sparkles, ArrowUp, X } from 'lucide-react';
+import type { ModuleRef } from './ModuleAsk';
 
 // ── Ask Lumos — docked page-level panel ──────────────────────────────────────
 // Opens by default on the right of the audience detail page (toggled by the
@@ -24,8 +25,9 @@ const STARTERS = [
 
 // Prototype stub: a plausible, context-aware reply so the panel isn't a dead
 // box. Real wiring replaces this with a call scoped to { audience, tab, filters }.
-function stubAnswer(q: string, audience: string): string {
-  return `Looking at ${audience} for the current tab and filters: ${q} — here's where the grounded answer appears, drawn from this audience's live data.`;
+function stubAnswer(q: string, audience: string, scope: string | null): string {
+  const focus = scope ? ` — focused on ${scope}` : '';
+  return `Looking at ${audience} for the current tab and filters${focus}: ${q} — here's where the grounded answer appears, drawn from this audience's live data.`;
 }
 
 // Thread + draft are owned by the parent (AudienceProfileViewer) so the
@@ -36,12 +38,17 @@ export default function AskLumosPanel({
   setMessages,
   draft,
   setDraft,
+  pinned = [],
+  onUnpin,
 }: {
   audienceName: string;
   messages: AskMsg[];
   setMessages: Dispatch<SetStateAction<AskMsg[]>>;
   draft: string;
   setDraft: Dispatch<SetStateAction<string>>;
+  // Sections pinned via a tile's inline "Ask" — quoted context on the composer.
+  pinned?: ModuleRef[];
+  onUnpin?: (id: string) => void;
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
@@ -54,12 +61,21 @@ export default function AskLumosPanel({
   const submit = (text: string) => {
     const q = text.trim();
     if (!q) return;
-    setMessages((m) => [...m, { role: 'you', text: q }, { role: 'lumos', text: stubAnswer(q, audienceName) }]);
+    const scope = pinned.length ? pinned.map((p) => p.label).join(', ') : null;
+    setMessages((m) => [...m, { role: 'you', text: q }, { role: 'lumos', text: stubAnswer(q, audienceName, scope) }]);
     setDraft('');
     inputRef.current?.focus();
   };
 
   const empty = messages.length === 0;
+
+  // Placeholder reflects any pinned sections so the composer reads as scoped.
+  const placeholder =
+    pinned.length === 1
+      ? `Ask about “${pinned[0].label}”…`
+      : pinned.length > 1
+      ? `Ask about these ${pinned.length} sections…`
+      : 'Ask about this audience…';
 
   return (
     <div className="flex-none w-[384px] h-full flex flex-col bg-[#fcfbfd] border-l border-[#e7e2ec]">
@@ -126,6 +142,27 @@ export default function AskLumosPanel({
       {/* ── Composer (pinned bottom) ── */}
       <div className="flex-none px-4 pt-[14px] pb-4 bg-white border-t border-[#efeaf2]">
         <div className="flex flex-col rounded-[16px] border-[1.5px] border-[#ddd0e4] bg-white overflow-hidden shadow-[0_6px_22px_rgba(108,60,114,0.07)] focus-within:border-[#6b3c72] transition-colors">
+          {/* Pinned sections — quoted context added via a tile's inline "Ask" */}
+          {pinned.length > 0 && (
+            <div className="flex flex-wrap gap-[6px] px-[12px] pt-[12px]">
+              {pinned.map((p) => (
+                <span
+                  key={p.id}
+                  className="flex items-center gap-[5px] bg-[#6b3c72] text-white rounded-full pl-[9px] pr-[5px] py-[3px] font-['Jua',sans-serif] text-[11px]"
+                >
+                  <Sparkles className="w-[10px] h-[10px]" />
+                  {p.label}
+                  <button
+                    onClick={() => onUnpin?.(p.id)}
+                    title={`Remove “${p.label}”`}
+                    className="w-[15px] h-[15px] rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
+                  >
+                    <X className="w-[10px] h-[10px]" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
           <textarea
             ref={inputRef}
             value={draft}
@@ -134,7 +171,7 @@ export default function AskLumosPanel({
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(draft); }
             }}
             rows={empty ? 3 : 1}
-            placeholder="Ask about this audience…"
+            placeholder={placeholder}
             className="resize-none bg-transparent outline-none px-4 pt-4 pb-2 font-['Inter',sans-serif] text-[14px] leading-[1.5] text-[#322e38] placeholder:text-[#ada6b5] min-h-[44px] max-h-[140px]"
           />
           <div className="flex items-center px-[10px] pb-[10px] pt-2">

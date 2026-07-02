@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
+import type { ModuleRef } from "./ModuleAsk";
 import Screen2Mobility from "@/imports/Screen2Mobility-1";
 import Screen3Temporal from "@/imports/Screen3Temporal";
 import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
@@ -27,14 +28,56 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   // Thread + draft live here (not in the panel) so the conversation survives a collapse.
   const [askMessages, setAskMessages] = useState<AskMsg[]>([]);
   const [askDraft, setAskDraft] = useState('');
+  // Sections pinned into the docked chat via a tile's inline "Ask".
+  const [pinned, setPinned] = useState<ModuleRef[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Short name for the panel's answer scope (strip the " — Singapore" suffix).
   const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
 
+  const pinSection = (ref: ModuleRef) => {
+    setAskOpen(true); // reveal the panel so the added context is visible
+    setPinned((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
+  };
+  const unpinSection = (id: string) => setPinned((prev) => prev.filter((r) => r.id !== id));
+
   const handleTabClick = (tab: DeepDiveTab) => {
     setActiveTab(tab);
+    setPinned([]); // pinned sections are tab-scoped — drop them when the tab changes
     scrollRef.current?.scrollTo({ top: 0 });
+  };
+
+  // The Mobility/Temporal/Digital tabs are Figma-generated screens whose tiles
+  // carry a static "Ask" pill. Rather than rewrite those generated files, we
+  // catch the click here, read the enclosing card's title, and pin it into chat.
+  // (The profile tab wires its own <AskPill> and is excluded to avoid double-pins.)
+  const CONTROL_LABELS = new Set(['Ask', 'Trend', 'Snapshot', 'Map', 'Index', '%', 'Count', 'Export', 'New']);
+  const handleScreenAsk = (e: React.MouseEvent) => {
+    if (activeTab === 'profile') return;
+    // Walk up from the click to find the "Ask" affordance itself.
+    let el = e.target as HTMLElement | null;
+    let hit: HTMLElement | null = null;
+    for (let d = 0; el && d < 4; d++, el = el.parentElement) {
+      if ((el.textContent || '').trim() === 'Ask') { hit = el; break; }
+    }
+    if (!hit) return;
+    // Read the enclosing tile's title: climb ancestors and stop at the smallest
+    // container (20–700 chars — a single card, not the whole screen) that holds a
+    // heading. Skip controls, numeric values, and the persistent page header;
+    // among what's left the title is the largest type.
+    let title = '';
+    let node: HTMLElement | null = hit;
+    for (let d = 0; node && d < 10; d++, node = node.parentElement) {
+      const len = (node.textContent || '').trim().length;
+      if (len < 20 || len > 700) continue;
+      const cands = [...node.querySelectorAll('p,span,h1,h2,h3')]
+        .map((n) => ({ t: (n.textContent || '').trim(), fs: parseFloat(getComputedStyle(n).fontSize) || 0 }))
+        .filter((o) => o.t.length > 3 && o.t.length < 46 && !CONTROL_LABELS.has(o.t) && !/^[\d$]/.test(o.t) && !/Urban Upgrade Drivers/.test(o.t));
+      if (cands.length) { cands.sort((a, b) => b.fs - a.fs); title = cands[0].t; break; }
+    }
+    if (!title) return;
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    pinSection({ id: `aud:${askName}:${activeTab}:${slug}`, label: title, audience: askName, state: [] });
   };
 
   return (
@@ -181,9 +224,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
       {/* ── Scrollable content — KPI card hidden via CSS, starts with date/geo filters ── */}
       <div
         ref={scrollRef}
+        onClick={handleScreenAsk}
         className="kc-deep-dive flex-1 overflow-y-auto overflow-x-auto"
       >
-        {activeTab === 'profile'  && <AudienceProfileContent />}
+        {activeTab === 'profile'  && <AudienceProfileContent onAsk={pinSection} audienceName={askName} />}
         {activeTab === 'mobility' && <Screen2Mobility />}
         {activeTab === 'temporal' && <Screen3Temporal />}
         {activeTab === 'digital'  && <Screen4DigitalTwin />}
@@ -198,6 +242,8 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           setMessages={setAskMessages}
           draft={askDraft}
           setDraft={setAskDraft}
+          pinned={pinned}
+          onUnpin={unpinSection}
         />
       )}
     </div>
