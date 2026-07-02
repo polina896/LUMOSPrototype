@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
@@ -20,6 +20,14 @@ const TABS: { key: DeepDiveTab; label: string }[] = [
   { key: 'temporal', label: 'Temporal & Seasonal' },
   { key: 'digital',  label: 'Digital Twin'        },
 ];
+
+// The profile tab's <AskPill> uses a lucide Sparkles glyph; the Figma screens ship
+// a different (chat-bubble) icon. We swap theirs for this so every "Ask" matches.
+// (currentColor → inherits the pill's #6b3c72 text colour.)
+const SPARKLE_ICON =
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;display:block">` +
+  `<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/>` +
+  `<path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M6 18H2"/></svg>`;
 
 export default function AudienceProfileViewer(props: AudienceProfileViewerProps) {
   const [activeTab, setActiveTab] = useState<DeepDiveTab>('profile');
@@ -80,6 +88,26 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     pinSection({ id: `aud:${askName}:${activeTab}:${slug}`, label: title, audience: askName, state: [] });
   };
 
+  // Match the Figma screens' baked-in "Ask" pills to the profile tab's <AskPill>:
+  // CSS (in the style block) handles shape/border/sizing/hover; the icon can't be
+  // swapped in CSS, so replace the glyph here once per screen mount. Safe against
+  // re-renders — the screen imports are static, so React never re-writes this DOM.
+  useEffect(() => {
+    if (activeTab === 'profile' || activeTab === 'digital') return;
+    const root = scrollRef.current;
+    if (!root) return;
+    root
+      .querySelectorAll<HTMLElement>('[data-name="Background+Border"]')
+      .forEach((pill) => {
+        if (!/bg-\[#f1e9ff\]/.test(pill.className) || !/rounded-\[7px\]/.test(pill.className)) return;
+        const iconWrap = pill.querySelector('[data-name="SVG"]');
+        if (iconWrap && !iconWrap.hasAttribute('data-ask-sparkle')) {
+          iconWrap.setAttribute('data-ask-sparkle', '');
+          iconWrap.innerHTML = SPARKLE_ICON;
+        }
+      });
+  }, [activeTab]);
+
   return (
     <div className="flex-1 flex min-w-0 overflow-hidden">
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafaf8]">
@@ -137,6 +165,30 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         /* Vertical gap between each stacked section inside each screen's main column */
         .kc-deep-dive [data-name="Container"][class*="flex-[1_0_0]"][class*="flex-col"] {
           gap: 14px !important;
+        }
+
+        /* ── Normalise the Figma screens' baked-in "Ask" pills to the profile tab's
+              <AskPill>: full radius, no border, matching padding/type + hover. The
+              icon glyph is swapped separately in JS (see SPARKLE_ICON). ── */
+        .kc-deep-dive [data-name="Background+Border"][class*="bg-[#f1e9ff]"][class*="rounded-[7px]"] {
+          border-radius: 9999px !important;
+          height: auto !important;
+          padding: 3px 8px !important;
+          gap: 4px !important;
+          cursor: pointer;
+        }
+        .kc-deep-dive [data-name="Background+Border"][class*="bg-[#f1e9ff]"][class*="rounded-[7px]"]:hover {
+          background-color: #e7dbf6 !important;
+        }
+        .kc-deep-dive [data-name="Background+Border"][class*="bg-[#f1e9ff]"][class*="rounded-[7px]"] > [aria-hidden] {
+          display: none !important;
+        }
+        .kc-deep-dive [data-name="Background+Border"][class*="bg-[#f1e9ff]"][class*="rounded-[7px]"] [data-name="SVG"] {
+          width: 11px !important;
+          height: 11px !important;
+        }
+        .kc-deep-dive [data-name="Background+Border"][class*="bg-[#f1e9ff]"][class*="rounded-[7px]"] p {
+          font-size: 11px !important;
         }
       `}</style>
 
