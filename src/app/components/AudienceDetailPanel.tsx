@@ -4,12 +4,10 @@ import { AUDIENCES, type AudienceId } from '../audienceData';
 import type { Screen } from '../App';
 import DataExplorerPanel from './DataExplorerPanel';
 import DataSourcesPopover from './DataSourcesPopover';
+import AudienceDensity from './AudienceDensity';
 import { Module, type ModuleRef } from './ModuleAsk';
 
 // ── Per-audience extended data ───────────────────────────────────────────────
-
-// Reachability matrix shown in the expand-map view: rows = channels, columns below.
-const REACH_WINDOWS = ['Early AM', 'Daytime', 'Evening', 'Late', 'Weekend'] as const;
 
 const EXTENDED: Record<string, {
   headline: string; headlineHighlights: string[];
@@ -325,33 +323,6 @@ function SegControl({ options, active, onChange }: { options: string[]; active: 
   );
 }
 
-function TimesToReach({ times, window: peak }: { times: { slot: string; pct: number }[]; window: string }) {
-  const max = Math.max(...times.map((t) => t.pct));
-  return (
-    <div className="mt-2.5">
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="font-['Jua',sans-serif] text-[10px] uppercase tracking-[0.06em] text-[#9a9a9a]">Best times to reach here</p>
-        <span className="inline-flex items-center gap-1 font-['Jua',sans-serif] text-[10.5px] text-[#6b3c72] bg-[#f1e9ff] px-1.5 py-0.5 rounded-[5px]">
-          <svg className="w-[10px] h-[10px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-          {peak}
-        </span>
-      </div>
-      <div className="flex items-end gap-2 h-[38px] px-0.5">
-        {times.map((t) => (
-          <div key={t.slot} className="flex-1 flex items-end justify-center h-full">
-            <div className="w-full rounded-t-[4px]" style={{ height: `${Math.max(14, (t.pct / max) * 100)}%`, background: t.pct === max ? '#6b3c72' : '#d9cce3' }} />
-          </div>
-        ))}
-      </div>
-      <div className="flex gap-2 px-0.5 mt-1">
-        {times.map((t) => (
-          <span key={t.slot} className={`flex-1 text-center font-['Jua',sans-serif] text-[9px] ${t.pct === max ? 'text-[#6b3c72]' : 'text-[#9a9a9a]'}`}>{t.slot}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function TakeawayInline({ text }: { text: React.ReactNode }) {
   return (
     <div className="flex gap-2 items-start bg-[#f1e9ff] rounded-[10px] px-3 py-2 mt-3">
@@ -399,65 +370,13 @@ function MapSVG({ districts }: { districts: { id: string; x: number; y: number; 
 }
 
 // ── Expand-map view: intermediate inspection layer over the sidebar ──────────
-function reachShade(v: number, isPeak: boolean) {
-  if (isPeak) return { bg: '#6B3C72', fg: '#ffffff' };
-  if (v >= 70) return { bg: '#8A5C90', fg: '#ffffff' };
-  if (v >= 50) return { bg: '#BEBDE7', fg: '#4a2a50' };
-  if (v >= 35) return { bg: '#D9CCE3', fg: '#6b3c72' };
-  return { bg: '#F1E9FF', fg: '#cdbfdb' };
-}
-
-// Best-time-to-reach as a channel × window heatmap — shown only in the expand-map view.
-function ReachMatrix({ rows }: { rows: { channel: string; vals: number[] }[] }) {
-  const cols = REACH_WINDOWS;
-  const grid = { gridTemplateColumns: `minmax(110px, 150px) repeat(${cols.length}, minmax(0, 1fr))` };
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-0.5">
-        <p className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a]">Best time to reach, by channel</p>
-        <span className="font-['Jua',sans-serif] text-[9px] uppercase tracking-[0.08em] text-[#6b3c72] bg-[#f1e9ff] px-1.5 py-0.5 rounded-[5px]">Behavioural</span>
-      </div>
-      <p className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a] mb-2.5">When this audience is most reachable on each channel · indexed</p>
-
-      <div className="grid items-center gap-1.5 mb-1.5" style={grid}>
-        <span />
-        {cols.map((c) => (
-          <span key={c} className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a] text-center">{c}</span>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        {rows.map((r) => {
-          const peak = Math.max(...r.vals);
-          return (
-            <div key={r.channel} className="grid items-center gap-1.5" style={grid}>
-              <span className="font-['Jua',sans-serif] text-[11px] text-[#1a1a1a] truncate pr-1">{r.channel}</span>
-              {r.vals.map((v, i) => {
-                const isPeak = v === peak;
-                const s = reachShade(v, isPeak);
-                return (
-                  <div key={i} className="h-[26px] rounded-[6px] flex items-center justify-center" style={{ background: s.bg }} title={`${cols[i]} · ${v}`}>
-                    {isPeak && <svg className="w-[11px] h-[11px]" viewBox="0 0 24 24" fill={s.fg}><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7z"/></svg>}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-
-      <p className="font-['Jua',sans-serif] text-[10.5px] text-[#9a9a9a] mt-2.5">★ = peak window per channel · best time &amp; channel to reach them</p>
-    </div>
-  );
-}
-
 function ExpandedMapModal({
-  audienceName, whereMode, setWhereMode, dayType, setDayType, geoMode, view, reach, onClose,
+  audienceId, audienceName, whereMode, setWhereMode, dayType, setDayType, geoMode, view, onClose,
 }: {
-  audienceName: string;
+  audienceId: AudienceId; audienceName: string;
   whereMode: GeoModeKey; setWhereMode: (m: GeoModeKey) => void;
   dayType: DayTypeKey; setDayType: (d: DayTypeKey) => void;
-  geoMode: GeoMode; view: GeoView; reach: { channel: string; vals: number[] }[]; onClose: () => void;
+  geoMode: GeoMode; view: GeoView; onClose: () => void;
 }) {
   // Esc closes — matches click-outside and the explicit X.
   useEffect(() => {
@@ -527,9 +446,9 @@ function ExpandedMapModal({
             </span>
           </div>
 
-          {/* times-to-reach — channel × window heatmap, under the map */}
+          {/* density — hour × day heatmap, under the map */}
           <div className="pt-1 border-t border-[#eeebef]">
-            <ReachMatrix rows={reach} />
+            <AudienceDensity audienceId={audienceId} mode={whereMode} variant="expanded" />
           </div>
         </div>
 
@@ -777,8 +696,10 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose, onAsk
                     </span>
                   </div>
 
-                  {/* times-to-reach — tied to the selected geography */}
-                  <TimesToReach times={view.times} window={view.window} />
+                  {/* density — when they're present & best time to reach, tied to the selected mode */}
+                  <div className="mt-3 pt-3 border-t border-[#eeebef]">
+                    <AudienceDensity audienceId={audienceId} mode={whereMode} variant="panel" />
+                  </div>
 
                   {/* expand CTA */}
                   <button onClick={() => setMapExpanded(true)} className="flex items-center gap-1.5 mt-3 font-['Jua',sans-serif] text-[12px] text-[#6b3c72] hover:opacity-70 transition-opacity">
@@ -883,10 +804,11 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose, onAsk
           {/* ── Expand-map view ── */}
           {mapExpanded && geo && view && geoMode && ext && (
             <ExpandedMapModal
+              audienceId={audienceId}
               audienceName={audience.name}
               whereMode={whereMode} setWhereMode={setWhereMode}
               dayType={dayType} setDayType={setDayType}
-              geoMode={geoMode} view={view} reach={ext.reach}
+              geoMode={geoMode} view={view}
               onClose={() => setMapExpanded(false)}
             />
           )}
