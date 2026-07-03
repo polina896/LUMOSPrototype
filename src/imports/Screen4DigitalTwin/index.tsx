@@ -3,7 +3,7 @@ import svgPaths from "./svg-nrlgex52fq";
 function Background() {
   return (
     <div className="bg-[#6b3c72] content-stretch flex items-center justify-center relative rounded-[8px] shrink-0 size-[26px]" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13px] text-center text-white whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13px] text-center text-white whitespace-nowrap">
         <p className="leading-[19.5px]">KC</p>
       </div>
     </div>
@@ -48,7 +48,7 @@ function Container1() {
       <div className="flex flex-row items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center pb-[14px] pt-[2px] px-[8px] relative size-full">
           <Background />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
             <p className="leading-[21px]">Koala Cola</p>
           </div>
           <Margin />
@@ -76,7 +76,7 @@ function Container4() {
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex gap-[10px] items-center px-[10px] py-[8px] relative size-full">
           <Svg1 />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
             <p className="leading-[19.5px]">Home</p>
           </div>
         </div>
@@ -103,7 +103,7 @@ function Container5() {
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex gap-[10px] items-center px-[10px] py-[8px] relative size-full">
           <Svg2 />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
             <p className="leading-[19.5px]">Data Explorer</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ function Background1() {
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex gap-[10px] items-center px-[10px] py-[8px] relative size-full">
           <Svg3 />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] whitespace-nowrap">
             <p className="leading-[19.5px]">Audiences</p>
           </div>
         </div>
@@ -155,7 +155,7 @@ function Container3() {
 function Container7() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[10px] tracking-[0.8px] uppercase whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[10px] tracking-[0.8px] uppercase whitespace-nowrap">
         <p className="leading-[15px]">4</p>
       </div>
     </div>
@@ -167,7 +167,7 @@ function Container6() {
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="flex flex-row items-center justify-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-between pb-[8px] pt-[15.5px] px-[8px] relative size-full">
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.8px] uppercase whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.8px] uppercase whitespace-nowrap">
             <p className="leading-[15px]">Your audiences</p>
           </div>
           <Container7 />
@@ -197,7 +197,7 @@ function BackgroundBorder1() {
       <div className="flex flex-row items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center px-[11px] py-[9px] relative size-full">
           <Svg4 />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+          <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
             <p className="leading-[18px]">Search audiences…</p>
           </div>
         </div>
@@ -210,7 +210,7 @@ function Background2() {
   return (
     <div className="bg-[#6b3c72] relative rounded-[7px] shrink-0 size-[26px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center pb-[6px] pt-[5px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[10px] text-center text-white whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[10px] text-center text-white whitespace-nowrap">
           <p className="leading-[15px]">WR</p>
         </div>
       </div>
@@ -221,7 +221,7 @@ function Background2() {
 function Container10() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[14.4px] mb-0">Weekend Runners —</p>
         <p className="leading-[14.4px]">Melbourne</p>
       </div>
@@ -232,7 +232,7 @@ function Container10() {
 function Container11() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] whitespace-nowrap">
         <p className="leading-[19.5px]">612k</p>
       </div>
     </div>
@@ -268,7 +268,7 @@ function Background3() {
   return (
     <div className="bg-[#f3f3f1] relative rounded-[7px] shrink-0 size-[26px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center pb-[6px] pt-[5px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
           <p className="leading-[15px]">GZ</p>
         </div>
       </div>
@@ -279,7 +279,7 @@ function Background3() {
 function Container13() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[14.4px]">Gen Z Women — Melbourne</p>
       </div>
     </div>
@@ -289,7 +289,7 @@ function Container13() {
 function Container14() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
         <p className="leading-[19.5px]">560k</p>
       </div>
     </div>
@@ -325,7 +325,7 @@ function Background4() {
   return (
     <div className="bg-[#f3f3f1] relative rounded-[7px] shrink-0 size-[26px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center pb-[6px] pt-[5px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
           <p className="leading-[15px]">TU</p>
         </div>
       </div>
@@ -336,7 +336,7 @@ function Background4() {
 function Container16() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[14.4px]">{`Tradies & Utes — National`}</p>
       </div>
     </div>
@@ -346,7 +346,7 @@ function Container16() {
 function Container17() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
         <p className="leading-[19.5px]">1.2M</p>
       </div>
     </div>
@@ -382,7 +382,7 @@ function Background5() {
   return (
     <div className="bg-[#f3f3f1] relative rounded-[7px] shrink-0 size-[26px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center pb-[6px] pt-[5px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] text-center whitespace-nowrap">
           <p className="leading-[15px]">EV</p>
         </div>
       </div>
@@ -393,7 +393,7 @@ function Background5() {
 function Container19() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[14.4px] mb-0">Premium EV Intenders —</p>
         <p className="leading-[14.4px]">Sydney</p>
       </div>
@@ -404,7 +404,7 @@ function Container19() {
 function Container20() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap">
         <p className="leading-[19.5px]">284k</p>
       </div>
     </div>
@@ -467,7 +467,7 @@ function Container21() {
       <div className="flex flex-row items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[7px] items-center pb-[8px] pt-[18px] px-[10px] relative size-full">
           <Svg5 />
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
             <p className="leading-[18px]">New audience</p>
           </div>
         </div>
@@ -492,7 +492,7 @@ function VerticalBorder() {
 
 function Paragraph() {
   return (
-    <div className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] h-[27px] leading-[0] relative shrink-0 w-[328.81px]" data-name="Paragraph">
+    <div className="[word-break:break-word] font-['Jua','Noto_Sans:Regular',sans-serif] h-[27px] leading-[0] relative shrink-0 w-[328.81px]" data-name="Paragraph">
       <div className="-translate-y-1/2 absolute flex flex-col justify-center left-0 text-[#1a1a1a] text-[18px] top-[13px] w-[244.106px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[27px]">{`Weekend Runners — Melbourne `}</p>
       </div>
@@ -520,7 +520,7 @@ function Button() {
     <div className="bg-[#fafaf8] content-stretch flex gap-[6px] items-center px-[12px] py-[8px] relative rounded-[8px] shrink-0" data-name="Button">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Svg6 />
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[11.4px] text-center whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Inter',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[11.4px] text-center whitespace-nowrap">
         <p className="leading-[normal]">Defined by</p>
       </div>
     </div>
@@ -544,7 +544,7 @@ function BackgroundBorder7() {
     <div className="bg-white content-stretch flex gap-[6px] items-center px-[13px] py-[8px] relative rounded-[8px] shrink-0" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Svg7 />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
         <p className="leading-[18px]">Export</p>
       </div>
     </div>
@@ -568,7 +568,7 @@ function BackgroundBorder8() {
     <div className="bg-[#6b3c72] content-stretch flex gap-[6px] items-center px-[13px] py-[8px] relative rounded-[8px] shrink-0" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#6b3c72] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Svg8 />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
         <p className="leading-[18px]">Ask Lumos</p>
       </div>
     </div>
@@ -612,7 +612,7 @@ function Container25() {
   return (
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
           <p className="leading-[15px]">Audience size</p>
         </div>
       </div>
@@ -623,7 +623,7 @@ function Container25() {
 function Background6() {
   return (
     <div className="absolute bg-[#f3f3f1] content-stretch flex items-center left-[50.81px] px-[7px] py-[2px] rounded-[999px] top-[6px]" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[10px] whitespace-nowrap">
         <p className="leading-[15px]">Gtr Melbourne</p>
       </div>
     </div>
@@ -634,7 +634,7 @@ function Container26() {
   return (
     <div className="h-[25px] relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[43.131px]">
+        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua',sans-serif] justify-center leading-[0] left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[43.131px]">
           <p className="leading-[23.1px]">612k</p>
         </div>
         <Background6 />
@@ -659,7 +659,7 @@ function Container27() {
   return (
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
           <p className="leading-[15px]">Index vs metro</p>
         </div>
       </div>
@@ -670,7 +670,7 @@ function Container27() {
 function Background7() {
   return (
     <div className="absolute bg-[#e7f3ec] content-stretch flex items-center left-[45.3px] px-[6px] py-[2px] rounded-[999px] top-[6px]" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular','Noto_Sans_Symbols2:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#2f7d4f] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular','Noto_Sans_Symbols2:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#2f7d4f] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[15px]">▲ +0.2×</p>
       </div>
     </div>
@@ -681,7 +681,7 @@ function Container28() {
   return (
     <div className="h-[25px] relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] left-0 text-[#1a1a1a] text-[21px] top-[11.5px] w-[38.106px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] left-0 text-[#1a1a1a] text-[21px] top-[11.5px] w-[38.106px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[23.1px]">1.8×</p>
         </div>
         <Background7 />
@@ -706,7 +706,7 @@ function Container29() {
   return (
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
           <p className="leading-[15px]">{`Peak day & hour`}</p>
         </div>
       </div>
@@ -717,10 +717,10 @@ function Container29() {
 function Paragraph1() {
   return (
     <div className="[word-break:break-word] absolute h-[23.09px] leading-[0] left-0 top-0 w-[74.81px]" data-name="Paragraph">
-      <div className="-translate-y-1/2 absolute flex flex-col font-['Jua:Regular',sans-serif] justify-center left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[34.104px]">
+      <div className="-translate-y-1/2 absolute flex flex-col font-['Jua',sans-serif] justify-center left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[34.104px]">
         <p className="leading-[23.1px]">{`Sat `}</p>
       </div>
-      <div className="-translate-y-1/2 absolute flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center left-[39.42px] text-[#6b6b6b] text-[12px] top-[14px] w-[35.117px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="-translate-y-1/2 absolute flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center left-[39.42px] text-[#6b6b6b] text-[12px] top-[14px] w-[35.117px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[13.2px]">7–9am</p>
       </div>
     </div>
@@ -730,7 +730,7 @@ function Paragraph1() {
 function Background8() {
   return (
     <div className="absolute bg-[#f1e9ff] content-stretch flex items-center left-[82.81px] px-[7px] py-[2px] rounded-[999px] top-[6px]" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b3c72] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b3c72] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[15px]">2.3×</p>
       </div>
     </div>
@@ -763,7 +763,7 @@ function VerticalBorder3() {
 function Container32() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] tracking-[0.6px] uppercase w-full">
         <p className="leading-[15px]">Distinctive</p>
       </div>
     </div>
@@ -773,7 +773,7 @@ function Container32() {
 function Background9() {
   return (
     <div className="absolute bg-[#f1e9ff] content-stretch flex items-center left-[48.58px] px-[7px] py-[2px] rounded-[999px] top-[6px]" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[10px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[10px] whitespace-nowrap">
         <p className="leading-[15px]">run local</p>
       </div>
     </div>
@@ -783,7 +783,7 @@ function Background9() {
 function Container33() {
   return (
     <div className="h-[25px] relative shrink-0 w-full" data-name="Container">
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[41.12px]">
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Jua',sans-serif] justify-center leading-[0] left-0 not-italic text-[#1a1a1a] text-[21px] top-[11.5px] w-[41.12px]">
         <p className="leading-[23.1px]">58%</p>
       </div>
       <Background9 />
@@ -833,7 +833,7 @@ function Container34() {
     <div className="flex-[1_0_0] min-w-px relative rounded-[9px] self-stretch" data-name="Container">
       <div className="flex flex-col items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-center p-[10px] relative size-full">
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
             <p className="leading-[19.5px]">Audience Profile</p>
           </div>
         </div>
@@ -847,7 +847,7 @@ function Container35() {
     <div className="flex-[1_0_0] min-w-px relative rounded-[9px] self-stretch" data-name="Container">
       <div className="flex flex-col items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-center p-[10px] relative size-full">
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
             <p className="leading-[19.5px]">{`Mobility & Movement`}</p>
           </div>
         </div>
@@ -861,7 +861,7 @@ function Container36() {
     <div className="flex-[1_0_0] min-w-px relative rounded-[9px] self-stretch" data-name="Container">
       <div className="flex flex-col items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-center p-[10px] relative size-full">
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[13px] text-center whitespace-nowrap">
             <p className="leading-[19.5px]">{`Temporal & Seasonal`}</p>
           </div>
         </div>
@@ -875,7 +875,7 @@ function Background10() {
     <div className="bg-[#f1e9ff] flex-[1_0_0] min-w-px relative rounded-[9px] self-stretch" data-name="Background">
       <div className="flex flex-col items-center size-full">
         <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-center p-[10px] relative size-full">
-          <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] text-center whitespace-nowrap">
+          <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] text-center whitespace-nowrap">
             <p className="leading-[19.5px]">Digital Twin</p>
           </div>
         </div>
@@ -917,7 +917,7 @@ function Container37() {
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
         <Svg9 />
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b3c72] text-[10px] tracking-[1.2px] uppercase whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b3c72] text-[10px] tracking-[1.2px] uppercase whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[15px]">Takeaway · talk to a synthetic stand-in</p>
         </div>
       </div>
@@ -929,7 +929,7 @@ function Container38() {
   return (
     <div className="max-w-[807.8389892578125px] relative shrink-0 w-[807.83px]" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start max-w-[inherit] pt-[1.1px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[20px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[20px] whitespace-nowrap">
           <p className="leading-[26px]">A synthetic stand-in of this audience, built from the measured data in the other three tabs.</p>
         </div>
       </div>
@@ -941,16 +941,16 @@ function Container39() {
   return (
     <div className="max-w-[652.3930053710938px] relative shrink-0 w-[652.39px]" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start max-w-[inherit] pb-[0.69px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#6b6b6b] text-[13px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="mb-0">
             <span className="leading-[20.8px]">{`Ask it about messaging, product or price and it answers in-character. Every answer shows what’s `}</span>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[20.8px] text-[#1a1a1a]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+            <span className="[word-break:break-word] font-['Jua','Noto_Sans:Regular',sans-serif] leading-[20.8px] text-[#1a1a1a]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
               measured
             </span>
             <span className="leading-[20.8px]">{` vs`}</span>
           </p>
           <p>
-            <span className="[word-break:break-word] font-['Jua:Regular','Noto_Sans:Regular',sans-serif] leading-[20.8px] text-[#1a1a1a]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+            <span className="[word-break:break-word] font-['Jua','Noto_Sans:Regular',sans-serif] leading-[20.8px] text-[#1a1a1a]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
               modelled
             </span>
             <span className="leading-[20.8px]">, so you can see where the data ends and the model begins.</span>
@@ -977,7 +977,7 @@ function TakeawayFramedAsIfThisAudienceWereAPerson() {
 function Container42() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
         <p className="leading-[21px]">Who do you want to talk to?</p>
       </div>
     </div>
@@ -987,7 +987,7 @@ function Container42() {
 function Container43() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[11px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[11px] whitespace-nowrap">
         <p className="leading-[16.5px]">Synthetic personas, modelled from the measured atoms</p>
       </div>
     </div>
@@ -1017,7 +1017,7 @@ function Background11() {
   return (
     <div className="bg-[#6b3c72] relative rounded-[15px] shrink-0 size-[30px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans_Math:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13px] text-center text-white whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans_Math:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13px] text-center text-white whitespace-nowrap">
           <p className="leading-[19.5px]">∑</p>
         </div>
       </div>
@@ -1028,7 +1028,7 @@ function Background11() {
 function Container46() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
         <p className="leading-[18px]">Whole audience</p>
       </div>
     </div>
@@ -1038,7 +1038,7 @@ function Container46() {
 function Container47() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[15px]">612k · blended</p>
       </div>
     </div>
@@ -1085,7 +1085,7 @@ function Background12() {
 function Container49() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
         <p className="leading-[18px]">Mara, 34</p>
       </div>
     </div>
@@ -1095,7 +1095,7 @@ function Container49() {
 function Container50() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[15px]">Weekend Runner · Brunswick</p>
       </div>
     </div>
@@ -1142,7 +1142,7 @@ function Background13() {
 function Container52() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap">
         <p className="leading-[18px]">Daniel, 41</p>
       </div>
     </div>
@@ -1152,7 +1152,7 @@ function Container52() {
 function Container53() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[15px]">Family Trailgoer · Sandringham</p>
       </div>
     </div>
@@ -1188,7 +1188,7 @@ function Background14() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[15px] shrink-0 size-[30px]" data-name="Background">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] text-center whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[13px] text-center whitespace-nowrap">
           <p className="leading-[19.5px]">+</p>
         </div>
       </div>
@@ -1199,7 +1199,7 @@ function Background14() {
 function Container55() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
         <p className="leading-[18px]">New persona</p>
       </div>
     </div>
@@ -1209,7 +1209,7 @@ function Container55() {
 function Container56() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap">
         <p className="leading-[15px]">from a segment</p>
       </div>
     </div>
@@ -1269,7 +1269,7 @@ function WhoYoureTalkingTo() {
 function Container59() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[14px] whitespace-nowrap">
         <p className="leading-[21px]">Talk to the digital twin of this audience</p>
       </div>
     </div>
@@ -1279,7 +1279,7 @@ function Container59() {
 function Container60() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[11px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#9a9a9a] text-[11px] whitespace-nowrap">
         <p className="leading-[16.5px]">{`Pressure-test messaging, products & price in natural language`}</p>
       </div>
     </div>
@@ -1351,7 +1351,7 @@ function Background15() {
   return (
     <div className="bg-[#f1e9ff] max-w-[745.6799926757812px] relative rounded-[12px] shrink-0 w-full" data-name="Background">
       <div className="content-stretch flex flex-col items-start max-w-[inherit] px-[12px] py-[10px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
           <p className="leading-[18px]">What do they actually buy, and which competitor stores do they visit?</p>
         </div>
       </div>
@@ -1373,7 +1373,7 @@ function BackgroundBorder16() {
   return (
     <div className="bg-[#f3f3f1] content-stretch flex flex-col items-start px-[7px] py-[2px] relative rounded-[5px] shrink-0" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[5px]" />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[9px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[9px] whitespace-nowrap">
         <p className="leading-[13.5px]">measured</p>
       </div>
     </div>
@@ -1384,7 +1384,7 @@ function Container63() {
   return (
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-center flex flex-wrap gap-[0px_6px] items-center relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[15px]">{`Grounded in: Purchase patterns · Competitor & POI visitation`}</p>
         </div>
         <BackgroundBorder16 />
@@ -1397,7 +1397,7 @@ function BackgroundBorder15() {
   return (
     <div className="bg-[#fafaf8] content-stretch flex flex-col gap-[7px] items-start max-w-[745.6799926757812px] px-[13px] py-[11px] relative rounded-[12px] shrink-0 w-[745.67px]" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[12px]" />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[18px] mb-0">They skew heavily to sports nutrition (1.9×) and athleisure (1.8×), avg basket $48, mostly in-store. On visitation, 42% have been to</p>
         <p className="leading-[18px] mb-0">rebel Sport in the last 3 months (1.6× metro), 31% a lululemon store, 27% Nike or a specialty running store — so they’re actively</p>
         <p className="leading-[18px]">shopping the category, not just browsing.</p>
@@ -1411,7 +1411,7 @@ function Background16() {
   return (
     <div className="bg-[#f1e9ff] max-w-[745.6799926757812px] relative rounded-[12px] shrink-0 w-full" data-name="Background">
       <div className="content-stretch flex flex-col items-start max-w-[inherit] px-[12px] py-[10px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[12px] whitespace-nowrap">
           <p className="leading-[18px]">Best way and time to reach them for a launch?</p>
         </div>
       </div>
@@ -1433,7 +1433,7 @@ function BackgroundBorder18() {
   return (
     <div className="bg-[#f3f3f1] content-stretch flex flex-col items-start px-[7px] py-[2px] relative rounded-[5px] shrink-0" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[5px]" />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[9px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b6b6b] text-[9px] whitespace-nowrap">
         <p className="leading-[13.5px]">measured</p>
       </div>
     </div>
@@ -1443,7 +1443,7 @@ function BackgroundBorder18() {
 function Background17() {
   return (
     <div className="bg-[#f1e9ff] content-stretch flex flex-col items-start px-[6px] py-px relative rounded-[5px] shrink-0" data-name="Background">
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[9px] whitespace-nowrap">
+      <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[9px] whitespace-nowrap">
         <p className="leading-[13.5px]">modelled</p>
       </div>
     </div>
@@ -1454,11 +1454,11 @@ function Container64() {
   return (
     <div className="relative shrink-0 w-full" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-center flex flex-wrap gap-[0px_6px] items-center relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[15px]">Grounded in: Peak dayparts · Best time by channel · Brand affinity</p>
         </div>
         <BackgroundBorder18 />
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[10px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[15px]">· phrasing</p>
         </div>
         <Background17 />
@@ -1471,7 +1471,7 @@ function BackgroundBorder17() {
   return (
     <div className="bg-[#fafaf8] content-stretch flex flex-col gap-[7px] items-start max-w-[745.6799926757812px] px-[13px] py-[11px] relative rounded-[12px] shrink-0 w-[745.67px]" data-name="Background+Border">
       <div aria-hidden className="absolute border border-[#e5e5e2] border-solid inset-0 pointer-events-none rounded-[12px]" />
-      <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+      <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#1a1a1a] text-[12px] whitespace-nowrap" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
         <p className="leading-[18px] mb-0">OOH around home at Sat 6–9am is your strongest single window (2.3×). Pair it with social on weekday evenings and retail media on</p>
         <p className="leading-[18px]">weekends. A “tested on your weekend route” message will land better than race-day performance for this crowd.</p>
       </div>
@@ -1484,7 +1484,7 @@ function Background18() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[999px] self-stretch shrink-0" data-name="Background">
       <div className="content-stretch flex flex-col items-start pb-[5.5px] pt-[4px] px-[11px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
           <p className="leading-[16.5px]">What do they buy?</p>
         </div>
       </div>
@@ -1496,7 +1496,7 @@ function Background19() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[999px] self-stretch shrink-0" data-name="Background">
       <div className="content-stretch flex flex-col items-start pb-[5.5px] pt-[4px] px-[11px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
           <p className="leading-[16.5px]">Which competitor stores do they visit?</p>
         </div>
       </div>
@@ -1508,7 +1508,7 @@ function Background20() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[999px] self-stretch shrink-0" data-name="Background">
       <div className="content-stretch flex flex-col items-start pb-[5.5px] pt-[4px] px-[11px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
           <p className="leading-[16.5px]">{`Best channel & time to reach them?`}</p>
         </div>
       </div>
@@ -1520,7 +1520,7 @@ function Background21() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[999px] self-stretch shrink-0" data-name="Background">
       <div className="content-stretch flex flex-col items-start pb-[5.5px] pt-[4px] px-[11px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
           <p className="leading-[16.5px]">How would they react to a $260 launch?</p>
         </div>
       </div>
@@ -1532,7 +1532,7 @@ function Background22() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[999px] self-stretch shrink-0" data-name="Background">
       <div className="content-stretch flex flex-col items-start pb-[5.5px] pt-[4px] px-[11px] relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
+        <div className="[word-break:break-word] flex flex-col font-['Jua',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#6b3c72] text-[11px] whitespace-nowrap">
           <p className="leading-[16.5px]">Stress-test message A vs B</p>
         </div>
       </div>
@@ -1570,7 +1570,7 @@ function Container66() {
   return (
     <div className="flex-[1_0_0] min-w-px relative" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Jua:Regular','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[12px] w-full" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
+        <div className="[word-break:break-word] flex flex-col font-['Jua','Noto_Sans:Regular',sans-serif] justify-center leading-[0] relative shrink-0 text-[#9a9a9a] text-[12px] w-full" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100, "wght" 400' }}>
           <p className="leading-[18px]">Ask the audience anything — message, product, price, channel…</p>
         </div>
       </div>
