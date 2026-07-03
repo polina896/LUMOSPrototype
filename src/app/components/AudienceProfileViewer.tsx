@@ -4,7 +4,7 @@ import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import { type ModuleRef } from "./ModuleAsk";
 import Screen2Mobility from "@/imports/Screen2Mobility-1";
 import Screen3Temporal from "@/imports/Screen3Temporal";
-import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
+import DigitalTwinTab from "./DigitalTwinTab";
 
 interface AudienceProfileViewerProps {
   audienceId: string;
@@ -312,7 +312,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         {activeTab === 'profile'  && <AudienceProfileContent onAsk={pinToAsk} audience={askName} />}
         {activeTab === 'mobility' && <Screen2Mobility />}
         {activeTab === 'temporal' && <Screen3Temporal />}
-        {activeTab === 'digital'  && <Screen4DigitalTwin />}
+        {activeTab === 'digital'  && <DigitalTwinTab />}
       </div>
     </div>
 
