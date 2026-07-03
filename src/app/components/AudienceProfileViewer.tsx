@@ -33,6 +33,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const [activeTab, setActiveTab] = useState<DeepDiveTab>('profile');
   // Ask Lumos docks open by default — interrogating the audience is the primary verb.
   const [askOpen, setAskOpen] = useState(true);
+  // "Defined by" reveals the audience's provenance (filters/sources/window/geo/confidence).
+  // Open by default so the definition is visible on every audience's deep dive.
+  const [defsOpen, setDefsOpen] = useState(true);
   // Thread + draft live here (not in the panel) so the conversation survives a collapse.
   const [askMessages, setAskMessages] = useState<AskMsg[]>([]);
   const [askDraft, setAskDraft] = useState('');
@@ -200,9 +203,14 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           <span className="font-['Inter',sans-serif] text-[11px] text-[#9a9a9a] whitespace-nowrap shrink-0">· updated 2d ago</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {/* Defined by */}
-          <button className="flex items-center gap-[6px] bg-[#fafaf8] border border-[#e5e5e2] rounded-lg px-3 py-2 hover:bg-[#f3f3f1] transition-colors">
-            <svg viewBox="0 0 13 13" width="13" height="13" fill="none">
+          {/* Defined by — toggles the audience definition panel inside the KPI card */}
+          <button
+            onClick={() => setDefsOpen((v) => !v)}
+            aria-pressed={defsOpen}
+            aria-label="Toggle audience definition"
+            className="flex items-center gap-[6px] bg-[#fafaf8] border border-[#e5e5e2] rounded-lg px-3 py-2 hover:bg-[#f3f3f1] transition-colors"
+          >
+            <svg viewBox="0 0 13 13" width="13" height="13" fill="none" className={`transition-transform ${defsOpen ? '' : 'rotate-180'}`}>
               <path d="M9.75 8.125L6.5 4.875L3.25 8.125" stroke="#6B6B6B" strokeWidth="1.08333" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="font-['Inter',sans-serif] text-[11.4px] text-[#6b6b6b] leading-normal">Defined by</span>
@@ -251,6 +259,27 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
                 </div>
               ))}
             </div>
+
+            {/* ── Defined by — audience provenance, revealed by the header button ── */}
+            {defsOpen && (
+              <div className="flex flex-wrap gap-[7px] w-full pt-[12px] border-t border-dashed border-[#e5e5e2]">
+                {[
+                  { label: 'Filters:', value: ' In-market auto intenders · showroom & dealer dwell' },
+                  { label: 'Sources:', value: ' LUMOS panels · GWI · Telco · Card & loyalty' },
+                  { label: 'Window:', value: ' Mar–May 2026 · rolling 90d' },
+                  { label: 'Geo:', value: ' Singapore' },
+                  { label: 'Confidence:', value: ' ±2.1% @ 95% CI' },
+                ].map((c) => (
+                  <span
+                    key={c.label}
+                    className="bg-[#f3f3f1] border border-[#e5e5e2] rounded-full pt-[4px] pb-[5.5px] px-[11px] font-['Jua',sans-serif] text-[11px] leading-[16.5px] whitespace-nowrap"
+                  >
+                    <span className="text-[#1a1a1a]">{c.label}</span>
+                    <span className="text-[#6b6b6b]">{c.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
