@@ -16,8 +16,16 @@ const gauss = (x: number, mu: number, sd: number) => Math.exp(-((x - mu) ** 2) /
 const fmtHour = (h: number) => String(h).padStart(2, '0') + ':00';
 const fmtClock = (h: number) => `${h % 12 === 0 ? 12 : h % 12}${h < 12 ? 'am' : 'pm'}`;
 
-// mode → time-of-day shape (weekday, weekend)
-function hourWeight(mode: GeoModeKey, h: number, weekend: boolean): number {
+// mode → time-of-day shape (weekday, weekend). earlyRiser shifts the morning
+// peak to dawn (fitness / marathon audiences active before work & at weekends).
+function hourWeight(mode: GeoModeKey, h: number, weekend: boolean, earlyRiser = false): number {
+  if (earlyRiser && mode === 'Residential') {
+    // Flatter distribution so the Sat-morning peak indexes ~2.3× (not a spike),
+    // weekday mornings read moderate, midday/late stay low.
+    return weekend
+      ? gauss(h, 7, 2.1) * 0.85 + gauss(h, 18.5, 2.4) * 0.30 + 0.42
+      : gauss(h, 7, 1.9) * 0.48 + gauss(h, 19, 2.1) * 0.34 + 0.42;
+  }
   switch (mode) {
     case 'Daytime': // out at work / on the move during office hours
       return weekend
@@ -40,16 +48,17 @@ const AUD_DAY_FACTOR: Record<string, Record<string, number>> = {
   'ev-upgrade-shoppers':     { Mon: 0.95, Tue: 0.98, Wed: 1.0, Thu: 1.0, Fri: 0.9,  Sat: 1.18, Sun: 1.05 },
   'premium-sedan-intenders': { Mon: 1.0,  Tue: 1.02, Wed: 1.03, Thu: 1.05, Fri: 1.1, Sat: 0.95, Sun: 0.85 },
   'family-suv-upgraders':    { Mon: 0.9,  Tue: 0.92, Wed: 0.95, Thu: 0.95, Fri: 1.0, Sat: 1.25, Sun: 1.12 },
+  'urban-upgrade-drivers':   { Mon: 0.85, Tue: 0.88, Wed: 0.9, Thu: 0.9,  Fri: 0.95, Sat: 1.32, Sun: 1.16 },
 };
 const DEFAULT_DAY_FACTOR = { Mon: 1, Tue: 1, Wed: 1, Thu: 1, Fri: 1, Sat: 1.05, Sun: 0.95 };
 
 type Cell = { r: number; c: number; v: number };
 type Matrix = { idx: number[][]; peak: Cell; second: Cell };
 
-function buildMatrix(audienceId: string, mode: GeoModeKey): Matrix {
+function buildMatrix(audienceId: string, mode: GeoModeKey, earlyRiser: boolean): Matrix {
   const dayFactor = AUD_DAY_FACTOR[audienceId] ?? DEFAULT_DAY_FACTOR;
   const raw = HOURS.map((h) =>
-    DAYS.map((d) => hourWeight(mode, h, d === 'Sat' || d === 'Sun') * (dayFactor[d] ?? 1)),
+    DAYS.map((d) => hourWeight(mode, h, d === 'Sat' || d === 'Sun', earlyRiser) * (dayFactor[d] ?? 1)),
   );
   const flat = raw.flat();
   const mean = flat.reduce((a, b) => a + b, 0) / flat.length;
@@ -76,13 +85,15 @@ const Star = ({ cls }: { cls: string }) => (
 );
 
 export default function AudienceDensity({
-  audienceId, mode, variant = 'panel',
+  audienceId, mode, variant = 'panel', earlyRiser = false, hideTitle = false,
 }: {
   audienceId: string;
   mode: GeoModeKey;
   variant?: 'panel' | 'expanded';
+  earlyRiser?: boolean;
+  hideTitle?: boolean;
 }) {
-  const { idx, peak, second } = buildMatrix(audienceId, mode);
+  const { idx, peak, second } = buildMatrix(audienceId, mode, earlyRiser);
   const big = variant === 'expanded';
 
   const cellH = big ? 52 : 40;
@@ -99,11 +110,13 @@ export default function AudienceDensity({
   return (
     <div>
       {/* header — title + legend */}
-      <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
-        <div>
-          <p className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a]">Audience density</p>
-          <p className="font-['Jua',sans-serif] text-[10.5px] text-[#9a9a9a]">By hour &amp; day · indexed (1.0 = average)</p>
-        </div>
+      <div className={`flex items-start gap-3 mb-2 flex-wrap ${hideTitle ? 'justify-end' : 'justify-between'}`}>
+        {!hideTitle && (
+          <div>
+            <p className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a]">Audience density</p>
+            <p className="font-['Jua',sans-serif] text-[10.5px] text-[#9a9a9a]">By hour &amp; day · indexed (1.0 = average)</p>
+          </div>
+        )}
         <div className="flex items-center gap-1.5 pt-0.5">
           <span className="font-['Jua',sans-serif] text-[9.5px] text-[#9a9a9a]">Low</span>
           {SCALE.map((c) => (
