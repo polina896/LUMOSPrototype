@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LUMOS — Create Audience in Data Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Jua&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* prototype (Data Explorer) tokens */
+    --page:#FAFAF9; --side:#F3F3F1; --rail:#F5F5F3; --card:#FFFFFF; --soft:#FAF9F7;
+    --ink:#1E163C; --ink2:#1A1A1A; --muted:#6A6A6A; --faint:#929292; --xfaint:#B0B0B0;
+    --line:#E5E5E2; --line2:#F0F0F0; --sideline:#D0D0D0;
+    --acc:#732D93; --acc-d:#6B3C72; --acc-soft:#EFE6FF; --acc-tint:#FCF6FF; --acc-line:#E4D3EE;
+    --iconbg:#F0E8FF; --good:#1D9E75;
+    /* library segment family — In-market / Intenders (ties creation back to the library) */
+    --mkt:#993C1D; --mkt-bg:#FAE3DA; --mkt-g:linear-gradient(135deg,#EE9168,#993C1D);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--page);color:var(--ink2);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5;padding:40px}
+  .jua{font-family:'Jua',system-ui,sans-serif;font-weight:400}
+  .mono{font-family:'DM Mono',monospace}
+
+  /* ---- flow presentation shell ---- */
+  .flow-head{max-width:1120px;margin:0 auto 34px}
+  .flow-head .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px;font-weight:600}
+  .flow-head h1{font-family:'Jua';font-size:27px;font-weight:400;margin-bottom:10px}
+  .flow-head p{color:var(--muted);max-width:840px}
+  .flow-head p b{color:var(--ink2)}
+  .flow{display:flex;align-items:flex-start;width:max-content;padding-bottom:40px}
+  .step{display:flex;flex-direction:column;align-items:center}
+  .arrow{align-self:flex-start;margin:380px 22px 0;color:var(--acc-line);flex:0 0 auto}
+  .caption{margin-top:18px;width:1360px;text-align:center}
+  .caption .num{display:inline-flex;align-items:center;justify-content:center;font-family:'Jua';background:var(--acc);color:#fff;width:24px;height:24px;border-radius:50%;font-size:13px;margin-bottom:9px}
+  .caption .t{font-family:'Jua';font-size:16px;margin-bottom:5px}
+  .caption .d{color:var(--muted);font-size:13px;max-width:1040px;margin:0 auto}
+  .caption .d b{color:var(--ink2)}
+
+  /* ---- app shell ---- */
+  .screen{width:1360px;height:760px;background:var(--page);border:1px solid var(--sideline);border-radius:14px;overflow:hidden;display:flex;box-shadow:0 1px 2px rgba(40,37,45,.05)}
+
+  /* sidebar */
+  .side{width:210px;flex:0 0 auto;background:var(--side);border-right:1px solid var(--sideline);padding:16px;display:flex;flex-direction:column}
+  .wsbtn{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;margin-bottom:16px}
+  .wsbtn .jua{font-size:14px;color:var(--muted)}
+  .wsbtn .cv{color:#323745;font-size:11px}
+  .modes{display:flex;gap:8px;margin-bottom:22px}
+  .mode{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:6px;font-size:12px;font-weight:500;color:#2B2A33}
+  .mode.on{background:#BDBDE7}
+  .mode.off{background:#E0E0E0}
+  .mode svg{width:14px;height:14px}
+  nav{display:flex;flex-direction:column;gap:3px;margin-bottom:26px}
+  .nv{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-family:'Jua';font-size:14px;color:var(--muted)}
+  .nv svg{width:16px;height:16px;color:#323745;flex:none}
+  .nv.home{background:#E5E5E5}
+  .nv.on{background:var(--acc-soft);color:var(--acc)}
+  .nv.on svg{color:var(--acc)}
+  .navsec{font-family:'Jua';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9C9C9C;padding:0 11px;margin-bottom:10px}
+  .recent{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:8px}
+  .recent.on{background:var(--acc-soft)}
+  .recent .ri{width:20px;height:20px;border-radius:6px;background:#D4AADF;display:flex;align-items:center;justify-content:center;flex:none;color:var(--acc-d)}
+  .recent .ri svg{width:12px;height:12px}
+  .recent .rt{font-family:'Jua';font-size:12px;line-height:1.25;color:var(--acc-d)}
+  .recent .rs{font-family:'Jua';font-size:10px;color:#999;margin-top:2px}
+  .recent.muted .rt{color:var(--xfaint)}
+
+  /* main chat */
+  .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--page);border-right:1px solid var(--sideline)}
+  .chat-hd{padding:14px 22px;border-bottom:1px solid var(--line);flex:0 0 auto;display:flex;align-items:center;gap:9px}
+  .chat-hd .ct{font-family:'Jua';font-size:14px}
+  .chat-hd .cs{font-size:12px;color:var(--xfaint)}
+  .chat-body{flex:1;padding:22px 22px;overflow:hidden}
+  .ai{font-size:14px;margin-bottom:14px;line-height:1.55;max-width:440px}
+  .ai .lead{font-family:'Jua';font-size:15px;display:block;margin-bottom:5px}
+  .ai.small{font-size:13.5px}
+  .ai b{font-weight:600}
+  .bub{align-self:flex-end;background:var(--acc-soft);border-radius:14px 14px 4px 14px;padding:11px 14px;font-size:13.5px;max-width:82%;margin-left:auto;margin-bottom:15px;color:var(--acc-d)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+  .chip{border:1px solid var(--acc-line);color:var(--acc);background:var(--acc-tint);border-radius:16px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Jua'}
+  .chip.ghost{background:#fff;border-color:var(--line);color:var(--muted);font-weight:400}
+  .qlabel{font-size:13px;color:var(--muted);margin-bottom:9px}
+  .qlabel .n{color:var(--acc);font-weight:700}
+  .starters{margin-bottom:14px}
+  .starter{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+  .starter .si{width:26px;height:26px;border-radius:7px;background:var(--iconbg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+  .starter .si svg{width:15px;height:15px}
+  .starter .st{font-family:'Jua';font-size:13px;color:var(--ink)}
+  .starter .ss{font-size:11.5px;color:var(--faint)}
+  .divider{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:11.5px;margin:2px 0 13px}
+  .divider::before,.divider::after{content:"";height:1px;background:var(--line);flex:1}
+  .reason{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:13px;color:var(--muted);font-size:13px}
+  .spin{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;flex:none}
+
+  /* collapsed reasoning row + stepped clarify widget — matches the existing chat design */
+  .reason2{display:flex;align-items:flex-start;gap:11px;background:#F4F3F1;border-radius:12px;padding:12px 15px;margin-bottom:16px;color:var(--muted);font-size:12.5px;font-style:italic;line-height:1.5;max-width:600px}
+  .reason2 .cv{color:var(--xfaint);font-style:normal;font-size:13px;margin-top:1px;flex:none}
+  .qhead{font-family:'Jua';font-size:16px;color:var(--ink2);line-height:1.45;max-width:600px}
+  .clar{background:#fff;border:1px solid #E0D8F8;border-radius:18px;box-shadow:0 4px 24px rgba(115,45,147,.10);overflow:hidden;margin:0 20px 14px;flex:0 0 auto}
+  .clar-step{display:flex;align-items:center;gap:12px;padding:14px 18px 12px;border-bottom:1px solid #F4F0FB}
+  .clar-prog{display:flex;gap:6px}
+  .clar-prog i{height:4px;border-radius:3px;display:block}
+  .clar-prog i.done{width:16px;background:var(--acc)}
+  .clar-prog i.cur{width:24px;background:var(--acc)}
+  .clar-prog i.todo{width:16px;background:#E5E0F0}
+  .clar-qn{font-family:'Jua';font-size:11px;color:#AAA}
+  .clar-body{padding:14px 18px 18px}
+  .clar-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .clar-chip{padding:7px 13px;border-radius:16px;font-family:'Jua';font-size:12px;border:1px solid #DDD;background:#fff;color:#555;cursor:pointer}
+  .clar-chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+  .clar-in{display:flex;align-items:center;gap:8px}
+  .clar-in .fake{flex:1;padding:10px 14px;background:#FAF9FF;border:1px solid #E8E4F4;border-radius:12px;font-family:'Jua';font-size:13px;color:#C0B8D0}
+  .clar-next{display:flex;align-items:center;gap:6px;padding:10px 16px;border-radius:12px;font-family:'Jua';font-size:13px;background:#F0EDF7;color:#C0B0D0;flex:none}
+  .clar-next.on{background:var(--acc);color:#fff}
+  .clar-next svg{width:14px;height:14px}
+  .srcline{font-size:12px;color:var(--faint);margin-bottom:14px}
+  .done{color:var(--good);font-weight:700}
+  .cta-row{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+  .btn{font-family:'Jua';font-size:13px;border-radius:10px;padding:9px 15px;border:1px solid var(--acc);background:var(--acc);color:#fff;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--acc-d);border-color:var(--acc-line)}
+  .btn.sm{font-size:12px;padding:7px 12px}
+  .btn.neutral{background:#fff;color:var(--muted);border-color:var(--line)}
+  .composer{margin:0 20px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;flex:0 0 auto}
+  .composer.focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+  .composer .ph{color:var(--faint);font-size:13.5px;margin-bottom:14px}
+  .composer .ph.typed{color:var(--ink2)}
+  .comp-row{display:flex;align-items:center;gap:13px;color:var(--muted);font-size:12px}
+  .comp-row .it{display:flex;align-items:center;gap:5px}
+  .comp-sp{flex:1}
+  .send{width:29px;height:29px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+  .send.idle{background:var(--acc-line)}
+
+  /* ---- Data Explorer session rail ---- */
+  .de{flex:0 0 auto;background:var(--rail);border-right:1px solid var(--sideline);display:flex;flex-direction:column;width:400px}
+  .de.narrow{width:300px}
+  .de-top{padding:14px 20px;border-bottom:1px solid var(--line);background:#fff;flex:0 0 auto}
+  .de-top .dt{font-family:'Jua';font-size:14px}
+  .de-top .ds{font-family:'Jua';font-size:12px;color:#999;margin-top:2px}
+  .de-scroll{flex:1;overflow:hidden;background:#fff;padding:16px 18px}
+  .de-sec{margin-bottom:22px}
+  .de-h{font-family:'Jua';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+  .de-card{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #E8E8E8;border-radius:12px;padding:11px 13px;margin-bottom:8px}
+  .de-card .di{width:32px;height:32px;border-radius:8px;background:var(--iconbg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+  .de-card .di svg{width:16px;height:16px}
+  .de-card .dn{font-family:'Jua';font-size:13px;color:var(--ink);line-height:1.25}
+  .de-card .dm{font-family:'Jua';font-size:12px;color:#888;line-height:1.3;margin-top:1px}
+  .de-card .arr{margin-left:auto;color:var(--acc);font-size:13px;flex:none}
+  .de-card.sel{background:var(--acc-tint);border-color:var(--acc);box-shadow:0 1px 3px rgba(115,45,147,.12)}
+  .de-card.building{border-style:dashed;border-color:var(--acc-line)}
+  .de-card.ph{background:#F9F9F9;border-style:dashed;border-color:#DDD;opacity:.7}
+  .de-card.ph .di{background:#EEE;color:#AAA}
+  .de-card.ph .dn{color:#BBB}
+  .de-card .spin{margin-left:auto}
+
+  /* ---- Audience detail panel ---- */
+  .detail{width:420px;flex:0 0 auto;background:#fff;display:flex;flex-direction:column;overflow:hidden}
+  .dpad{padding:16px 20px;overflow:hidden;flex:1}
+  .d-top{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--line2);flex:0 0 auto}
+  .d-top .dl{font-family:'Jua';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .d-top .sp{flex:1}
+  .d-top .ic{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+  .d-top .autopill{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--acc-d);background:var(--acc-soft);border-radius:12px;padding:3px 9px}
+  .d-hero{background:var(--acc);color:#fff;padding:16px 20px}
+  .d-hero.build{background:var(--acc-line);color:var(--acc-d)}
+  .d-hero .hn{font-family:'Jua';font-size:18px;display:flex;align-items:center;gap:9px}
+  .d-hero .hn .ed{opacity:.75;font-size:12px}
+  .badge{font-size:10px;font-weight:700;background:rgba(255,255,255,.22);border-radius:6px;padding:2px 8px;font-family:'DM Sans'}
+  .badge.saved{background:var(--good)}
+  .d-hero .hs{font-size:12px;opacity:.92;margin-top:4px}
+  .grp{font-family:'Jua';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:15px 0 8px}
+  .grp:first-child{margin-top:0}
+  .sizecard{border:1px solid var(--acc-line);background:var(--acc-tint);border-radius:12px;padding:13px 15px;margin-bottom:4px}
+  .sizecard .sv{font-family:'Jua';font-size:28px;line-height:1;color:var(--acc-d)}
+  .sizecard .sv .u{font-size:13px;color:var(--muted);font-family:'DM Sans';margin-left:6px}
+  .sizecard .meter{height:8px;background:#fff;border:1px solid var(--acc-line);border-radius:5px;overflow:hidden;margin:10px 0 7px}
+  .sizecard .meter i{display:block;height:100%;background:var(--acc);border-radius:5px}
+  .sizecard .note{font-size:11.5px;color:var(--muted)}
+  .sizecard .note b{color:var(--acc-d)}
+  .recipe{border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .rc{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line2)}
+  .rc:last-child{border-bottom:none}
+  .rc .ri{width:24px;height:24px;border-radius:7px;background:var(--soft);color:var(--muted);display:flex;align-items:center;justify-content:center;flex:none}
+  .rc .ri svg{width:14px;height:14px}
+  .rc .rk{font-family:'Jua';font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .rc .rv{font-size:13px;font-weight:500}
+  .rc.pending{opacity:.5}.rc.pending .rv{font-style:italic;color:var(--faint)}
+  .tagrow{display:flex;flex-wrap:wrap;gap:7px}
+  .tag{border:1px solid var(--line);border-radius:16px;padding:5px 11px;font-size:12px;color:var(--ink2)}
+  .tag.soft{background:var(--acc-soft);border-color:var(--acc-line);color:var(--acc-d)}
+  .pill-seg{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:8px;padding:4px 10px;background:var(--mkt-bg);color:var(--mkt)}
+  .pill-seg .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .demo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+  .demo .d{border:1px solid var(--line);border-radius:9px;padding:8px 9px}
+  .demo .d .l{font-size:10px;color:var(--faint);margin-bottom:3px}
+  .demo .d .v{font-family:'Jua';font-size:13px}
+  .beh{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12.5px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px}
+  .beh .ix{color:var(--acc-d);font-weight:600;font-family:'DM Mono';font-size:12px}
+  .barline{margin-bottom:8px}
+  .barline .bh{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+  .barline .bh .bv{color:var(--muted);font-weight:600}
+  .barline .bt{height:7px;background:var(--soft);border-radius:5px;overflow:hidden}
+  .barline .bt i{display:block;height:100%;border-radius:5px;background:var(--acc)}
+  .d-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:13px 20px;flex:0 0 auto}
+  .d-foot .fl{font-family:'Jua';font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .d-foot .fv{font-family:'Jua';font-size:19px;color:var(--acc-d)}
+  .savednote{display:flex;align-items:flex-start;gap:9px;background:var(--acc-tint);border:1px solid var(--acc-line);border-radius:11px;padding:11px 13px;font-size:12.5px;color:var(--acc-d);line-height:1.45}
+  .savednote .sk{width:20px;height:20px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;font-size:12px}
+
+  /* ===== real AudienceDetailPanel (matches the prototype exactly) ===== */
+  :root{--adp:#6B3C72;--adp-soft:#F1E9FF;--adp-bg:#FAFAF9;--adp-line:#E5E5E2;--adp-mut:#6B6B6B;--adp-faint:#9A9A9A;--adp-bar:#BEBDE7}
+  .adp-tabs{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--adp-line);background:#fff;flex:0 0 auto}
+  .adp-tab{display:flex;align-items:center;gap:5px;padding:6px 9px;border-radius:8px;font-family:'Jua';font-size:12px;color:var(--adp-mut)}
+  .adp-tab.on{background:var(--adp-soft);color:var(--adp)}
+  .adp-tab svg{width:13px;height:13px}
+  .adp-tsp{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .adp-save{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid var(--adp);color:var(--adp);border-radius:8px;font-family:'Jua';font-size:12px}
+  .adp-save svg{width:12px;height:12px}
+  .adp-ic{width:28px;height:28px;border:1px solid var(--adp-line);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--adp-mut);font-size:13px}
+  .adp-hero{background:var(--adp);padding:13px 20px;flex:0 0 auto}
+  .adp-hero .hn{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+  .adp-hero .hn .n{font-family:'Jua';font-size:17px;color:#fff}
+  .adp-hero .pill{padding:2px 8px;background:rgba(255,255,255,.2);border-radius:7px;font-family:'Jua';font-size:11px;color:#fff}
+  .adp-hero .pill.saved{background:var(--good)}
+  .adp-hero .sd{font-family:'Jua';font-size:12px;color:rgba(255,255,255,.82)}
+  .adp-body{flex:1;overflow:hidden;background:var(--adp-bg);padding:0 20px}
+  .adp-sec{padding:16px 0;border-bottom:1px solid var(--adp-line)}
+  .adp-read-h{font-family:'Jua';font-size:15.5px;color:#1a1a1a;line-height:1.35;margin-bottom:12px;padding-right:28px}
+  .adp-read-h .hl{color:var(--adp)}
+  .adp-pillar{display:flex;gap:12px;align-items:baseline;margin-bottom:8px}
+  .adp-pillar .pn{font-family:'Jua';font-size:16px;color:var(--adp);min-width:50px;flex:none}
+  .adp-pillar .pt{font-family:'Jua';font-size:12px;color:var(--adp-mut);line-height:1.5}
+  .adp-pillar .pt b{color:#1a1a1a;font-weight:400}
+  .adp-sh{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .adp-sh .num{width:21px;height:21px;border-radius:6px;background:var(--adp-soft);color:var(--adp);font-family:'Jua';font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+  .adp-sh .ttl{font-family:'Jua';font-size:15px;color:#1a1a1a}
+  .adp-sh .aside{margin-left:auto;font-family:'Jua';font-size:11px;color:var(--adp-faint)}
+  .adp-utabs{display:flex;gap:18px;border-bottom:1px solid var(--adp-line);margin-bottom:12px}
+  .adp-utab{font-family:'Jua';font-size:12px;color:var(--adp-faint);padding-bottom:8px;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .adp-utab.on{color:var(--adp);border-color:var(--adp)}
+  .adp-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .adp-dcard{border:1px solid var(--adp-line);border-radius:10px;padding:8px 10px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .adp-dcard .dl{font-family:'Jua';font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--adp-faint)}
+  .adp-dcard .dv{font-family:'Jua';font-size:13px;color:#1a1a1a}
+  .adp-idx{display:inline-flex;align-items:center;gap:3px;font-family:'Jua';font-size:11px;padding:2px 6px;border-radius:6px;flex:none}
+  .adp-idx.lead{background:var(--adp-soft);color:var(--adp)}
+  .adp-idx.flat{background:#fff;border:1px solid var(--adp-line);color:var(--adp-faint)}
+  .adp-idx svg{width:9px;height:9px}
+  .adp-take{display:flex;gap:8px;align-items:flex-start;background:var(--adp-soft);border-radius:10px;padding:8px 11px;margin-top:12px}
+  .adp-take svg{width:13px;height:13px;color:var(--adp);flex:none;margin-top:2px}
+  .adp-take p{font-family:'Jua';font-size:12px;color:#1a1a1a;line-height:1.5}
+  .adp-take p b{color:var(--adp);font-weight:400}
+  .adp-segc{display:inline-flex;background:#F1ECF3;border-radius:8px;padding:3px;gap:2px}
+  .adp-segc .o{font-family:'Jua';font-size:11px;padding:5px 10px;border-radius:6px;color:var(--adp-faint)}
+  .adp-segc .o.on{background:#fff;color:var(--adp);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  .adp-map{position:relative;border:1px solid var(--adp-line);border-radius:10px;overflow:hidden;background:#fafaf8;margin-top:2px}
+  .adp-map .ml{position:absolute;left:8px;top:8px;font-family:'Jua';font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--adp-faint);z-index:2}
+  .adp-map .leg{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.85);padding:2px 6px;border-radius:6px;z-index:2}
+  .adp-map .leg span{font-family:'Jua';font-size:9.5px;color:var(--adp-faint)}
+  .adp-map .leg i{width:40px;height:6px;border-radius:4px;background:linear-gradient(90deg,#F1E9FF,#6B3C72);display:block}
+  .adp-insight{display:flex;gap:8px;align-items:flex-start;font-family:'Jua';font-size:12px;color:#1a1a1a;line-height:1.5;margin-top:10px}
+  .adp-insight svg{width:14px;height:14px;color:var(--adp);flex:none;margin-top:2px}
+  .adp-insight b{color:var(--adp);font-weight:400}
+  .adp-explink{display:flex;align-items:center;gap:6px;margin-top:12px;font-family:'Jua';font-size:12px;color:var(--adp)}
+  .adp-explink svg{width:13px;height:13px}
+  .adp-foot{flex:0 0 auto;border-top:1px solid var(--adp-line);padding:12px 14px;display:flex;gap:10px;background:#fff}
+  .adp-fbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border-radius:9px;font-family:'Jua';font-size:13px}
+  .adp-fbtn.pri{background:var(--adp);color:#fff;flex:1.4}
+  .adp-fbtn.pri svg{width:14px;height:14px}
+  .adp-fbtn.sec{border:1px solid var(--adp-line);background:#fff;color:#1a1a1a}
+  .adp-fbtn.sec svg{width:14px;height:14px}
+</style>
+</head>
+<body>
+
+<div class="flow-head">
+  <div class="kicker">LUMOS · Audiences</div>
+  <h1 class="jua">Create Audience — inside Data Explorer</h1>
+  <p>Clicking <b>+ Create audience</b> doesn't open a separate surface — it drops the user into <b>Data Explorer</b>, the app's existing chat-plus-session-rail workspace. The sidebar's <b>Data Explorer</b> lights up, the chat opens a guided brief, and the audience takes shape as a card in the <b>session rail</b> on the right. Selecting it slides in the <b>standard Audience detail panel</b> — the same one used across the product — where the profile builds live and the user refines by talking. Save files it as a reusable object that also lands in the Audiences library. Nothing new to learn; it's the surface people already explore data in.</p>
+</div>
+
+<div class="flow">
+
+  <!-- reusable sidebar is inlined per screen -->
+
+  <!-- ============ SCREEN 1 — ENTER DATA EXPLORER ============ -->
+  <div class="step">
+    <div class="screen">
+      <!-- SIDEBAR -->
+      <div class="side">
+        <div class="wsbtn"><span class="jua">Meridian Motors</span><span class="cv">▾</span></div>
+        <div class="modes"><span class="mode on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6c0-1.5 3.6-2.5 8-2.5S20 4.5 20 6M4 6v12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5V6M4 12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5"/></svg>Research</span><span class="mode off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span></div>
+        <nav>
+          <div class="nv home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</div>
+          <div class="nv on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/></svg>Data Explorer</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg>Audiences</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Documents</div>
+        </nav>
+        <div class="navsec">Recent analysis</div>
+        <div class="recent on"><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">New audience — premium SUV…</div><div class="rs">Just now · Today</div></div></div>
+        <div class="recent muted"><span class="ri" style="background:#E2E2E0;color:#666"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">Launch flagship sedan · SG</div></div></div>
+      </div>
+      <!-- CHAT -->
+      <div class="chat">
+        <div class="chat-hd"><span class="ct jua">New audience</span><span class="cs">· guided brief</span></div>
+        <div class="chat-body">
+          <div class="ai"><span class="lead jua">Who do you want to reach?</span>Describe the audience in your own words — the goal, the market, the kind of people. I'll build it here and it'll appear in your session on the right. Or start from a pattern.</div>
+          <div class="starters">
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12l4-4 4 4 6-6"/><path d="M17 6h4v4"/></svg></span><div><div class="st">In-market for a category</div><div class="ss">People actively shopping now</div></div></div>
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 6L9 17l-5-5"/></svg></span><div><div class="st">Loyal / returning customers</div><div class="ss">Your repeat, high-retention base</div></div></div>
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M15 20c0-3-2.7-5-6-5s-6 2-6 5"/><path d="M16 3.5a3 3 0 010 5.8"/></svg></span><div><div class="st">Lookalike of an existing audience</div><div class="ss">Expand from one you've saved</div></div></div>
+          </div>
+          <div class="divider">or describe your own</div>
+          <div class="chips"><span class="chip ghost">Lapsed owners due to upgrade</span><span class="chip ghost">Families shopping 7-seaters</span><span class="chip ghost">EV-curious commuters</span></div>
+        </div>
+        <div class="composer focus">
+          <div class="ph">Describe your audience…</div>
+          <div class="comp-row"><span class="it">👥 From existing</span><span class="comp-sp"></span><span class="it">📎</span><span class="send idle">→</span></div>
+        </div>
+      </div>
+      <!-- DATA EXPLORER RAIL -->
+      <div class="de">
+        <div class="de-top"><div class="dt jua">Data Explorer</div><div class="ds jua">Audiences, insights & documents from this session</div></div>
+        <div class="de-scroll">
+          <div class="de-sec"><div class="de-h">Audiences</div>
+            <div class="de-card ph"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="dn">No audiences yet</div><div class="dm">The audience you're building will appear here</div></div></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Insights</div>
+            <div class="de-card ph"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="dn">No insights yet</div><div class="dm">Charts & stats appear as Lumos works</div></div></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Documents</div>
+            <div class="de-card ph"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="dn">Create document</div><div class="dm">Collate into a recommendation later</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><span class="num jua">1</span><div class="t jua">Create audience → drops into Data Explorer</div><div class="d">The library CTA activates <b>Data Explorer</b> in the sidebar (no new tab, no takeover) and opens a guided brief in the chat: <b>"Who do you want to reach?"</b> with common starting patterns. The <b>session rail</b> on the right is primed with empty Audiences / Insights / Documents sections — exactly the workspace people already use to explore data.</div></div>
+  </div>
+
+  <div class="arrow"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+
+  <!-- ============ SCREEN 2 — CLARIFY, RAIL FILLS ============ -->
+  <div class="step">
+    <div class="screen">
+      <div class="side">
+        <div class="wsbtn"><span class="jua">Meridian Motors</span><span class="cv">▾</span></div>
+        <div class="modes"><span class="mode on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6c0-1.5 3.6-2.5 8-2.5S20 4.5 20 6M4 6v12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5V6M4 12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5"/></svg>Research</span><span class="mode off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span></div>
+        <nav>
+          <div class="nv home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</div>
+          <div class="nv on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/></svg>Data Explorer</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg>Audiences</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Documents</div>
+        </nav>
+        <div class="navsec">Recent analysis</div>
+        <div class="recent on"><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">New audience — premium SUV…</div><div class="rs">Just now · Today</div></div></div>
+      </div>
+      <div class="chat">
+        <div class="chat-hd"><span class="ct jua">New audience</span><span class="cs">· guided brief</span></div>
+        <div class="chat-body">
+          <div class="bub">People in Singapore in-market for a premium SUV — launching our new flagship, want to raise consideration.</div>
+          <div class="reason2"><span class="cv">›</span><span>Reading the brief — premium SUV intenders, Singapore, competitor &amp; showroom-visitation signals, launch-consideration objective…</span></div>
+          <div class="qhead jua">Before I build it, a couple of quick things — which competitor owners should count as "in-market"?</div>
+        </div>
+        <!-- floating stepped clarify widget (matches existing chat design) -->
+        <div class="clar">
+          <div class="clar-step"><span class="clar-prog"><i class="cur"></i><i class="todo"></i></span><span class="clar-qn">Question 1 of 2</span></div>
+          <div class="clar-body">
+            <div class="clar-chips"><span class="clar-chip on">BMW X5</span><span class="clar-chip on">Audi Q7</span><span class="clar-chip on">Mercedes GLE</span><span class="clar-chip">Volvo XC90</span><span class="clar-chip">Lexus RX</span></div>
+            <div class="clar-in"><span class="fake">Or name another competitor…</span><span class="clar-next on">Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></span></div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="ph">Reply to Lumos</div>
+          <div class="comp-row"><span class="it" style="color:var(--acc)">👥 Add audience</span><span class="comp-sp"></span><span class="it">⌖ Explore</span><span>📎</span><span>🎤</span><span class="send idle">→</span></div>
+        </div>
+      </div>
+      <div class="de">
+        <div class="de-top"><div class="dt jua">Data Explorer</div><div class="ds jua">Audiences, insights & documents from this session</div></div>
+        <div class="de-scroll">
+          <div class="de-sec"><div class="de-h">Audiences</div>
+            <div class="de-card building"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg></span><div><div class="dn">Premium SUV Intenders</div><div class="dm">building… ~210K · narrowing</div></div><span class="spin"></span></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Insights</div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="dn">Auto-intent index — SG</div><div class="dm">Stat · premium SUV segment</div></div></div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.4 7-11a7 7 0 10-14 0c0 4.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><div class="dn">Competitor showroom visitation</div><div class="dm">Heatmap · district level</div></div></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Documents</div>
+            <div class="de-card ph"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="dn">Create document</div><div class="dm">Collate into a recommendation later</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><span class="num jua">2</span><div class="t jua">Lumos clarifies — using the existing stepped question card</div><div class="d">Clarification reuses the product's <b>existing chat pattern</b>: a collapsed "Reading the brief…" row, a bold question headline, then the <b>stepped question card</b> (progress "Question 1 of 2", tappable chips, an "Or describe…" field + Next) floating above the composer — one question at a time, only what changes the definition. On the right the audience appears as a <b>building card</b> and supporting <b>Insights</b> accrue in the same session rail.</div></div>
+  </div>
+
+  <div class="arrow"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+
+  <!-- ============ SCREEN 3 — SELECT → DETAIL PANEL, REFINE ============ -->
+  <div class="step">
+    <div class="screen">
+      <div class="side">
+        <div class="wsbtn"><span class="jua">Meridian Motors</span><span class="cv">▾</span></div>
+        <div class="modes"><span class="mode on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6c0-1.5 3.6-2.5 8-2.5S20 4.5 20 6M4 6v12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5V6M4 12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5"/></svg>Research</span><span class="mode off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span></div>
+        <nav>
+          <div class="nv home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</div>
+          <div class="nv on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/></svg>Data Explorer</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg>Audiences</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Documents</div>
+        </nav>
+        <div class="navsec">Recent analysis</div>
+        <div class="recent on"><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">New audience — premium SUV…</div><div class="rs">Just now · Today</div></div></div>
+      </div>
+      <div class="chat">
+        <div class="chat-hd"><span class="ct jua">New audience</span><span class="cs">· refine</span></div>
+        <div class="chat-body">
+          <div class="reason"><span class="done">✓</span><span>Built — 148K people from 14 sources</span></div>
+          <div class="ai small"><b>Premium SUV Intenders</b> — open on the right. Refine it in words, or save it as-is.</div>
+          <div class="grp" style="margin:2px 0 8px">Try refining</div>
+          <div class="chips"><span class="chip">Only Districts 9, 10, 11</span><span class="chip">Tighten to high-intent</span><span class="chip ghost">Add EV-curious</span></div>
+          <div class="cta-row"><button class="btn">Save audience →</button></div>
+        </div>
+        <div class="composer">
+          <div class="ph">e.g. "drop anyone who bought in the last 12 months"…</div>
+          <div class="comp-row"><span class="it">👥 From existing</span><span class="comp-sp"></span><span class="it">📎</span><span class="send idle">→</span></div>
+        </div>
+      </div>
+      <!-- narrowed DE list -->
+      <div class="de narrow">
+        <div class="de-top"><div class="dt jua">Data Explorer</div></div>
+        <div class="de-scroll">
+          <div class="de-sec"><div class="de-h">Audiences</div>
+            <div class="de-card sel"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg></span><div><div class="dn">Premium SUV Intenders</div><div class="dm">148K · Singapore</div></div><span class="arr">↗</span></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Insights</div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="dn">Auto-intent index</div><div class="dm">Stat</div></div></div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.4 7-11a7 7 0 10-14 0c0 4.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><div class="dn">Competitor visitation</div><div class="dm">Heatmap</div></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- audience detail panel — the prototype's real AudienceDetailPanel -->
+      <div class="detail">
+        <div class="adp-tabs">
+          <span class="adp-tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Preview</span>
+          <span class="adp-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>Data Explorer</span>
+          <span class="adp-tsp"><span class="adp-save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save</span><span class="adp-ic">✕</span><span class="adp-ic">⤓</span><span class="adp-ic">⋯</span></span>
+        </div>
+        <div class="adp-hero"><div class="hn"><span class="n">Premium SUV Intenders</span><span class="pill">Draft</span></div><div class="sd">148K people · Singapore · In-market for premium SUVs</div></div>
+        <div class="adp-body">
+          <!-- THE READ -->
+          <div class="adp-sec">
+            <div class="adp-read-h">Singapore's actively-shopping <span class="hl">premium-SUV intenders</span> — competitor showroom visitors weighing <span class="hl">EV vs hybrid</span> before they commit.</div>
+            <div class="adp-pillar"><span class="pn">2.4×</span><span class="pt">more likely to have <b>visited a premium SUV showroom</b> in the last 90 days</span></div>
+            <div class="adp-pillar"><span class="pn">1.9×</span><span class="pt">more likely to <b>research EV / hybrid drivetrains</b> than the national average</span></div>
+          </div>
+          <!-- §1 WHO THEY ARE -->
+          <div class="adp-sec">
+            <div class="adp-sh"><span class="num">1</span><span class="ttl">Who they are</span><span class="aside">Indexed vs national</span></div>
+            <div class="adp-utabs"><span class="adp-utab on">Demographics</span><span class="adp-utab">Income</span><span class="adp-utab">Segments</span><span class="adp-utab">Interests</span><span class="adp-utab">Behaviours</span></div>
+            <div class="adp-dgrid">
+              <div class="adp-dcard"><div><div class="dl">Core age</div><div class="dv">33–52</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.6×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Gender</div><div class="dv">58% male</div></div><span class="adp-idx flat">0.9×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Occupation</div><div class="dv">Professional</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.4×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Life stage</div><div class="dv">Est. family</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.5×</span></div>
+            </div>
+            <div class="adp-take"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2"/></svg><p>A <b>mid-career, family-stage professional</b> core — affluent enough for premium, settled enough to buy considered.</p></div>
+          </div>
+          <!-- §2 WHERE THEY ARE -->
+          <div class="adp-sec" style="border-bottom:none">
+            <div class="adp-sh"><span class="num">2</span><span class="ttl">Where they are</span><span class="aside">Geo intelligence</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:11px;flex-wrap:wrap">
+              <span class="adp-segc"><span class="o on">Residential</span><span class="o">Daytime</span><span class="o">Transaction</span></span>
+              <span class="adp-segc"><span class="o on">Weekday</span><span class="o">Weekend</span></span>
+            </div>
+            <div class="adp-map">
+              <span class="ml">Home districts · Weekday</span>
+              <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                <rect width="400" height="150" fill="#FAFAF8"/>
+                <polygon points="60,57 120,45 150,74 110,98 65,90" fill="#6B3C72"/>
+                <polygon points="150,74 120,45 185,37 215,66 180,94 110,98" fill="#8A5C90"/>
+                <polygon points="215,66 185,37 255,45 270,82 230,98 180,94" fill="#BEBDE7"/>
+                <polygon points="270,82 255,45 320,62 330,103 285,115 230,98" fill="#6B3C72"/>
+                <polygon points="180,94 230,98 285,115 250,139 175,135 130,123 110,98" fill="#D9CCE3"/>
+                <polygon points="330,103 320,62 360,78 355,123 285,115" fill="#F1E9FF"/>
+                <text x="100" y="78" font-family="Jua" font-size="10" fill="#fff">D10</text>
+                <text x="158" y="74" font-family="Jua" font-size="10" fill="#fff">D11</text>
+                <text x="216" y="78" font-family="Jua" font-size="10" fill="#4a2a50">D9</text>
+                <text x="286" y="92" font-family="Jua" font-size="10" fill="#4a2a50">D15</text>
+              </svg>
+              <span class="leg"><span>Low</span><i></i><span>High</span></span>
+            </div>
+            <div class="adp-insight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Anchored in prime <b>districts 9–11</b> — Singapore's affluent central core.</span></div>
+            <span class="adp-explink">Expand map <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6"/></svg></span>
+          </div>
+        </div>
+        <div class="adp-foot">
+          <button class="adp-fbtn pri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save audience</button>
+          <button class="adp-fbtn sec">Open full <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><span class="num jua">3</span><div class="t jua">Select it → the standard Audience detail panel opens</div><div class="d">Clicking the rail card slides in the <b>exact Audience detail panel the prototype already uses</b> (the DE list narrows beside it) — Preview / Data Explorer tabs, the <b>#6b3c72 hero with the Draft pill</b>, "The read" headline + index pillars, <b>§1 Who they are</b> (tabbed demographic cards + inline takeaway), <b>§2 Where they are</b> (geo map + density), §3 How to win, and the Save / Open-full footer. Refinement is <b>conversational</b> in the chat — "only Districts 9–11", "tighten to high-intent" — and the panel updates in place.</div></div>
+  </div>
+
+  <div class="arrow"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+
+  <!-- ============ SCREEN 4 — SAVE → LANDS IN LIBRARY ============ -->
+  <div class="step">
+    <div class="screen">
+      <div class="side">
+        <div class="wsbtn"><span class="jua">Meridian Motors</span><span class="cv">▾</span></div>
+        <div class="modes"><span class="mode on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6c0-1.5 3.6-2.5 8-2.5S20 4.5 20 6M4 6v12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5V6M4 12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5"/></svg>Research</span><span class="mode off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span></div>
+        <nav>
+          <div class="nv home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</div>
+          <div class="nv on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/></svg>Data Explorer</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg>Audiences</div>
+          <div class="nv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Documents</div>
+        </nav>
+        <div class="navsec">Recent analysis</div>
+        <div class="recent on"><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">New audience — premium SUV…</div><div class="rs">Just now · Today</div></div></div>
+      </div>
+      <div class="chat">
+        <div class="chat-hd"><span class="ct jua">New audience</span><span class="cs">· saved</span></div>
+        <div class="chat-body">
+          <div class="reason"><span class="done">✓</span><span>Saved · now in your Audiences library</span></div>
+          <div class="ai small"><b>Premium SUV Intenders — Singapore</b> is saved and reusable in any prompt. Want to keep going?</div>
+          <div class="starters" style="margin-top:8px">
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg></span><div><div class="st">Open its full profile</div><div class="ss">Deep-dive · mobility · digital twin</div></div></div>
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="st">Build a campaign recommendation</div><div class="ss">Channel, timing & budget off this audience</div></div></div>
+            <div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="st">Create another audience</div><div class="ss">Keep building in this session</div></div></div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="ph">Reply to Lumos…</div>
+          <div class="comp-row"><span class="it">👥 From existing</span><span class="comp-sp"></span><span class="it">📎</span><span class="send idle">→</span></div>
+        </div>
+      </div>
+      <div class="de narrow">
+        <div class="de-top"><div class="dt jua">Data Explorer</div></div>
+        <div class="de-scroll">
+          <div class="de-sec"><div class="de-h">Audiences</div>
+            <div class="de-card sel"><span class="di" style="background:#E4F4EC;color:var(--good)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-10"/></svg></span><div><div class="dn">Premium SUV Intenders</div><div class="dm" style="color:var(--good)">Saved · 148K · Singapore</div></div></div>
+          </div>
+          <div class="de-sec"><div class="de-h">Insights</div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="dn">Auto-intent index</div><div class="dm">Stat</div></div></div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.4 7-11a7 7 0 10-14 0c0 4.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><div class="dn">Competitor visitation</div><div class="dm">Heatmap</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="detail">
+        <div class="adp-tabs">
+          <span class="adp-tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Preview</span>
+          <span class="adp-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>Data Explorer</span>
+          <span class="adp-tsp"><span class="adp-save" style="background:var(--adp);color:#fff;border-color:var(--adp)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-10"/></svg>Saved</span><span class="adp-ic">✕</span><span class="adp-ic">⤓</span><span class="adp-ic">⋯</span></span>
+        </div>
+        <div class="adp-hero"><div class="hn"><span class="n">Premium SUV Intenders</span><span class="pill saved">Saved</span></div><div class="sd">148K people · Singapore · In-market for premium SUVs</div></div>
+        <div class="adp-body">
+          <!-- THE READ -->
+          <div class="adp-sec">
+            <div class="adp-read-h">Singapore's actively-shopping <span class="hl">premium-SUV intenders</span> — competitor showroom visitors weighing <span class="hl">EV vs hybrid</span> before they commit.</div>
+            <div class="adp-pillar"><span class="pn">2.4×</span><span class="pt">more likely to have <b>visited a premium SUV showroom</b> in the last 90 days</span></div>
+            <div class="adp-pillar"><span class="pn">1.9×</span><span class="pt">more likely to <b>research EV / hybrid drivetrains</b> than the national average</span></div>
+          </div>
+          <!-- §1 WHO THEY ARE -->
+          <div class="adp-sec">
+            <div class="adp-sh"><span class="num">1</span><span class="ttl">Who they are</span><span class="aside">Indexed vs national</span></div>
+            <div class="adp-utabs"><span class="adp-utab on">Demographics</span><span class="adp-utab">Income</span><span class="adp-utab">Segments</span><span class="adp-utab">Interests</span><span class="adp-utab">Behaviours</span></div>
+            <div class="adp-dgrid">
+              <div class="adp-dcard"><div><div class="dl">Core age</div><div class="dv">33–52</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.6×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Gender</div><div class="dv">58% male</div></div><span class="adp-idx flat">0.9×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Occupation</div><div class="dv">Professional</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.4×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Life stage</div><div class="dv">Est. family</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.5×</span></div>
+            </div>
+            <div class="adp-take"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2"/></svg><p>A <b>mid-career, family-stage professional</b> core — affluent enough for premium, settled enough to buy considered.</p></div>
+          </div>
+        </div>
+        <div class="adp-foot">
+          <button class="adp-fbtn pri" style="background:#fff;color:var(--adp);border:1px solid var(--adp);flex:1.4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/></svg>View in library</button>
+          <button class="adp-fbtn sec">Open full <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><span class="num jua">4</span><div class="t jua">Save → reusable object, filed in the library</div><div class="d">Hitting <b>Save audience</b> flips the panel to a <b>Saved</b> state (hero pill + top-bar), keeps it in this session's rail <b>and</b> files it under its auto-category in the Audiences library — a persistent, reusable object. The footer swaps to <b>View in library / Open full</b>, and the chat offers the next moves: open the full profile, build a campaign, or create another. The user never left Data Explorer.</div></div>
+  </div>
+
+</div>
+
+</body>
+</html>
