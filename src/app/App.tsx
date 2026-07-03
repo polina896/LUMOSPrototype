@@ -8,6 +8,7 @@ import AudienceDetailPanel from './components/AudienceDetailPanel';
 import AudienceLibrary from './components/AudienceLibrary';
 import AudienceProfileViewer from './components/AudienceProfileViewer';
 import CompareFlow, { type SavedAudience } from './components/CompareFlow';
+import CreateAudienceFlow from './components/CreateAudienceFlow';
 import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
@@ -50,6 +51,27 @@ export default function App() {
   const [compareActive, setCompareActive] = useState(false);
   const [compareSeed, setCompareSeed] = useState<SavedAudience[]>([]);
   const [comparePrompt, setComparePrompt] = useState('');
+  const [createAudienceActive, setCreateAudienceActive] = useState(false);
+
+  const startCreateAudience = () => {
+    setCreateAudienceActive(true);
+    setShowAudiences(false);
+    setShowDocuments(false);
+    setCompareActive(false);
+    setSelectedAudienceId(null);
+    setShowDataExplorer(true); // lights up Data Explorer in the sidebar
+    closeDeepDive();
+  };
+  const exitCreateAudience = () => {
+    setCreateAudienceActive(false);
+    setShowDataExplorer(false);
+    setShowAudiences(true); // back to the Audiences library
+  };
+  const savedFromCreateAudience = (id: string, name: string) => {
+    setCreateAudienceActive(false);
+    setShowDataExplorer(false);
+    openAudience(id, name); // open the saved audience's full profile
+  };
 
   const startCompare = (seed: SavedAudience[], prompt: string) => {
     setCompareSeed(seed);
@@ -85,7 +107,7 @@ export default function App() {
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
       <Sidebar
         showDataExplorer={showDataExplorer}
-        onToggleDataExplorer={() => { setShowDataExplorer((v) => !v); setShowAudiences(false); setShowDocuments(false); setCompareActive(false); closeDeepDive(); }}
+        onToggleDataExplorer={() => { setShowDataExplorer((v) => !v); setShowAudiences(false); setShowDocuments(false); setCompareActive(false); setCreateAudienceActive(false); closeDeepDive(); }}
         showAudiences={showAudiences}
         onToggleAudiences={() => {
           const next = !showAudiences;
@@ -93,17 +115,23 @@ export default function App() {
           setShowDataExplorer(false);
           setShowDocuments(false);
           setCompareActive(false);
+          setCreateAudienceActive(false);
           if (!next) closeDeepDive();
         }}
         showDocuments={showDocuments}
-        onToggleDocuments={() => { setShowDocuments((v) => !v); setShowAudiences(false); setShowDataExplorer(false); setCompareActive(false); closeDeepDive(); }}
+        onToggleDocuments={() => { setShowDocuments((v) => !v); setShowAudiences(false); setShowDataExplorer(false); setCompareActive(false); setCreateAudienceActive(false); closeDeepDive(); }}
         recentAnalyses={recentAnalyses}
         activeAnalysisId={activeAnalysisId}
         onSelectAnalysis={(id) => setActiveAnalysisId(id)}
       />
 
       {/* Main content area */}
-      {compareActive ? (
+      {createAudienceActive ? (
+        <CreateAudienceFlow
+          onExit={exitCreateAudience}
+          onSaved={savedFromCreateAudience}
+        />
+      ) : compareActive ? (
         <CompareFlow
           seed={compareSeed}
           seedPrompt={comparePrompt}
@@ -121,6 +149,7 @@ export default function App() {
         ) : (
           <AudienceLibrary
             onSelectAudience={(id, name) => openAudience(id, name ?? id)}
+            onCreateAudience={startCreateAudience}
           />
         )
       ) : (
@@ -142,7 +171,7 @@ export default function App() {
         />
       )}
 
-      {!compareActive && !showAudiences && !showDocuments && showDataExplorer ? (
+      {!createAudienceActive && !compareActive && !showAudiences && !showDocuments && showDataExplorer ? (
         <>
           {/* DataExplorer list — narrows when detail panel is open */}
           <div className={`flex-shrink-0 border-l border-[#d3d3d0] bg-[#f5f5f3] overflow-hidden flex flex-col transition-all duration-200 ${selectedAudienceId ? 'w-[300px]' : 'w-[400px]'}`}>
@@ -173,7 +202,7 @@ export default function App() {
             </div>
           )}
         </>
-      ) : !compareActive && !showAudiences && !showDocuments ? (
+      ) : !createAudienceActive && !compareActive && !showAudiences && !showDocuments ? (
         <ArtifactPanel
           screen={screen}
           setOnAddTextBlock={setOnAddTextBlock}
