@@ -1,10 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
+import MobilityDeepDive from "./MobilityDeepDive";
+import TemporalDeepDive from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
-import Screen2Mobility from "@/imports/Screen2Mobility-1";
-import Screen3Temporal from "@/imports/Screen3Temporal";
 import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
+import {
+  seedBlocks,
+  seedMobilityBlocks,
+  seedTemporalBlocks,
+  resolveBlockRequest,
+  type BlockConfig,
+} from "./deepDiveBlocks";
 
 interface AudienceProfileViewerProps {
   audienceId: string;
@@ -13,6 +20,8 @@ interface AudienceProfileViewerProps {
 }
 
 type DeepDiveTab = 'profile' | 'mobility' | 'temporal' | 'digital';
+// The three tabs that render an editable block deck (Digital Twin is excluded).
+type DeckKey = 'profile' | 'mobility' | 'temporal';
 
 const TABS: { key: DeepDiveTab; label: string }[] = [
   { key: 'profile',  label: 'Audience Profile'   },
@@ -33,15 +42,89 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const [activeTab, setActiveTab] = useState<DeepDiveTab>('profile');
   // Ask Lumos docks open by default — interrogating the audience is the primary verb.
   const [askOpen, setAskOpen] = useState(true);
+  // "Defined by" reveals the audience's provenance (filters/sources/window/geo/confidence).
+  // Open by default so the definition is visible on every audience's deep dive.
+  const [defsOpen, setDefsOpen] = useState(true);
   // Thread + draft live here (not in the panel) so the conversation survives a collapse.
   const [askMessages, setAskMessages] = useState<AskMsg[]>([]);
   const [askDraft, setAskDraft] = useState('');
-  // Sections pinned into the docked chat via a tile's inline "Ask".
+  // Sections pinned into the docked chat via a tile's inline "Ask" (Digital Twin).
   const [pinned, setPinned] = useState<ModuleRef[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // ── Editable block decks — one per in-scope tab, held in memory. The docked
+  //    Ask panel scopes to whichever block's ✦ Ask (or the Add tile) was clicked. ──
+  const [decks, setDecks] = useState<Record<DeckKey, BlockConfig[]>>(() => ({
+    profile: seedBlocks(),
+    mobility: seedMobilityBlocks(),
+    temporal: seedTemporalBlocks(),
+  }));
+  const [scope, setScope] = useState<{ blockId: string; label: string } | null>(null);
+  const deckKey: DeckKey | null = activeTab === 'digital' ? null : activeTab;
+
   // Short name for the panel's answer scope (strip the " — Singapore" suffix).
   const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
+
+  // Which deck a block id lives in (scope only ever targets the active tab today).
+  const findDeck = (id: string): DeckKey | null =>
+    (Object.keys(decks) as DeckKey[]).find((k) => decks[k].some((b) => b.id === id)) ?? null;
+
+  // A block's ✦ Ask → scope the docked chat to that block (edit).
+  const askBlock = (config: BlockConfig) => {
+    setAskOpen(true);
+    setScope({ blockId: config.id, label: config.title });
+  };
+
+  // The Add-chart tile → scope the chat to "new block" + seed the prompt.
+  const addBlock = () => {
+    setAskOpen(true);
+    setScope({ blockId: 'new', label: 'New chart' });
+    setAskMessages((m) => [
+      ...m,
+      {
+        role: 'lumos',
+        text: 'What would you like to add? Describe the chart in plain language — e.g. “compare car ownership by lifestage as a bar chart”.',
+      },
+    ]);
+  };
+
+  // Route a composer submission: new-block, block-edit, or general Q&A.
+  const handleAskSubmit = (q: string) => {
+    setAskMessages((m) => [...m, { role: 'you', text: q }]);
+
+    if (scope?.blockId === 'new') {
+      const res = resolveBlockRequest({ userText: q, scope: 'new' });
+      if (res.kind === 'new' && deckKey) {
+        const dk = deckKey;
+        setDecks((d) => ({ ...d, [dk]: [...d[dk], res.newBlock] }));
+      }
+      setAskMessages((m) => [...m, { role: 'lumos', text: res.reply }]);
+      setScope(null);
+    } else if (scope) {
+      const dk = findDeck(scope.blockId);
+      const current = dk ? decks[dk].find((b) => b.id === scope.blockId) : undefined;
+      const res = resolveBlockRequest({ userText: q, scope: 'edit', currentConfig: current });
+      if (res.kind === 'patch' && dk) {
+        setDecks((d) => ({
+          ...d,
+          [dk]: d[dk].map((b) => (b.id === scope.blockId ? { ...b, ...res.patch } : b)),
+        }));
+        if (res.patch.title) setScope({ blockId: scope.blockId, label: res.patch.title });
+      }
+      setAskMessages((m) => [...m, { role: 'lumos', text: res.reply }]);
+    } else {
+      // General audience Q&A — mirrors the panel's stub, honouring pinned context.
+      const scopeStr = pinned.length ? pinned.map((p) => p.label).join(', ') : null;
+      const focus = scopeStr ? ` — focused on ${scopeStr}` : '';
+      setAskMessages((m) => [
+        ...m,
+        {
+          role: 'lumos',
+          text: `Looking at ${askName} for the current tab and filters${focus}: ${q} — here's where the grounded answer appears, drawn from this audience's live data.`,
+        },
+      ]);
+    }
+  };
 
   const pinSection = (ref: ModuleRef) => {
     setAskOpen(true); // reveal the panel so the added context is visible
@@ -52,6 +135,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const handleTabClick = (tab: DeepDiveTab) => {
     setActiveTab(tab);
     setPinned([]); // pinned sections are tab-scoped — drop them when the tab changes
+    setScope(null); // an off-tab block scope would edit something out of view
     scrollRef.current?.scrollTo({ top: 0 });
   };
 
@@ -61,7 +145,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   // (The profile tab wires its own <AskPill> and is excluded to avoid double-pins.)
   const CONTROL_LABELS = new Set(['Ask', 'Trend', 'Snapshot', 'Map', 'Index', '%', 'Count', 'Export', 'New']);
   const handleScreenAsk = (e: React.MouseEvent) => {
-    if (activeTab === 'profile') return;
+    // Only the Figma-export anchors carry static "Ask" pills: Mobility's map anchor
+    // and Digital Twin. Profile & Temporal are editable decks with real ✦ Ask.
+    if (activeTab === 'profile' || activeTab === 'temporal') return;
     // Walk up from the click to find the "Ask" affordance itself.
     let el = e.target as HTMLElement | null;
     let hit: HTMLElement | null = null;
@@ -93,7 +179,8 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   // swapped in CSS, so replace the glyph here once per screen mount. Safe against
   // re-renders — the screen imports are static, so React never re-writes this DOM.
   useEffect(() => {
-    if (activeTab === 'profile' || activeTab === 'digital') return;
+    // Only Mobility still renders a Figma screen (its map anchor) with baked pills.
+    if (activeTab !== 'mobility') return;
     const root = scrollRef.current;
     if (!root) return;
     root
@@ -199,9 +286,14 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           <span className="font-['Inter',sans-serif] text-[11px] text-[#9a9a9a] whitespace-nowrap shrink-0">· updated 2d ago</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {/* Defined by */}
-          <button className="flex items-center gap-[6px] bg-[#fafaf8] border border-[#e5e5e2] rounded-lg px-3 py-2 hover:bg-[#f3f3f1] transition-colors">
-            <svg viewBox="0 0 13 13" width="13" height="13" fill="none">
+          {/* Defined by — toggles the audience definition panel inside the KPI card */}
+          <button
+            onClick={() => setDefsOpen((v) => !v)}
+            aria-pressed={defsOpen}
+            aria-label="Toggle audience definition"
+            className="flex items-center gap-[6px] bg-[#fafaf8] border border-[#e5e5e2] rounded-lg px-3 py-2 hover:bg-[#f3f3f1] transition-colors"
+          >
+            <svg viewBox="0 0 13 13" width="13" height="13" fill="none" className={`transition-transform ${defsOpen ? '' : 'rotate-180'}`}>
               <path d="M9.75 8.125L6.5 4.875L3.25 8.125" stroke="#6B6B6B" strokeWidth="1.08333" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="font-['Inter',sans-serif] text-[11.4px] text-[#6b6b6b] leading-normal">Defined by</span>
@@ -250,6 +342,27 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
                 </div>
               ))}
             </div>
+
+            {/* ── Defined by — audience provenance, revealed by the header button ── */}
+            {defsOpen && (
+              <div className="flex flex-wrap gap-[7px] w-full pt-[12px] border-t border-dashed border-[#e5e5e2]">
+                {[
+                  { label: 'Filters:', value: ' In-market auto intenders · showroom & dealer dwell' },
+                  { label: 'Sources:', value: ' LUMOS panels · GWI · Telco · Card & loyalty' },
+                  { label: 'Window:', value: ' Mar–May 2026 · rolling 90d' },
+                  { label: 'Geo:', value: ' Singapore' },
+                  { label: 'Confidence:', value: ' ±2.1% @ 95% CI' },
+                ].map((c) => (
+                  <span
+                    key={c.label}
+                    className="bg-[#f3f3f1] border border-[#e5e5e2] rounded-full pt-[4px] pb-[5.5px] px-[11px] font-['Jua',sans-serif] text-[11px] leading-[16.5px] whitespace-nowrap"
+                  >
+                    <span className="text-[#1a1a1a]">{c.label}</span>
+                    <span className="text-[#6b6b6b]">{c.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -279,10 +392,31 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         onClick={handleScreenAsk}
         className="kc-deep-dive flex-1 overflow-y-auto overflow-x-auto"
       >
-        {activeTab === 'profile'  && <AudienceProfileContent onAsk={pinSection} audienceName={askName} />}
-        {activeTab === 'mobility' && <Screen2Mobility />}
-        {activeTab === 'temporal' && <Screen3Temporal />}
-        {activeTab === 'digital'  && <Screen4DigitalTwin />}
+        {activeTab === 'profile' && (
+          <AudienceProfileContent
+            blocks={decks.profile}
+            scopeId={scope?.blockId ?? null}
+            onAskBlock={askBlock}
+            onAddBlock={addBlock}
+          />
+        )}
+        {activeTab === 'mobility' && (
+          <MobilityDeepDive
+            blocks={decks.mobility}
+            scopeId={scope?.blockId ?? null}
+            onAskBlock={askBlock}
+            onAddBlock={addBlock}
+          />
+        )}
+        {activeTab === 'temporal' && (
+          <TemporalDeepDive
+            blocks={decks.temporal}
+            scopeId={scope?.blockId ?? null}
+            onAskBlock={askBlock}
+            onAddBlock={addBlock}
+          />
+        )}
+        {activeTab === 'digital' && <Screen4DigitalTwin />}
       </div>
     </div>
 
@@ -296,6 +430,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           setDraft={setAskDraft}
           pinned={pinned}
           onUnpin={unpinSection}
+          scope={scope}
+          onClearScope={() => setScope(null)}
+          onSubmit={handleAskSubmit}
         />
       )}
     </div>
