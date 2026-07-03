@@ -149,10 +149,10 @@ export function seedBlocks(): BlockConfig[] {
         'The four leading segments all reflect high-income professional lifestyles, with Premium Vehicle Owners and Wealth Management Users clustering together. Premium Vehicle Owners rose versus last quarter; Business Class Travellers declined slightly as travel normalised.',
       data: {
         rows: [
-          { label: 'Premium Vehicle Owners', index: 2.1, trend: 'up' },
-          { label: 'Wealth Management Users', index: 1.8, trend: 'up' },
-          { label: 'Premium Retail Shoppers', index: 1.7, trend: 'flat' },
-          { label: 'Business Class Travellers', index: 1.5, trend: 'down' },
+          { label: 'Premium Vehicle Owners', index: 2.1, percent: 30, trend: 'up', color: '#6b3c72' },
+          { label: 'Wealth Management Users', index: 1.8, percent: 25, trend: 'up', color: '#9b6ba0' },
+          { label: 'Premium Retail Shoppers', index: 1.7, percent: 24, trend: 'flat', color: '#c4a0c8' },
+          { label: 'Business Class Travellers', index: 1.5, percent: 21, trend: 'down', color: '#e0cce4' },
         ],
       },
     },
@@ -172,10 +172,10 @@ export function seedBlocks(): BlockConfig[] {
       footer: 'Dealership / in-person 72%  ·  Online 28%',
       data: {
         rows: [
-          { label: 'Premium automotive', index: 2.4, trend: 'up' },
-          { label: 'Financial & investment services', index: 1.8, trend: 'up' },
-          { label: 'Business travel & hospitality', index: 1.7, trend: 'flat' },
-          { label: 'Health & wellness', index: 1.6, trend: 'flat' },
+          { label: 'Premium automotive', index: 2.4, percent: 32, trend: 'up', color: '#6b3c72' },
+          { label: 'Financial & investment services', index: 1.8, percent: 24, trend: 'up', color: '#9b6ba0' },
+          { label: 'Business travel & hospitality', index: 1.7, percent: 23, trend: 'flat', color: '#c4a0c8' },
+          { label: 'Health & wellness', index: 1.6, percent: 21, trend: 'flat', color: '#e0cce4' },
         ],
       },
     },
@@ -194,10 +194,10 @@ export function seedBlocks(): BlockConfig[] {
         'Car show & expo attendance over-indexes highest at 2.3×. Fine dining and golf courses cluster together. Premium fitness and wellness rounds out the top four. Weekend activities skew toward premium, experiential occasions.',
       data: {
         rows: [
-          { label: 'Car show & expo attendance', index: 2.3, trend: 'up' },
-          { label: 'Fine dining & restaurants', index: 1.8, trend: 'up' },
-          { label: 'Golf courses', index: 1.6, trend: 'flat' },
-          { label: 'Premium fitness & wellness', index: 1.5, trend: 'flat' },
+          { label: 'Car show & expo attendance', index: 2.3, percent: 32, trend: 'up', color: '#6b3c72' },
+          { label: 'Fine dining & restaurants', index: 1.8, percent: 25, trend: 'up', color: '#9b6ba0' },
+          { label: 'Golf courses', index: 1.6, percent: 22, trend: 'flat', color: '#c4a0c8' },
+          { label: 'Premium fitness & wellness', index: 1.5, percent: 21, trend: 'flat', color: '#e0cce4' },
         ],
       },
     },
@@ -215,10 +215,10 @@ export function seedBlocks(): BlockConfig[] {
         'Affinity is strongest for premium automotive and financial services brands. CarousellAuto and BMW cluster together. Mercedes-Benz and Porsche also over-index.',
       data: {
         rows: [
-          { label: 'CarousellAuto', index: 2.4 },
-          { label: 'BMW', index: 2.0 },
-          { label: 'Mercedes-Benz', index: 1.9 },
-          { label: 'Porsche', index: 1.7 },
+          { label: 'CarousellAuto', index: 2.4, percent: 30, color: '#6b3c72' },
+          { label: 'BMW', index: 2.0, percent: 25, color: '#9b6ba0' },
+          { label: 'Mercedes-Benz', index: 1.9, percent: 24, color: '#c4a0c8' },
+          { label: 'Porsche', index: 1.7, percent: 21, color: '#e0cce4' },
         ],
       },
     },
@@ -491,8 +491,11 @@ export function resolveBlockRequest(input: {
     if (title) { patch.title = title; changed.push(`renamed to “${title}”`); }
 
     const chartType = detectChartType(text);
-    if (chartType && chartType !== currentConfig.chartType) {
+    // Apply if the type changes, OR if we're leaving a split layout (whose
+    // chartType is otherwise cosmetic) — either way the requested chart renders.
+    if (chartType && (chartType !== currentConfig.chartType || currentConfig.layout === 'split')) {
       patch.chartType = chartType;
+      if (currentConfig.layout === 'split') patch.layout = 'stacked'; // exit takeaway+bars
       changed.push(`switched to a ${chartType.replace('-', ' ')} chart`);
     }
 

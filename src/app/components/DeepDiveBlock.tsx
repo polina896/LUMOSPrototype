@@ -322,7 +322,9 @@ export function BlockDeck({
   onAdd: () => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-3 items-start">
+    // data-editable-deck lets the viewer's Figma-pill click handler ignore real
+    // block ✦ Ask clicks (they route through onAsk → scope, not pin-to-chat).
+    <div data-editable-deck className="grid grid-cols-3 gap-3 items-start">
       {blocks.map((b) => (
         <div key={b.id} className={b.span === 3 ? 'col-span-3' : 'col-span-1'}>
           <DeepDiveBlock config={b} active={scopeId === b.id} onAsk={onAsk} />

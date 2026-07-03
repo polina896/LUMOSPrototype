@@ -32,6 +32,9 @@ function stubAnswer(q: string, audience: string, scope: string | null): string {
 
 // Thread + draft are owned by the parent (AudienceProfileViewer) so the
 // conversation survives the panel being collapsed and re-opened.
+// A block scoped for editing via its ✦ Ask (or the Add-chart tile → id 'new').
+export type AskScope = { blockId: string; label: string } | null;
+
 export default function AskLumosPanel({
   audienceName,
   messages,
@@ -40,6 +43,9 @@ export default function AskLumosPanel({
   setDraft,
   pinned = [],
   onUnpin,
+  scope = null,
+  onClearScope,
+  onSubmit,
 }: {
   audienceName: string;
   messages: AskMsg[];
@@ -49,29 +55,47 @@ export default function AskLumosPanel({
   // Sections pinned via a tile's inline "Ask" — quoted context on the composer.
   pinned?: ModuleRef[];
   onUnpin?: (id: string) => void;
+  // Active block-edit scope + its clear handler (editable deck tabs).
+  scope?: AskScope;
+  onClearScope?: () => void;
+  // When provided, the parent owns submission (block edit / add / general Q&A).
+  onSubmit?: (text: string) => void;
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
   // Focus the composer on open so it reads as ready to type into.
   useEffect(() => { inputRef.current?.focus(); }, []);
+  // Re-focus whenever a block is scoped in, so the user can type straight away.
+  useEffect(() => { if (scope) inputRef.current?.focus(); }, [scope]);
   // Keep the latest message in view.
   useEffect(() => { threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight }); }, [messages]);
 
   const submit = (text: string) => {
     const q = text.trim();
     if (!q) return;
-    const scope = pinned.length ? pinned.map((p) => p.label).join(', ') : null;
-    setMessages((m) => [...m, { role: 'you', text: q }, { role: 'lumos', text: stubAnswer(q, audienceName, scope) }]);
+    // The parent (AudienceProfileViewer) routes block edits, adds, and Q&A.
+    if (onSubmit) {
+      onSubmit(q);
+      setDraft('');
+      inputRef.current?.focus();
+      return;
+    }
+    const ctx = pinned.length ? pinned.map((p) => p.label).join(', ') : null;
+    setMessages((m) => [...m, { role: 'you', text: q }, { role: 'lumos', text: stubAnswer(q, audienceName, ctx) }]);
     setDraft('');
     inputRef.current?.focus();
   };
 
   const empty = messages.length === 0;
+  const isNewScope = scope?.blockId === 'new';
 
-  // Placeholder reflects any pinned sections so the composer reads as scoped.
-  const placeholder =
-    pinned.length === 1
+  // Placeholder reflects the active scope, then any pinned sections.
+  const placeholder = scope
+    ? isNewScope
+      ? 'Describe the chart to add…'
+      : `Ask about “${scope.label}”…`
+    : pinned.length === 1
       ? `Ask about “${pinned[0].label}”…`
       : pinned.length > 1
       ? `Ask about these ${pinned.length} sections…`
@@ -142,26 +166,43 @@ export default function AskLumosPanel({
       {/* ── Composer (pinned bottom) ── */}
       <div className="flex-none px-4 pt-[14px] pb-4 bg-white border-t border-[#efeaf2]">
         <div className="flex flex-col rounded-[16px] border-[1.5px] border-[#ddd0e4] bg-white overflow-hidden shadow-[0_6px_22px_rgba(108,60,114,0.07)] focus-within:border-[#6b3c72] transition-colors">
-          {/* Pinned sections — quoted context added via a tile's inline "Ask" */}
-          {pinned.length > 0 && (
+          {/* Block-edit scope chip (editable deck tabs) — single, takes priority. */}
+          {scope ? (
             <div className="flex flex-wrap gap-[6px] px-[12px] pt-[12px]">
-              {pinned.map((p) => (
-                <span
-                  key={p.id}
-                  className="flex items-center gap-[5px] bg-[#6b3c72] text-white rounded-full pl-[9px] pr-[5px] py-[3px] font-['Jua',sans-serif] text-[11px]"
+              <span className="flex items-center gap-[5px] bg-[#6b3c72] text-white rounded-full pl-[9px] pr-[5px] py-[3px] font-['Jua',sans-serif] text-[11px]">
+                <Sparkles className="w-[10px] h-[10px]" />
+                {isNewScope ? 'New chart' : scope.label}
+                <button
+                  onClick={() => onClearScope?.()}
+                  title="Clear scope"
+                  className="w-[15px] h-[15px] rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
                 >
-                  <Sparkles className="w-[10px] h-[10px]" />
-                  {p.label}
-                  <button
-                    onClick={() => onUnpin?.(p.id)}
-                    title={`Remove “${p.label}”`}
-                    className="w-[15px] h-[15px] rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
-                  >
-                    <X className="w-[10px] h-[10px]" />
-                  </button>
-                </span>
-              ))}
+                  <X className="w-[10px] h-[10px]" />
+                </button>
+              </span>
             </div>
+          ) : (
+            /* Pinned sections — quoted context added via a tile's inline "Ask" */
+            pinned.length > 0 && (
+              <div className="flex flex-wrap gap-[6px] px-[12px] pt-[12px]">
+                {pinned.map((p) => (
+                  <span
+                    key={p.id}
+                    className="flex items-center gap-[5px] bg-[#6b3c72] text-white rounded-full pl-[9px] pr-[5px] py-[3px] font-['Jua',sans-serif] text-[11px]"
+                  >
+                    <Sparkles className="w-[10px] h-[10px]" />
+                    {p.label}
+                    <button
+                      onClick={() => onUnpin?.(p.id)}
+                      title={`Remove “${p.label}”`}
+                      className="w-[15px] h-[15px] rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
+                    >
+                      <X className="w-[10px] h-[10px]" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )
           )}
           <textarea
             ref={inputRef}
@@ -177,7 +218,7 @@ export default function AskLumosPanel({
           <div className="flex items-center px-[10px] pb-[10px] pt-2">
             <span className="flex items-center gap-[5px] font-['Inter',sans-serif] text-[10.5px] text-[#9a9a9a]">
               <Sparkles className="w-[11px] h-[11px]" />
-              Uses the current tab &amp; filters
+              {scope ? (isNewScope ? 'Describes a new chart' : 'Editing this chart') : 'Uses the current tab & filters'}
             </span>
             <button
               onClick={() => submit(draft)}

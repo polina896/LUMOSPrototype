@@ -148,6 +148,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     // Only the Figma-export anchors carry static "Ask" pills: Mobility's map anchor
     // and Digital Twin. Profile & Temporal are editable decks with real ✦ Ask.
     if (activeTab === 'profile' || activeTab === 'temporal') return;
+    // Ignore clicks inside the editable deck — those route through the block's own
+    // ✦ Ask (scope), not the legacy pin-to-chat affordance on the map anchor.
+    if ((e.target as HTMLElement).closest?.('[data-editable-deck]')) return;
     // Walk up from the click to find the "Ask" affordance itself.
     let el = e.target as HTMLElement | null;
     let hit: HTMLElement | null = null;
