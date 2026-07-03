@@ -4,7 +4,7 @@ import MobilityDeepDive from "./MobilityDeepDive";
 import TemporalDeepDive from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
-import Screen4DigitalTwin from "@/imports/Screen4DigitalTwin";
+import DigitalTwinTab from "./DigitalTwinTab";
 import {
   seedBlocks,
   seedMobilityBlocks,
@@ -419,7 +419,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
             onAddBlock={addBlock}
           />
         )}
-        {activeTab === 'digital' && <Screen4DigitalTwin />}
+        {activeTab === 'digital' && <DigitalTwinTab />}
       </div>
     </div>
 
