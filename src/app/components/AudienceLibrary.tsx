@@ -390,7 +390,10 @@ export default function AudienceLibrary({ onSelectAudience }: AudienceLibraryPro
                 {totalCount} audiences · {categoryCount} categories
               </p>
             </div>
-            <button className="inline-flex items-center gap-[7px] bg-[#7C3AED] text-white border-none font-semibold text-[14px] px-[15px] py-[10px] rounded-[10px] cursor-pointer hover:bg-[#6d33d4] transition-colors">
+            <button
+              onClick={() => { window.location.href = '/create-audience-flow.html'; }}
+              className="inline-flex items-center gap-[7px] bg-[#7C3AED] text-white border-none font-semibold text-[14px] px-[15px] py-[10px] rounded-[10px] cursor-pointer hover:bg-[#6d33d4] transition-colors"
+            >
               <Plus className="w-4 h-4" />
               Create audience
             </button>
