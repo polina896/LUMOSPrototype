@@ -219,6 +219,8 @@ export default function App() {
           isAnalysisComplete={isAnalysisComplete}
           selectedAudienceId={selectedAudienceId}
           onOpenFullPage={(id, name) => openAudience(id, name)}
+          savedAudienceIds={savedAudienceIds}
+          onSaveAudience={saveAudience}
         />
       ) : null}
     </div>
