@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Plus } from 'lucide-react';
+import { BlockPinButton } from './MyView';
 import {
   type BlockConfig,
   type BlockRow,
@@ -281,6 +282,8 @@ function BlockHeader({ config, active, onAsk }: { config: BlockConfig; active?: 
           <Sparkles className="w-[11px] h-[11px]" />
           Ask
         </button>
+        {/* Pin to My View — renders only inside the MyViewProvider (deep-dive viewer). */}
+        <BlockPinButton id={config.id} />
       </div>
     </div>
   );

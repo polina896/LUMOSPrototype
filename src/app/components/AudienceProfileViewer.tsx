@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
 import MobilityDeepDive from "./MobilityDeepDive";
 import TemporalDeepDive from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
 import DigitalTwinTab from "./DigitalTwinTab";
+import { MyViewProvider, MyViewTab, PinIcon, type Catalog } from "./MyView";
 import {
   seedBlocks,
   seedMobilityBlocks,
@@ -19,16 +20,29 @@ interface AudienceProfileViewerProps {
   onBack: () => void;
 }
 
-type DeepDiveTab = 'profile' | 'mobility' | 'temporal' | 'digital';
+type DeepDiveTab = 'myview' | 'profile' | 'mobility' | 'temporal' | 'digital';
 // The three tabs that render an editable block deck (Digital Twin is excluded).
 type DeckKey = 'profile' | 'mobility' | 'temporal';
 
+// My View leads (it's the user's own overview); the analytical tabs follow.
 const TABS: { key: DeepDiveTab; label: string }[] = [
+  { key: 'myview',   label: 'My View'            },
   { key: 'profile',  label: 'Audience Profile'   },
   { key: 'mobility', label: 'Mobility & Movement' },
   { key: 'temporal', label: 'Temporal & Seasonal' },
   { key: 'digital',  label: 'Digital Twin'        },
 ];
+
+// Source-tab label for each deck (shown as a chip on My View's mixed cards).
+const DECK_LABELS: Record<DeckKey, string> = {
+  profile: 'Audience Profile',
+  mobility: 'Mobility & Movement',
+  temporal: 'Temporal & Seasonal',
+};
+
+// Default pinned modules — a cross-tab starter mix so My View is never bare on
+// first open. Ids must exist in the seed decks.
+const DEFAULT_MYVIEW = ['tmp-peak', 'mob-districts', 'purchase-patterns', 'top-segments'];
 
 // The profile tab's <AskPill> uses a lucide Sparkles glyph; the Figma screens ship
 // a different (chat-bubble) icon. We swap theirs for this so every "Ask" matches.
@@ -60,7 +74,36 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     temporal: seedTemporalBlocks(),
   }));
   const [scope, setScope] = useState<{ blockId: string; label: string } | null>(null);
-  const deckKey: DeckKey | null = activeTab === 'digital' ? null : activeTab;
+  const deckKey: DeckKey | null = activeTab === 'digital' || activeTab === 'myview' ? null : activeTab;
+
+  // ── My View — the user's pinned modules for this audience. Order is display
+  //    order; membership = pinned. Persisted per-audience (per-user feel). ──
+  const storageKey = `lumos:myview:${props.audienceId}`;
+  const [myViewIds, setMyViewIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) return JSON.parse(raw);
+    } catch { /* ignore */ }
+    return DEFAULT_MYVIEW;
+  });
+  useEffect(() => {
+    try { localStorage.setItem(storageKey, JSON.stringify(myViewIds)); } catch { /* ignore */ }
+  }, [storageKey, myViewIds]);
+
+  const togglePin = (id: string) =>
+    setMyViewIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+
+  // Flatten every deck's blocks so My View can resolve a pinned id to its config
+  // and know which tab it came from. Digital Twin has no blocks, so it's absent.
+  const { blockMap, sourceOf, catalog } = useMemo(() => {
+    const bm: Record<string, BlockConfig> = {};
+    const src: Record<string, string> = {};
+    const cat: Catalog = (['profile', 'mobility', 'temporal'] as DeckKey[]).map((k) => {
+      decks[k].forEach((b) => { bm[b.id] = b; src[b.id] = DECK_LABELS[k]; });
+      return { key: k, label: DECK_LABELS[k], blocks: decks[k] };
+    });
+    return { blockMap: bm, sourceOf: src, catalog: cat };
+  }, [decks]);
 
   // Short name for the panel's answer scope (strip the " — Singapore" suffix).
   const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
@@ -199,6 +242,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   }, [activeTab]);
 
   return (
+    <MyViewProvider value={{ isPinned: (id) => myViewIds.includes(id), toggle: togglePin }}>
     <div className="flex-1 flex min-w-0 overflow-hidden">
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafaf8]">
       <style>{`
@@ -373,19 +417,30 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
       {/* ── Tab bar — below audience definition, above date/geo filters ── */}
       <div className="flex-none px-5 pt-3 pb-0 bg-[#fafaf8]">
         <div className="flex items-center bg-white border border-[#e5e5e2] rounded-xl p-[5px] gap-1 h-[50px]">
-          {TABS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => handleTabClick(key)}
-              className={`flex-1 flex items-center justify-center px-3 py-2 rounded-[9px] font-['Jua',sans-serif] text-[13px] transition-colors whitespace-nowrap ${
-                activeTab === key
-                  ? 'bg-[#f1e9ff] text-[#6b3c72]'
-                  : 'text-[#6b6b6b] hover:bg-[#f5f5f3]'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+          {TABS.map(({ key, label }) => {
+            const isMyView = key === 'myview';
+            const activeCls = isMyView ? 'bg-[#fbf3de] text-[#c69214]' : 'bg-[#f1e9ff] text-[#6b3c72]';
+            return (
+              <button
+                key={key}
+                onClick={() => handleTabClick(key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-[9px] font-['Jua',sans-serif] text-[13px] transition-colors whitespace-nowrap ${
+                  activeTab === key ? activeCls : 'text-[#6b6b6b] hover:bg-[#f5f5f3]'
+                }`}
+              >
+                {isMyView && <PinIcon filled={activeTab === key} size={13} />}
+                {label}
+                {isMyView && (
+                  <span
+                    className="text-[10px] px-[6px] py-[1px] rounded-full leading-none"
+                    style={activeTab === key ? { background: 'rgba(198,146,20,0.16)' } : { background: 'rgba(0,0,0,0.06)' }}
+                  >
+                    {myViewIds.filter((id) => blockMap[id]).length}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -395,6 +450,19 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         onClick={handleScreenAsk}
         className="kc-deep-dive flex-1 overflow-y-auto overflow-x-auto"
       >
+        {activeTab === 'myview' && (
+          <MyViewTab
+            order={myViewIds}
+            blockMap={blockMap}
+            sourceOf={sourceOf}
+            catalog={catalog}
+            scopeId={scope?.blockId ?? null}
+            onReorder={setMyViewIds}
+            onToggle={togglePin}
+            onAsk={askBlock}
+            onBrowse={() => handleTabClick('profile')}
+          />
+        )}
         {activeTab === 'profile' && (
           <AudienceProfileContent
             blocks={decks.profile}
@@ -439,5 +507,6 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
         />
       )}
     </div>
+    </MyViewProvider>
   );
 }
