@@ -324,34 +324,45 @@ export function BlockDeck({
   return (
     // data-editable-deck lets the viewer's Figma-pill click handler ignore real
     // block ✦ Ask clicks (they route through onAsk → scope, not pin-to-chat).
-    <div data-editable-deck className="grid grid-cols-3 gap-3 items-start">
-      {blocks.map((b) => (
-        <div key={b.id} className={b.span === 3 ? 'col-span-3' : 'col-span-1'}>
-          <DeepDiveBlock config={b} active={scopeId === b.id} onAsk={onAsk} />
-        </div>
-      ))}
-      <div className="col-span-1">
-        <AddChartTile active={scopeId === 'new'} onAdd={onAdd} />
+    <div data-editable-deck>
+      <div className="grid grid-cols-3 gap-3 items-start">
+        {blocks.map((b) => (
+          <div key={b.id} className={b.span === 3 ? 'col-span-3' : 'col-span-1'}>
+            <DeepDiveBlock config={b} active={scopeId === b.id} onAsk={onAsk} />
+          </div>
+        ))}
       </div>
+      {/* Full-width invitation to build a custom chart — trails every editable deck. */}
+      <AddChartTile active={scopeId === 'new'} onAdd={onAdd} />
     </div>
   );
 }
 
-// ── Add-chart bento tile — starts a scoped "new block" chat ──────────────────
+// ── Add-chart invitation banner — starts a scoped "new block" chat ───────────
+// Full-width call-to-action so the "you can make your own chart" affordance reads
+// as a real invitation rather than an empty grid cell.
 
 export function AddChartTile({ active, onAdd }: { active?: boolean; onAdd: () => void }) {
   return (
     <button
       onClick={onAdd}
-      className={`rounded-[14px] border-2 border-dashed flex flex-col items-center justify-center gap-2 p-[17px] min-h-[150px] transition-colors ${
-        active ? 'border-[#6b3c72] bg-[#f8f4ff]' : 'border-[#d8cfe0] bg-[#fcfbfd] hover:border-[#6b3c72] hover:bg-[#f8f4ff]'
+      className={`mt-3 w-full flex items-center gap-[22px] rounded-[16px] border-[1.5px] border-dashed p-[24px] text-left transition-colors ${
+        active
+          ? 'border-[#6b3c72] bg-[#f5f0fb]'
+          : 'border-[#bebde7] bg-[#fbf9fe] hover:border-[#6b3c72] hover:bg-[#f5f0fb]'
       }`}
     >
-      <div className="w-8 h-8 rounded-full bg-[#f1e9ff] text-[#6b3c72] flex items-center justify-center">
-        <Plus className="w-4 h-4" />
+      <div className="w-[52px] h-[52px] shrink-0 rounded-[15px] bg-[#f1e9ff] text-[#6b3c72] flex items-center justify-center">
+        <Plus className="w-6 h-6" />
       </div>
-      <span className="font-['Jua',sans-serif] text-[13px] text-[#6b3c72]">Add chart</span>
-      <span className="font-['Jua',sans-serif] text-[10.5px] text-[#9a9a9a] text-center leading-[1.4]">Describe it to Lumos<br />— e.g. “car ownership by lifestage”</span>
+      <div className="flex-1">
+        <div className="font-['Jua',sans-serif] text-[16px] text-[#1a1a1a] mb-[3px]">Need something we didn’t chart?</div>
+        <div className="font-['Jua',sans-serif] text-[13px] text-[#6b6b6b]">Describe any chart in plain language and Lumos builds it from this audience — e.g. “car ownership by lifestage”.</div>
+      </div>
+      <div className="shrink-0 flex items-center gap-2 rounded-[10px] bg-[#6b3c72] px-[20px] py-[11px] font-['Jua',sans-serif] text-[13px] text-white">
+        <Sparkles className="w-4 h-4" />
+        Create a chart
+      </div>
     </button>
   );
 }
