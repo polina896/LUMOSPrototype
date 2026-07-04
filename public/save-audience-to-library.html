@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUMOS — Save audience → Audiences library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Jua&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Data Explorer app tokens */
+    --page:#FAFAF9; --side:#F3F3F1; --rail:#F5F5F3; --card:#FFFFFF; --soft:#FAF9F7;
+    --ink:#1E163C; --ink2:#1A1A1A; --muted:#6A6A6A; --faint:#929292; --xfaint:#B0B0B0;
+    --line:#E5E5E2; --line2:#F0F0F0; --sideline:#D0D0D0;
+    --acc:#732D93; --acc-d:#6B3C72; --acc-soft:#EFE6FF; --acc-tint:#FCF6FF; --acc-line:#E4D3EE;
+    --iconbg:#F0E8FF; --good:#1D9E75;
+    --mkt:#993C1D; --mkt-bg:#FAE3DA;
+    /* audience-detail-panel tokens */
+    --adp:#6B3C72; --adp-soft:#F1E9FF; --adp-bg:#FAFAF9; --adp-line:#E5E5E2; --adp-mut:#6B6B6B; --adp-faint:#9A9A9A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#E9E8E5;color:var(--ink2);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5;padding:22px}
+  .jua{font-family:'Jua',system-ui,sans-serif;font-weight:400}
+  .mono{font-family:'DM Mono',monospace}
+  button{font-family:inherit;cursor:pointer}
+
+  /* intro strip */
+  .intro{max-width:1400px;margin:0 auto 16px}
+  .intro .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:6px;font-weight:600}
+  .intro h1{font-family:'Jua';font-size:22px;font-weight:400;margin-bottom:6px}
+  .intro p{color:var(--muted);max-width:940px;font-size:13.5px}
+  .intro p b{color:var(--ink2)}
+  .intro .hint{margin-top:9px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--acc-d);background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:20px;padding:6px 13px}
+  .intro .hint b{color:var(--acc)}
+
+  /* app shell */
+  .app{max-width:1400px;height:820px;margin:0 auto;background:var(--page);border:1px solid var(--sideline);border-radius:16px;overflow:hidden;display:flex;box-shadow:0 8px 30px rgba(40,37,45,.12)}
+
+  /* ---- sidebar (persistent) ---- */
+  .side{width:212px;flex:0 0 auto;background:var(--side);border-right:1px solid var(--sideline);padding:16px;display:flex;flex-direction:column}
+  .wsbtn{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;margin-bottom:16px}
+  .wsbtn .jua{font-size:14px;color:var(--muted)}
+  .wsbtn .cv{color:#323745;font-size:11px}
+  .modes{display:flex;gap:8px;margin-bottom:22px}
+  .mode{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:6px;font-size:12px;font-weight:500;color:#2B2A33}
+  .mode.on{background:#BDBDE7}
+  .mode.off{background:#E0E0E0}
+  .mode svg{width:14px;height:14px}
+  nav{display:flex;flex-direction:column;gap:3px;margin-bottom:26px}
+  .nv{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-family:'Jua';font-size:14px;color:var(--muted);border:none;background:none;width:100%;text-align:left}
+  .nv svg{width:16px;height:16px;color:#323745;flex:none}
+  .nv .cta-badge{margin-left:auto;font-family:'DM Sans';font-size:10px;font-weight:700;color:#fff;background:var(--good);border-radius:20px;padding:1px 7px;display:none}
+  .nv .cta-badge.show{display:inline-block;animation:pop .3s ease}
+  .nv:hover{background:#E5E5E5}
+  .nv.on{background:var(--acc-soft);color:var(--acc)}
+  .nv.on svg{color:var(--acc)}
+  .navsec{font-family:'Jua';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9C9C9C;padding:0 11px;margin-bottom:10px}
+  .recent{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:8px}
+  .recent.on{background:var(--acc-soft)}
+  .recent .ri{width:20px;height:20px;border-radius:6px;background:#D4AADF;display:flex;align-items:center;justify-content:center;flex:none;color:var(--acc-d)}
+  .recent .ri svg{width:12px;height:12px}
+  .recent .rt{font-family:'Jua';font-size:12px;line-height:1.25;color:var(--acc-d)}
+  .recent .rs{font-family:'Jua';font-size:10px;color:#999;margin-top:2px}
+
+  /* content area holds the two views */
+  .content{flex:1;min-width:0;display:flex}
+  .view{flex:1;min-width:0;display:none}
+  .view.on{display:flex}
+
+  /* =================== DATA EXPLORER VIEW =================== */
+  .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--page);border-right:1px solid var(--sideline)}
+  .chat-hd{padding:14px 22px;border-bottom:1px solid var(--line);flex:0 0 auto;display:flex;align-items:center;gap:9px}
+  .chat-hd .ct{font-family:'Jua';font-size:14px}
+  .chat-hd .cs{font-size:12px;color:var(--xfaint)}
+  .chat-body{flex:1;padding:22px;overflow:auto}
+  .ai{font-size:14px;margin-bottom:14px;line-height:1.55;max-width:440px}
+  .ai.small{font-size:13.5px}
+  .ai b{font-weight:600}
+  .reason{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:13px;color:var(--muted);font-size:13px}
+  .done{color:var(--good);font-weight:700}
+  .grp-l{font-family:'Jua';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:15px 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+  .chip{border:1px solid var(--acc-line);color:var(--acc);background:var(--acc-tint);border-radius:16px;padding:7px 12px;font-size:12.5px;font-weight:600;font-family:'Jua'}
+  .chip.ghost{background:#fff;border-color:var(--line);color:var(--muted);font-weight:400}
+  .cta-row{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+  .btn{font-family:'Jua';font-size:13px;border-radius:10px;padding:9px 15px;border:1px solid var(--acc);background:var(--acc);color:#fff;display:inline-flex;align-items:center;gap:7px}
+  .btn.ghost{background:#fff;color:var(--acc-d);border-color:var(--acc-line)}
+  .starter{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px}
+  .starter .si{width:26px;height:26px;border-radius:7px;background:var(--iconbg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+  .starter .si svg{width:15px;height:15px}
+  .starter .st{font-family:'Jua';font-size:13px;color:var(--ink)}
+  .starter .ss{font-size:11.5px;color:var(--faint)}
+  .composer{margin:0 20px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;flex:0 0 auto}
+  .composer .ph{color:var(--faint);font-size:13.5px;margin-bottom:14px}
+  .comp-row{display:flex;align-items:center;gap:13px;color:var(--muted);font-size:12px}
+  .comp-sp{flex:1}
+  .send{width:29px;height:29px;border-radius:50%;background:var(--acc-line);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+
+  /* DE rail */
+  .de{flex:0 0 auto;background:var(--rail);border-right:1px solid var(--sideline);display:flex;flex-direction:column;width:300px}
+  .de-top{padding:14px 20px;border-bottom:1px solid var(--line);background:#fff;flex:0 0 auto}
+  .de-top .dt{font-family:'Jua';font-size:14px}
+  .de-scroll{flex:1;overflow:auto;background:#fff;padding:16px 18px}
+  .de-sec{margin-bottom:22px}
+  .de-h{font-family:'Jua';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+  .de-card{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #E8E8E8;border-radius:12px;padding:11px 13px;margin-bottom:8px}
+  .de-card .di{width:32px;height:32px;border-radius:8px;background:var(--iconbg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+  .de-card .di svg{width:16px;height:16px}
+  .de-card .dn{font-family:'Jua';font-size:13px;color:var(--ink);line-height:1.25}
+  .de-card .dm{font-family:'Jua';font-size:12px;color:#888;line-height:1.3;margin-top:1px}
+  .de-card .arr{margin-left:auto;color:var(--acc);font-size:13px;flex:none}
+  .de-card.sel{background:var(--acc-tint);border-color:var(--acc);box-shadow:0 1px 3px rgba(115,45,147,.12)}
+
+  /* audience detail panel */
+  .detail{width:426px;flex:0 0 auto;background:#fff;display:flex;flex-direction:column;overflow:hidden}
+  .adp-tabs{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--adp-line);background:#fff;flex:0 0 auto}
+  .adp-tab{display:flex;align-items:center;gap:5px;padding:6px 9px;border-radius:8px;font-family:'Jua';font-size:12px;color:var(--adp-mut)}
+  .adp-tab.on{background:var(--adp-soft);color:var(--adp)}
+  .adp-tab svg{width:13px;height:13px}
+  .adp-tsp{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .adp-save{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid var(--adp);color:var(--adp);border-radius:8px;font-family:'Jua';font-size:12px;background:#fff}
+  .adp-save.saved{background:var(--good);border-color:var(--good);color:#fff}
+  .adp-save svg{width:12px;height:12px}
+  .adp-ic{width:28px;height:28px;border:1px solid var(--adp-line);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--adp-mut);font-size:13px;background:#fff}
+  .adp-hero{background:var(--adp);padding:13px 20px;flex:0 0 auto}
+  .adp-hero .hn{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+  .adp-hero .hn .n{font-family:'Jua';font-size:17px;color:#fff}
+  .adp-hero .pill{padding:2px 8px;background:rgba(255,255,255,.2);border-radius:7px;font-family:'Jua';font-size:11px;color:#fff}
+  .adp-hero .pill.saved{background:var(--good)}
+  .adp-hero .sd{font-family:'Jua';font-size:12px;color:rgba(255,255,255,.82)}
+  .adp-body{flex:1;overflow:auto;background:var(--adp-bg);padding:0 20px}
+  .adp-sec{padding:16px 0;border-bottom:1px solid var(--adp-line)}
+  .adp-read-h{font-family:'Jua';font-size:15.5px;color:#1a1a1a;line-height:1.35;margin-bottom:12px;padding-right:28px}
+  .adp-read-h .hl{color:var(--adp)}
+  .adp-pillar{display:flex;gap:12px;align-items:baseline;margin-bottom:8px}
+  .adp-pillar .pn{font-family:'Jua';font-size:16px;color:var(--adp);min-width:50px;flex:none}
+  .adp-pillar .pt{font-family:'Jua';font-size:12px;color:var(--adp-mut);line-height:1.5}
+  .adp-pillar .pt b{color:#1a1a1a;font-weight:400}
+  .adp-sh{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .adp-sh .num{width:21px;height:21px;border-radius:6px;background:var(--adp-soft);color:var(--adp);font-family:'Jua';font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+  .adp-sh .ttl{font-family:'Jua';font-size:15px;color:#1a1a1a}
+  .adp-sh .aside{margin-left:auto;font-family:'Jua';font-size:11px;color:var(--adp-faint)}
+  .adp-utabs{display:flex;gap:18px;border-bottom:1px solid var(--adp-line);margin-bottom:12px}
+  .adp-utab{font-family:'Jua';font-size:12px;color:var(--adp-faint);padding-bottom:8px;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .adp-utab.on{color:var(--adp);border-color:var(--adp)}
+  .adp-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .adp-dcard{border:1px solid var(--adp-line);border-radius:10px;padding:8px 10px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .adp-dcard .dl{font-family:'Jua';font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--adp-faint)}
+  .adp-dcard .dv{font-family:'Jua';font-size:13px;color:#1a1a1a}
+  .adp-idx{display:inline-flex;align-items:center;gap:3px;font-family:'Jua';font-size:11px;padding:2px 6px;border-radius:6px;flex:none}
+  .adp-idx.lead{background:var(--adp-soft);color:var(--adp)}
+  .adp-idx.flat{background:#fff;border:1px solid var(--adp-line);color:var(--adp-faint)}
+  .adp-idx svg{width:9px;height:9px}
+  .adp-take{display:flex;gap:8px;align-items:flex-start;background:var(--adp-soft);border-radius:10px;padding:8px 11px;margin-top:12px}
+  .adp-take svg{width:13px;height:13px;color:var(--adp);flex:none;margin-top:2px}
+  .adp-take p{font-family:'Jua';font-size:12px;color:#1a1a1a;line-height:1.5}
+  .adp-take p b{color:var(--adp);font-weight:400}
+  .adp-segc{display:inline-flex;background:#F1ECF3;border-radius:8px;padding:3px;gap:2px}
+  .adp-segc .o{font-family:'Jua';font-size:11px;padding:5px 10px;border-radius:6px;color:var(--adp-faint)}
+  .adp-segc .o.on{background:#fff;color:var(--adp);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  .adp-map{position:relative;border:1px solid var(--adp-line);border-radius:10px;overflow:hidden;background:#fafaf8;margin-top:2px}
+  .adp-map .ml{position:absolute;left:8px;top:8px;font-family:'Jua';font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--adp-faint);z-index:2}
+  .adp-map .leg{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.85);padding:2px 6px;border-radius:6px;z-index:2}
+  .adp-map .leg span{font-family:'Jua';font-size:9.5px;color:var(--adp-faint)}
+  .adp-map .leg i{width:40px;height:6px;border-radius:4px;background:linear-gradient(90deg,#F1E9FF,#6B3C72);display:block}
+  .adp-insight{display:flex;gap:8px;align-items:flex-start;font-family:'Jua';font-size:12px;color:#1a1a1a;line-height:1.5;margin-top:10px}
+  .adp-insight svg{width:14px;height:14px;color:var(--adp);flex:none;margin-top:2px}
+  .adp-insight b{color:var(--adp);font-weight:400}
+  .adp-foot{flex:0 0 auto;border-top:1px solid var(--adp-line);padding:12px 14px;display:flex;gap:10px;background:#fff}
+  .adp-fbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border-radius:9px;font-family:'Jua';font-size:13px;border:none}
+  .adp-fbtn.pri{background:var(--adp);color:#fff;flex:1.4}
+  .adp-fbtn.pri svg{width:14px;height:14px}
+  .adp-fbtn.pri.done{background:#fff;color:var(--adp);border:1px solid var(--adp)}
+  .adp-fbtn.sec{border:1px solid var(--adp-line);background:#fff;color:#1a1a1a}
+  .adp-fbtn.sec svg{width:14px;height:14px}
+
+  /* =================== AUDIENCES LIBRARY VIEW =================== */
+  .lib{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--card);overflow:hidden}
+  .lib-scroll{flex:1;overflow:auto}
+  .lib-topbar{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 32px 0}
+  .lib-h1{font-family:'Jua';font-size:26px;line-height:1.1}
+  .lib-sub{color:var(--muted);font-size:13.5px;margin-top:6px}
+  .lib-createbtn{display:inline-flex;align-items:center;gap:7px;background:var(--acc);color:#fff;border:none;font-weight:600;font-size:14px;padding:10px 15px;border-radius:10px}
+  .lib-createbtn .plus{font-size:17px;line-height:1;margin-top:-1px}
+  .lib-controls{display:flex;align-items:center;gap:9px;padding:20px 32px 6px;flex-wrap:wrap}
+  .lib-search{flex:1;min-width:240px;display:flex;align-items:center;gap:9px;background:#FAF9F7;border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:var(--faint);font-size:13.5px}
+  .lib-search .mag{width:14px;height:14px;border:1.8px solid var(--faint);border-radius:50%;position:relative;flex:none}
+  .lib-search .mag::after{content:"";position:absolute;width:5px;height:1.8px;background:var(--faint);right:-3px;bottom:1px;transform:rotate(45deg);border-radius:2px}
+  .lib-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13.5px;color:var(--ink2);white-space:nowrap}
+  .lib-chip b{font-weight:600}.lib-chip .ca{color:var(--faint);font-size:10px}
+  .lib-colh{display:flex;align-items:center;gap:12px;padding:14px 32px 8px;color:var(--faint);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+  .lib-colh .c-name{flex:1}
+  .lib-colh .c-seg{width:168px;flex:none}.lib-colh .c-size{width:96px;text-align:right;flex:none}
+  .lib-colh .c-loc{width:158px;text-align:right;flex:none}.lib-colh .c-chev{width:18px;flex:none}
+  .lib-grp{display:flex;align-items:center;gap:9px;padding:12px 32px;background:#FBFAF8;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+  .lib-grp .tw{color:var(--faint);font-size:11px}
+  .lib-grp .cicon{width:24px;height:24px;border-radius:7px;background:#F0EDE7;flex:none;display:flex;align-items:center;justify-content:center;color:#6E6A73}
+  .lib-grp .cicon svg{width:14px;height:14px}
+  .lib-grp .nm{font-size:13.5px;font-weight:600}.lib-grp .ct{color:var(--faint);font-size:13px}
+  .lib-grp .auto{margin-left:auto;font-size:11.5px;color:var(--acc);display:flex;align-items:center;gap:5px}
+  .lib-grp.fresh{background:var(--acc-tint)}
+  .lib-row{display:flex;align-items:center;gap:12px;padding:0 32px;height:50px;position:relative}
+  .lib-row:hover{background:#FBFAF8}
+  .lib-row:hover .chev{color:var(--acc)}
+  .lib-name{flex:1;display:flex;align-items:center;gap:11px;min-width:0}
+  .lib-name .t{font-size:14px;color:var(--ink2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lib-name .newtag{font-family:'DM Sans';font-size:10px;font-weight:700;color:#fff;background:var(--good);border-radius:20px;padding:1px 8px}
+  .av{width:20px;height:20px;border-radius:50%;flex:none}
+  .av-val{background:linear-gradient(135deg,#A488F1,#5B27B4)}
+  .av-freq{background:linear-gradient(135deg,#5FD0AB,#0F6E56)}
+  .av-cust{background:linear-gradient(135deg,#D77FA0,#8E2F4E)}
+  .av-mkt{background:linear-gradient(135deg,#EE9168,#993C1D)}
+  .seg{width:168px;flex:none}
+  .pill-seg{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;border-radius:8px;padding:4px 11px;border:none}
+  .pill-seg .cv{color:currentColor;opacity:.45;font-size:9px;margin-left:1px}
+  .pill-seg .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+  .ps-val{background:#EDE6FB;color:#5B27B4}
+  .ps-freq{background:#D7EFE6;color:#0F6E56}
+  .ps-cust{background:#FBE2EC;color:#993556}
+  .ps-mkt{background:#FAE3DA;color:#993C1D}
+  .size{width:96px;text-align:right;flex:none;font-size:14px;font-weight:600}
+  .size .u{font-size:11.5px;font-weight:400;color:var(--faint);margin-left:4px}
+  .loc{width:158px;flex:none;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .loc .pin{color:var(--xfaint);font-size:11px}
+  .chev{width:18px;flex:none;text-align:right;color:var(--xfaint);font-size:18px;line-height:1}
+  .row-hidden{display:none}
+  .flash{animation:flash 1.8s ease}
+  @keyframes flash{0%{background:var(--acc-soft)}60%{background:var(--acc-tint)}100%{background:transparent}}
+  @keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:38px;transform:translateX(-50%) translateY(20px);background:#241833;color:#fff;border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:12px;font-size:13.5px;box-shadow:0 12px 34px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.32s ease;z-index:50;max-width:460px}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .toast .tk{width:22px;height:22px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+  .toast .tk svg{width:13px;height:13px}
+  .toast b{font-weight:600}
+  .toast .tact{margin-left:6px;font-family:'Jua';font-size:12.5px;color:#E5C8F5;background:none;border:none;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="kicker">LUMOS · Audiences</div>
+  <h1 class="jua">Save audience → it lands in the Audiences tab</h1>
+  <p>The fix: hitting <b>Save audience</b> in the Data Explorer detail panel now actually <b>persists the audience</b>. The panel flips to its <b>Saved</b> state, and the audience is filed under its auto-category in the <b>Audiences library</b> — so it's there when you open the tab, reusable in any prompt.</p>
+  <div class="hint">▶ Live prototype — click <b>Save audience</b> in the panel, then open the <b>Audiences</b> tab in the sidebar.</div>
+</div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR (persistent) ============ -->
+  <div class="side">
+    <div class="wsbtn"><span class="jua">Meridian Motors</span><span class="cv">▾</span></div>
+    <div class="modes"><span class="mode on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6c0-1.5 3.6-2.5 8-2.5S20 4.5 20 6M4 6v12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5V6M4 12c0 1.5 3.6 2.5 8 2.5s8-1 8-2.5"/></svg>Research</span><span class="mode off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span></div>
+    <nav>
+      <button class="nv" data-view="explorer" onclick="switchView('explorer')" style="cursor:default"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</button>
+      <button class="nv on" id="nav-explorer" onclick="switchView('explorer')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/></svg>Data Explorer</button>
+      <button class="nv" id="nav-audiences" onclick="switchView('audiences')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg>Audiences<span class="cta-badge" id="navBadge">1 new</span></button>
+      <button class="nv" style="cursor:default"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Documents</button>
+    </nav>
+    <div class="navsec">Recent analysis</div>
+    <div class="recent on"><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="rt">New audience — premium SUV…</div><div class="rs">Just now · Today</div></div></div>
+  </div>
+
+  <!-- ============ CONTENT (two views) ============ -->
+  <div class="content">
+
+    <!-- ---------- DATA EXPLORER VIEW ---------- -->
+    <div class="view on" id="view-explorer">
+      <!-- chat -->
+      <div class="chat">
+        <div class="chat-hd"><span class="ct jua">New audience</span><span class="cs" id="chatSub">· refine</span></div>
+        <div class="chat-body" id="chatBody">
+          <div class="reason"><span class="done">✓</span><span>Built — 148K people from 14 sources</span></div>
+          <div class="ai small"><b>Premium SUV Intenders</b> — open on the right. Refine it in words, or save it as-is.</div>
+          <div class="grp-l" style="margin:2px 0 8px">Try refining</div>
+          <div class="chips"><span class="chip">Only Districts 9, 10, 11</span><span class="chip">Tighten to high-intent</span><span class="chip ghost">Add EV-curious</span></div>
+          <div class="cta-row"><button class="btn" onclick="saveAudience()">Save audience →</button></div>
+        </div>
+        <div class="composer">
+          <div class="ph">e.g. "drop anyone who bought in the last 12 months"…</div>
+          <div class="comp-row"><span>👥 From existing</span><span class="comp-sp"></span><span>📎</span><span class="send">→</span></div>
+        </div>
+      </div>
+
+      <!-- DE rail -->
+      <div class="de">
+        <div class="de-top"><div class="dt jua">Data Explorer</div></div>
+        <div class="de-scroll">
+          <div class="de-sec"><div class="de-h">Audiences</div>
+            <div class="de-card sel" id="railCard">
+              <span class="di" id="railIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.2"/></svg></span>
+              <div><div class="dn">Premium SUV Intenders</div><div class="dm" id="railMeta">148K · Singapore</div></div>
+              <span class="arr">↗</span>
+            </div>
+          </div>
+          <div class="de-sec"><div class="de-h">Insights</div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9"/></svg></span><div><div class="dn">Auto-intent index</div><div class="dm">Stat</div></div></div>
+            <div class="de-card"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.4 7-11a7 7 0 10-14 0c0 4.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><div class="dn">Competitor visitation</div><div class="dm">Heatmap</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- audience detail panel -->
+      <div class="detail">
+        <div class="adp-tabs">
+          <span class="adp-tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Preview</span>
+          <span class="adp-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>Data Explorer</span>
+          <span class="adp-tsp"><button class="adp-save" id="tabSave" onclick="saveAudience()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save</span></button><span class="adp-ic">✕</span><span class="adp-ic">⤓</span><span class="adp-ic">⋯</span></span>
+        </div>
+        <div class="adp-hero"><div class="hn"><span class="n">Premium SUV Intenders</span><span class="pill" id="heroPill">Draft</span></div><div class="sd">148K people · Singapore · In-market for premium SUVs</div></div>
+        <div class="adp-body">
+          <!-- THE READ -->
+          <div class="adp-sec">
+            <div class="adp-read-h">Singapore's actively-shopping <span class="hl">premium-SUV intenders</span> — competitor showroom visitors weighing <span class="hl">EV vs hybrid</span> before they commit.</div>
+            <div class="adp-pillar"><span class="pn">2.4×</span><span class="pt">more likely to have <b>visited a premium SUV showroom</b> in the last 90 days</span></div>
+            <div class="adp-pillar"><span class="pn">1.9×</span><span class="pt">more likely to <b>research EV / hybrid drivetrains</b> than the national average</span></div>
+          </div>
+          <!-- §1 WHO THEY ARE -->
+          <div class="adp-sec">
+            <div class="adp-sh"><span class="num">1</span><span class="ttl">Who they are</span><span class="aside">Indexed vs national</span></div>
+            <div class="adp-utabs"><span class="adp-utab on">Demographics</span><span class="adp-utab">Income</span><span class="adp-utab">Segments</span><span class="adp-utab">Interests</span><span class="adp-utab">Behaviours</span></div>
+            <div class="adp-dgrid">
+              <div class="adp-dcard"><div><div class="dl">Core age</div><div class="dv">33–52</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.6×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Gender</div><div class="dv">58% male</div></div><span class="adp-idx flat">0.9×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Occupation</div><div class="dv">Professional</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.4×</span></div>
+              <div class="adp-dcard"><div><div class="dl">Life stage</div><div class="dv">Est. family</div></div><span class="adp-idx lead"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 12H5z"/></svg>1.5×</span></div>
+            </div>
+            <div class="adp-take"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2"/></svg><p>A <b>mid-career, family-stage professional</b> core — affluent enough for premium, settled enough to buy considered.</p></div>
+          </div>
+          <!-- §2 WHERE THEY ARE -->
+          <div class="adp-sec" style="border-bottom:none">
+            <div class="adp-sh"><span class="num">2</span><span class="ttl">Where they are</span><span class="aside">Geo intelligence</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:11px;flex-wrap:wrap">
+              <span class="adp-segc"><span class="o on">Residential</span><span class="o">Daytime</span><span class="o">Transaction</span></span>
+              <span class="adp-segc"><span class="o on">Weekday</span><span class="o">Weekend</span></span>
+            </div>
+            <div class="adp-map">
+              <span class="ml">Home districts · Weekday</span>
+              <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                <rect width="400" height="150" fill="#FAFAF8"/>
+                <polygon points="60,57 120,45 150,74 110,98 65,90" fill="#6B3C72"/>
+                <polygon points="150,74 120,45 185,37 215,66 180,94 110,98" fill="#8A5C90"/>
+                <polygon points="215,66 185,37 255,45 270,82 230,98 180,94" fill="#BEBDE7"/>
+                <polygon points="270,82 255,45 320,62 330,103 285,115 230,98" fill="#6B3C72"/>
+                <polygon points="180,94 230,98 285,115 250,139 175,135 130,123 110,98" fill="#D9CCE3"/>
+                <polygon points="330,103 320,62 360,78 355,123 285,115" fill="#F1E9FF"/>
+                <text x="100" y="78" font-family="Jua" font-size="10" fill="#fff">D10</text>
+                <text x="158" y="74" font-family="Jua" font-size="10" fill="#fff">D11</text>
+                <text x="216" y="78" font-family="Jua" font-size="10" fill="#4a2a50">D9</text>
+                <text x="286" y="92" font-family="Jua" font-size="10" fill="#4a2a50">D15</text>
+              </svg>
+              <span class="leg"><span>Low</span><i></i><span>High</span></span>
+            </div>
+            <div class="adp-insight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Anchored in prime <b>districts 9–11</b> — Singapore's affluent central core.</span></div>
+          </div>
+        </div>
+        <div class="adp-foot" id="adpFoot">
+          <button class="adp-fbtn pri" id="footPri" onclick="saveAudience()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save audience</span></button>
+          <button class="adp-fbtn sec">Open full <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- AUDIENCES LIBRARY VIEW ---------- -->
+    <div class="view" id="view-audiences">
+      <div class="lib">
+        <div class="lib-scroll">
+          <div class="lib-topbar">
+            <div><h1 class="lib-h1">Audiences</h1><p class="lib-sub" id="libSub">32 audiences · 16 categories</p></div>
+            <button class="lib-createbtn" onclick="switchView('explorer')"><span class="plus">+</span> Create audience</button>
+          </div>
+          <div class="lib-controls">
+            <div class="lib-search"><span class="mag"></span> Search audiences…</div>
+            <div class="lib-chip">Group by: <b>Category</b> <span class="ca">▾</span></div>
+            <div class="lib-chip">Segment <span class="ca">▾</span></div>
+            <div class="lib-chip">Sort: Largest <span class="ca">▾</span></div>
+          </div>
+          <div class="lib-colh"><span class="c-name">Name</span><span class="c-seg">Segment</span><span class="c-size">Size</span><span class="c-loc">Location</span><span class="c-chev"></span></div>
+
+          <!-- NEW auto-category, revealed on save -->
+          <div class="lib-grp fresh row-hidden" id="newGrp"><span class="tw">▾</span><span class="cicon" style="background:#F6EAF0;color:#993556"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14l-1.5-7H6.5L5 17zM3 17h18M8 10V7a4 4 0 018 0v3"/></svg></span><span class="nm">Automotive</span><span class="ct" id="newGrpCt">1</span><span class="auto">✦ Auto-tagged</span></div>
+          <div class="lib-row row-hidden" id="newRow"><span class="lib-name"><span class="av av-mkt"></span><span class="t">Premium SUV Intenders</span><span class="newtag">NEW</span></span><span class="seg"><span class="pill-seg ps-mkt"><span class="dot"></span>In-market <span class="cv">▾</span></span></span><span class="size">148,000<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>Singapore</span><span class="chev">›</span></div>
+
+          <div class="lib-grp"><span class="tw">▾</span><span class="cicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a2 2 0 002 2 2 2 0 002-2V3M8 10v11"/><path d="M17 3c-1.6 1-2.2 3.2-2.2 5.2 0 1.8.6 2.8 2.2 2.8v10"/></svg></span><span class="nm">Eating Places</span><span class="ct">2</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-val"></span><span class="t">Premium diners — Melbourne</span></span><span class="seg"><span class="pill-seg ps-val"><span class="dot"></span>High value <span class="cv">▾</span></span></span><span class="size">184,200<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>Greater Melbourne</span><span class="chev">›</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-freq"></span><span class="t">Takeaway regulars</span></span><span class="seg"><span class="pill-seg ps-freq"><span class="dot"></span>Frequent <span class="cv">▾</span></span></span><span class="size">421,800<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>Greater Melbourne</span><span class="chev">›</span></div>
+
+          <div class="lib-grp"><span class="tw">▾</span><span class="cicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14l11-11M21 3l-6.5 18a.55.55 0 01-1 0L10 14 3.5 10.5a.55.55 0 010-1L21 3z"/></svg></span><span class="nm">Airline Travelers</span><span class="ct">3</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-val"></span><span class="t">Big-ticket flyers</span></span><span class="seg"><span class="pill-seg ps-val"><span class="dot"></span>High value <span class="cv">▾</span></span></span><span class="size">338,900<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-freq"></span><span class="t">Frequent flyers</span></span><span class="seg"><span class="pill-seg ps-freq"><span class="dot"></span>Frequent <span class="cv">▾</span></span></span><span class="size">704,500<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-cust"></span><span class="t">Lapsed business class</span></span><span class="seg"><span class="pill-seg ps-cust"><span class="dot"></span>Win-back VIP <span class="cv">▾</span></span></span><span class="size">92,600<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>National</span><span class="chev">›</span></div>
+
+          <div class="lib-grp"><span class="tw">▾</span><span class="cicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.6 6.3a3.6 3.6 0 00-4.9 4.9l-6.4 6.4a1.5 1.5 0 002.1 2.1l6.4-6.4a3.6 3.6 0 004.9-4.9l-2.5 2.5-2.1-2.1 2.5-2.5z"/></svg></span><span class="nm">Home Improvement</span><span class="ct">2</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-val"></span><span class="t">Big renovators</span></span><span class="seg"><span class="pill-seg ps-val"><span class="dot"></span>High value <span class="cv">▾</span></span></span><span class="size">263,100<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>VIC + NSW</span><span class="chev">›</span></div>
+          <div class="lib-row"><span class="lib-name"><span class="av av-freq"></span><span class="t">Weekend DIYers</span></span><span class="seg"><span class="pill-seg ps-freq"><span class="dot"></span>Frequent <span class="cv">▾</span></span></span><span class="size">529,400<span class="u">ppl</span></span><span class="loc"><span class="pin">◍</span>VIC + NSW</span><span class="chev">›</span></div>
+          <div style="height:20px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast">
+  <span class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg></span>
+  <span><b>Premium SUV Intenders</b> saved to your Audiences library.</span>
+  <button class="tact" onclick="switchView('audiences')">View in Audiences →</button>
+</div>
+
+<script>
+  var saved = false;
+
+  function switchView(view){
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('on'); });
+    document.getElementById('view-' + view).classList.add('on');
+    document.getElementById('nav-explorer').classList.toggle('on', view === 'explorer');
+    document.getElementById('nav-audiences').classList.toggle('on', view === 'audiences');
+    if(view === 'audiences' && saved){
+      // clear the "new" nudge once the user has looked
+      document.getElementById('navBadge').classList.remove('show');
+      var row = document.getElementById('newRow');
+      row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash');
+    }
+  }
+
+  function saveAudience(){
+    if(saved) return;
+    saved = true;
+
+    // 1. detail panel — hero pill → Saved
+    var pill = document.getElementById('heroPill');
+    pill.className = 'pill saved';
+    pill.textContent = 'Saved';
+
+    // 2. tab Save chip → Saved
+    var ts = document.getElementById('tabSave');
+    ts.classList.add('saved');
+    ts.querySelector('svg').innerHTML = '<path d="M5 12l5 5 9-10"/>';
+    ts.querySelector('svg').setAttribute('stroke-width','2.4');
+    ts.querySelector('span').textContent = 'Saved';
+
+    // 3. footer primary → View in library
+    var fp = document.getElementById('footPri');
+    fp.className = 'adp-fbtn pri done';
+    fp.setAttribute('onclick', "switchView('audiences')");
+    fp.querySelector('svg').innerHTML = '<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/>';
+    fp.querySelector('span').textContent = 'View in library';
+
+    // 4. DE rail card → saved
+    document.getElementById('railIcon').style.background = '#E4F4EC';
+    document.getElementById('railIcon').style.color = 'var(--good)';
+    document.getElementById('railIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-10"/></svg>';
+    var rm = document.getElementById('railMeta');
+    rm.textContent = 'Saved · 148K · Singapore';
+    rm.style.color = 'var(--good)';
+
+    // 5. file it into the Audiences library
+    document.getElementById('newGrp').classList.remove('row-hidden');
+    document.getElementById('newRow').classList.remove('row-hidden');
+    document.getElementById('libSub').textContent = '33 audiences · 17 categories';
+
+    // 6. nudge on the Audiences nav item
+    document.getElementById('navBadge').classList.add('show');
+
+    // 7. swap the chat to the "saved · next moves" state
+    document.getElementById('chatSub').textContent = '· saved';
+    document.getElementById('chatBody').innerHTML =
+      '<div class="reason"><span class="done">✓</span><span>Saved · now in your Audiences library</span></div>' +
+      '<div class="ai small"><b>Premium SUV Intenders — Singapore</b> is saved and reusable in any prompt. Want to keep going?</div>' +
+      '<div style="margin-top:8px">' +
+        '<div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/></svg></span><div><div class="st">Open its full profile</div><div class="ss">Deep-dive · mobility · digital twin</div></div></div>' +
+        '<div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="st">Build a campaign recommendation</div><div class="ss">Channel, timing & budget off this audience</div></div></div>' +
+        '<div class="starter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg></span><div><div class="st">Create another audience</div><div class="ss">Keep building in this session</div></div></div>' +
+      '</div>' +
+      '<div class="cta-row" style="margin-top:12px"><button class="btn ghost" onclick="switchView(\'audiences\')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5"/></svg> View in library</button></div>';
+
+    // 8. toast
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 5200);
+  }
+</script>
+</body>
+</html>
