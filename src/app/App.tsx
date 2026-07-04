@@ -198,6 +198,7 @@ export default function App() {
                 screen={screen}
                 onClose={() => setSelectedAudienceId(null)}
                 onAskInChat={addChatContext}
+                onOpenFullPage={(id, name) => { setSelectedAudienceId(null); openAudience(id, name); }}
               />
             </div>
           )}

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Bookmark, Download, MoreHorizontal, FileText, Search, ArrowRight, Maximize2, Plus, Minus, X } from 'lucide-react';
+import { Bookmark, Download, MoreHorizontal, FileText, ArrowRight, Maximize2, Plus, Minus, X } from 'lucide-react';
 import { AUDIENCES, type AudienceId } from '../audienceData';
 import type { Screen } from '../App';
-import DataExplorerPanel from './DataExplorerPanel';
 import DataSourcesPopover from './DataSourcesPopover';
 import AudienceDensity from './AudienceDensity';
 import { Module, type ModuleRef } from './ModuleAsk';
@@ -470,8 +469,7 @@ function ExpandedMapModal({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function AudienceDetailPanel({ audienceId, screen, onClose, onAskInChat }: { audienceId: AudienceId; screen: Screen; onClose?: () => void; onAskInChat?: (ref: ModuleRef) => void }) {
-  const [mainTab, setMainTab] = useState<'preview' | 'data'>('preview');
+export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, onOpenFullPage }: { audienceId: AudienceId; screen?: Screen; onClose?: () => void; onAskInChat?: (ref: ModuleRef) => void; onOpenFullPage?: (id: AudienceId, name: string) => void }) {
   const [whoTab, setWhoTab] = useState('Demographics');
   const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
   const [dayType, setDayType] = useState<DayTypeKey>('Weekday');
@@ -490,18 +488,18 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose, onAsk
 
       {/* ── Top tab bar ── */}
       <div className="flex-none flex items-center gap-1.5 px-4 py-2.5 border-b border-[#e5e5e2] bg-white">
-        <button
-          onClick={() => setMainTab('preview')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] transition-colors ${mainTab === 'preview' ? 'bg-[#f1e9ff] text-[#6b3c72]' : 'text-[#6b6b6b] hover:bg-gray-50'}`}
-        >
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] bg-[#f1e9ff] text-[#6b3c72]">
           <FileText className="w-3.5 h-3.5" />Preview
-        </button>
-        <button
-          onClick={() => setMainTab('data')}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] transition-colors ${mainTab === 'data' ? 'bg-[#f1e9ff] text-[#6b3c72]' : 'text-[#6b6b6b] hover:bg-gray-50'}`}
-        >
-          <Search className="w-3.5 h-3.5" />Data Explorer
-        </button>
+        </div>
+        {onOpenFullPage && (
+          <button
+            onClick={() => onOpenFullPage(audienceId, audience.name)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] text-[#6b6b6b] hover:bg-gray-50 transition-colors"
+            title="Open the full audience page"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />View Full Page
+          </button>
+        )}
 
         <div className="ml-auto flex items-center gap-1.5">
           <button className="flex items-center gap-1.5 px-2.5 py-1.5 border border-[#6b3c72] text-[#6b3c72] rounded-lg font-['Jua',sans-serif] text-[12px] hover:bg-[#f5f0ff] transition-colors">
@@ -535,14 +533,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose, onAsk
         </div>
       </div>
 
-      {mainTab === 'data' && (
-        <div className="flex-1 overflow-hidden bg-white">
-          <DataExplorerPanel screen={screen} selectedAudienceId={audienceId} />
-        </div>
-      )}
-
-      {mainTab === 'preview' && (
-        <>
+      <>
           {/* ── Hero band ── */}
           <div className="flex-none bg-[#6b3c72] px-5 py-3.5">
             <div className="flex items-center gap-2.5 mb-1">
@@ -812,8 +803,7 @@ export default function AudienceDetailPanel({ audienceId, screen, onClose, onAsk
               onClose={() => setMapExpanded(false)}
             />
           )}
-        </>
-      )}
+      </>
     </div>
   );
 }
