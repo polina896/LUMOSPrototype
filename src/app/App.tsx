@@ -33,6 +33,10 @@ export default function App() {
   const [entryMode, setEntryMode] = useState<'brief' | 'upload' | null>(null);
   const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
   const [selectedAudienceId, setSelectedAudienceId] = useState<AudienceId | null>(null);
+  // Audiences saved from the Data Explorer detail panel — surfaced in the Audiences library.
+  const [savedAudienceIds, setSavedAudienceIds] = useState<AudienceId[]>([]);
+  const saveAudience = (id: AudienceId) =>
+    setSavedAudienceIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
   const [showDataExplorer, setShowDataExplorer] = useState(false);
   const [showAudiences, setShowAudiences] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
@@ -150,6 +154,7 @@ export default function App() {
           <AudienceLibrary
             onSelectAudience={(id, name) => openAudience(id, name ?? id)}
             onCreateAudience={startCreateAudience}
+            savedAudienceIds={savedAudienceIds}
           />
         )
       ) : (
@@ -199,6 +204,8 @@ export default function App() {
                 onClose={() => setSelectedAudienceId(null)}
                 onAskInChat={addChatContext}
                 onOpenFullPage={(id, name) => { setSelectedAudienceId(null); openAudience(id, name); }}
+                isSaved={savedAudienceIds.includes(selectedAudienceId)}
+                onSave={saveAudience}
               />
             </div>
           )}
@@ -211,6 +218,7 @@ export default function App() {
           entryMode={entryMode}
           isAnalysisComplete={isAnalysisComplete}
           selectedAudienceId={selectedAudienceId}
+          onOpenFullPage={(id, name) => openAudience(id, name)}
         />
       ) : null}
     </div>
