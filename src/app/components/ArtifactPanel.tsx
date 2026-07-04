@@ -19,6 +19,7 @@ interface ArtifactPanelProps {
   entryMode: 'brief' | 'upload' | null;
   isAnalysisComplete: boolean;
   selectedAudienceId: AudienceId | null;
+  onOpenFullPage?: (id: AudienceId, name: string) => void;
 }
 
 export default function ArtifactPanel({
@@ -28,6 +29,7 @@ export default function ArtifactPanel({
   entryMode,
   isAnalysisComplete,
   selectedAudienceId,
+  onOpenFullPage,
 }: ArtifactPanelProps) {
   const [previewMode, setPreviewMode] = useState<'preview' | 'data'>('preview');
 
@@ -39,7 +41,7 @@ export default function ArtifactPanel({
     if (!selectedAudienceId) return null;
     return (
       <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} />
+        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} />
       </div>
     );
   }
@@ -60,7 +62,7 @@ export default function ArtifactPanel({
     }
     return (
       <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} />
+        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} />
       </div>
     );
   }
