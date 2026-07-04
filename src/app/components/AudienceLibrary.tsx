@@ -1,5 +1,26 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Search, Plus, GripVertical, MapPin, X, Bell, ShoppingCart, Car, Compass, Zap, Heart, PlayCircle, Tag, Activity, Coffee, Truck, Leaf, Music } from "lucide-react";
+import { AUDIENCES as DETAIL_AUDIENCES, type AudienceId } from "../audienceData";
+
+// Prefix for library rows that originate from a saved Data Explorer audience,
+// keeping their ids from colliding with the seeded demo rows.
+const SAVED_PREFIX = "saved:";
+
+// Map a rich Data Explorer audience onto the flat library row shape.
+function detailToLibraryRow(id: AudienceId): Audience | null {
+  const a = DETAIL_AUDIENCES.find((d) => d.id === id);
+  if (!a) return null;
+  const size = parseInt(a.reachCount.replace(/[^0-9]/g, ""), 10) || 0;
+  return {
+    id: `${SAVED_PREFIX}${a.id}`,
+    name: a.name,
+    segment: "in-market",
+    segmentLabel: "In-market",
+    size,
+    location: "Singapore",
+    category: "Automotive",
+  };
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -277,10 +298,23 @@ function SegmentPill({
 interface AudienceLibraryProps {
   onSelectAudience?: (id: string, name: string) => void;
   onCreateAudience?: () => void;
+  savedAudienceIds?: AudienceId[];
 }
 
-export default function AudienceLibrary({ onSelectAudience, onCreateAudience }: AudienceLibraryProps) {
+export default function AudienceLibrary({ onSelectAudience, onCreateAudience, savedAudienceIds = [] }: AudienceLibraryProps) {
   const [audiences, setAudiences] = useState<Audience[]>(AUDIENCES);
+
+  // Merge any audiences saved from the Data Explorer detail panel into the
+  // list, newest first, so they show up under their category.
+  useEffect(() => {
+    setAudiences((prev) => {
+      const have = new Set(prev.map((a) => a.id));
+      const additions = savedAudienceIds
+        .map(detailToLibraryRow)
+        .filter((row): row is Audience => row !== null && !have.has(row.id));
+      return additions.length ? [...additions, ...prev] : prev;
+    });
+  }, [savedAudienceIds]);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("largest");
   const [groupKey, setGroupKey] = useState<GroupKey>("category");
@@ -502,6 +536,8 @@ export default function AudienceLibrary({ onSelectAudience, onCreateAudience }: 
                   {!isCollapsed && rows.map((audience) => {
                     const isDragging = dragId === audience.id;
                     const color = SEGMENTS[audience.segment]?.color ?? "#999";
+                    const isSavedRow = audience.id.startsWith(SAVED_PREFIX);
+                    const openId = isSavedRow ? audience.id.slice(SAVED_PREFIX.length) : audience.id;
 
                     return (
                       <div
@@ -509,7 +545,7 @@ export default function AudienceLibrary({ onSelectAudience, onCreateAudience }: 
                         draggable
                         onDragStart={() => handleDragStart(audience.id)}
                         onDragEnd={handleDragEnd}
-                        onClick={() => onSelectAudience?.(audience.id, audience.name)}
+                        onClick={() => onSelectAudience?.(openId, audience.name)}
                         className={`flex items-center gap-3 px-[30px] h-[48px] cursor-pointer relative group transition-colors ${
                           isDragging
                             ? "bg-white border border-[#E4D9FB] rounded-[10px] shadow-[0_14px_30px_rgba(40,37,45,.16)] mx-[22px] z-10"
@@ -525,6 +561,9 @@ export default function AudienceLibrary({ onSelectAudience, onCreateAudience }: 
                         <span className="flex-1 flex items-center gap-[11px] min-w-0">
                           <span className="w-[20px] h-[20px] rounded-full flex-none" style={{ background: SEGMENT_AVATAR[audience.segment] ?? color }} />
                           <span className="text-[14px] text-[#262329] font-medium truncate">{audience.name}</span>
+                          {isSavedRow && (
+                            <span className="flex-none px-[7px] py-[1px] rounded-full bg-[#1D9E75] text-white text-[10px] font-bold tracking-wide">NEW</span>
+                          )}
                         </span>
 
                         {/* Segment */}
