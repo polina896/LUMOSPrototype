@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { Search, ChevronDown, BarChart2, MessageSquare, FileText, Map, LayoutTemplate, Plus, ExternalLink } from 'lucide-react';
 import TemplateGalleryPanel from './TemplateGalleryPanel';
+import DocumentViewer, { type DocKey } from './DocumentViewer';
+
+// Map a document's type to the worked example the viewer opens on. Types
+// without a bespoke example fall back to the Audience Strategy doc.
+const DOC_TYPE_TO_KEY: Record<string, DocKey> = {
+  'Audience Strategy': 'strategy',
+  'Messaging Matrix': 'matrix',
+  'Campaign Brief': 'brief',
+};
 
 const TAG_PALETTES: Record<string, { bg: string; text: string }> = {
   'Affluent Professionals':    { bg: '#e8f4ec', text: '#1e7a42' },
@@ -65,9 +74,14 @@ const DOC_GROUPS: DocGroup[] = [
 export default function DocumentsPanel() {
   const [search, setSearch] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<DocKey | null>(null);
 
   if (showTemplates) {
     return <TemplateGalleryPanel onBack={() => setShowTemplates(false)} />;
+  }
+
+  if (viewingDoc) {
+    return <DocumentViewer initialDoc={viewingDoc} onBack={() => setViewingDoc(null)} />;
   }
 
   const filtered = search.trim()
@@ -186,7 +200,10 @@ export default function DocumentsPanel() {
                           <span className="font-['Jua',sans-serif] text-[12px] text-[#9a9a9a]">{doc.timestamp}</span>
                         </td>
                         <td className="py-3 pl-4 pr-6">
-                          <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#e5e5e2] rounded-lg font-['Jua',sans-serif] text-[12px] text-[#444] hover:border-[#6b3c72] hover:text-[#6b3c72] transition-colors opacity-0 group-hover/row:opacity-100">
+                          <button
+                            onClick={() => setViewingDoc(DOC_TYPE_TO_KEY[doc.type] ?? 'strategy')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-[#e5e5e2] rounded-lg font-['Jua',sans-serif] text-[12px] text-[#444] hover:border-[#6b3c72] hover:text-[#6b3c72] transition-colors opacity-0 group-hover/row:opacity-100"
+                          >
                             <ExternalLink className="w-3 h-3" />
                             View
                           </button>
