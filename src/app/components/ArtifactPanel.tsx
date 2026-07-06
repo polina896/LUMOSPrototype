@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users } from 'lucide-react';
+import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users, Bookmark } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Screen } from '../App';
@@ -22,6 +22,8 @@ interface ArtifactPanelProps {
   onOpenFullPage?: (id: AudienceId, name: string) => void;
   savedAudienceIds?: AudienceId[];
   onSaveAudience?: (id: AudienceId) => void;
+  onSaveDocument?: (doc: { name: string; type: string; tags: string[] }) => void;
+  savedDocumentNames?: string[];
 }
 
 export default function ArtifactPanel({
@@ -34,6 +36,8 @@ export default function ArtifactPanel({
   onOpenFullPage,
   savedAudienceIds = [],
   onSaveAudience,
+  onSaveDocument,
+  savedDocumentNames = [],
 }: ArtifactPanelProps) {
   const [previewMode, setPreviewMode] = useState<'preview' | 'data'>('preview');
 
@@ -85,6 +89,8 @@ export default function ArtifactPanel({
             entryMode={entryMode}
             screen={screen}
             selectedAudienceId={selectedAudienceId}
+            onSaveDocument={onSaveDocument}
+            savedDocumentNames={savedDocumentNames}
           />
         )}
       </div>
@@ -308,6 +314,8 @@ function ResultPanel({
   entryMode,
   screen,
   selectedAudienceId,
+  onSaveDocument,
+  savedDocumentNames = [],
 }: {
   previewMode: 'preview' | 'data';
   setPreviewMode: (mode: 'preview' | 'data') => void;
@@ -316,9 +324,12 @@ function ResultPanel({
   entryMode: 'brief' | 'upload' | null;
   screen: Screen;
   selectedAudienceId: AudienceId | null;
+  onSaveDocument?: (doc: { name: string; type: string; tags: string[] }) => void;
+  savedDocumentNames?: string[];
 }) {
   const [pageTitle, setPageTitle] = useState('Meridian Motors Singapore Launch — Audiences');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const isDocSaved = savedDocumentNames.includes(pageTitle);
   const [blocks, setBlocks] = useState<BlockData[]>([
     { id: 'insight-1', type: 'insight' },
     { id: 'map-1', type: 'geo-map', title: 'GEOGRAPHIC CONCENTRATION' },
@@ -398,6 +409,25 @@ function ResultPanel({
           <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#e5e5e2] rounded-lg font-['Jua',sans-serif] text-[12px] text-[#6b6b6b] hover:bg-gray-50 transition-colors">
             <Plus className="w-3.5 h-3.5" />
             Add block
+          </button>
+          <button
+            onClick={() =>
+              onSaveDocument?.({
+                name: pageTitle,
+                type: 'Audience Strategy',
+                tags: ['Premium Sedan Intenders', 'EV Upgrade Shoppers', 'Family SUV Upgraders'],
+              })
+            }
+            disabled={isDocSaved}
+            title={isDocSaved ? 'Saved to your Documents' : 'Save to your Documents'}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-['Jua',sans-serif] text-[12px] transition-colors ${
+              isDocSaved
+                ? 'border border-[#1D9E75] bg-[#1D9E75] text-white'
+                : 'border border-[#6b3c72] text-[#6b3c72] hover:bg-[#f5f0ff]'
+            }`}
+          >
+            {isDocSaved ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+            {isDocSaved ? 'Saved to Documents' : 'Save to Documents'}
           </button>
           <div className="relative">
             <button
