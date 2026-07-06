@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
-import MobilityDeepDive, { MobilityOverviewCard, MOBILITY_OVERVIEW_ID } from "./MobilityDeepDive";
+import MobilityDeepDive from "./MobilityDeepDive";
+import { MOBILITY_SECTIONS, MobilitySectionCard } from "./MobilitySections";
 import TemporalDeepDive, { PeakDaysDaypartsCard, TEMPORAL_DENSITY_ID } from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
@@ -99,10 +100,11 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const { blockMap, sourceOf, catalog } = useMemo(() => {
     const bm: Record<string, BlockConfig> = {};
     const src: Record<string, string> = {};
-    // Anchor catalog items, keyed by the deck they belong beside.
+    // Anchor catalog items, keyed by the deck they belong beside. Mobility's
+    // sections are now individual native cards (MOBILITY_SECTIONS).
     const anchorItems: Record<DeckKey, { id: string; title: string; subtitle?: string }[]> = {
       profile: [],
-      mobility: [{ id: MOBILITY_OVERVIEW_ID, title: 'Where they live & move', subtitle: 'Map · catchment · visitation' }],
+      mobility: MOBILITY_SECTIONS.map((s) => ({ id: s.id, title: s.title, subtitle: s.subtitle })),
       temporal: [{ id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', subtitle: 'Hour × day · indexed density' }],
     };
     const cat: Catalog = (['profile', 'mobility', 'temporal'] as DeckKey[]).map((k) => {
@@ -185,17 +187,16 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const unpinSection = (id: string) => setPinned((prev) => prev.filter((r) => r.id !== id));
 
   // Fixed anchors — hand-built cards that aren't config-driven blocks but are
-  // still pinnable: the Temporal density heatmap and the Mobility map overview
-  // (the map's sub-sections are one Figma export, so they pin as one module).
+  // still pinnable: the Temporal density heatmap and each native Mobility section.
   const anchors: Record<string, AnchorModule> = {
     [TEMPORAL_DENSITY_ID]: {
       id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', source: DECK_LABELS.temporal, span: 3,
       render: () => <PeakDaysDaypartsCard audience={askName} onAskGraph={pinSection} />,
     },
-    [MOBILITY_OVERVIEW_ID]: {
-      id: MOBILITY_OVERVIEW_ID, title: 'Where they live & move', source: DECK_LABELS.mobility, span: 3,
-      render: () => <MobilityOverviewCard />,
-    },
+    ...Object.fromEntries(MOBILITY_SECTIONS.map((s) => [s.id, {
+      id: s.id, title: s.title, source: DECK_LABELS.mobility, span: s.span,
+      render: () => <MobilitySectionCard id={s.id} audience={askName} onAskGraph={pinSection} />,
+    }])),
   };
 
   const handleTabClick = (tab: DeepDiveTab) => {
@@ -211,9 +212,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   // (The profile tab wires its own <AskPill> and is excluded to avoid double-pins.)
   const CONTROL_LABELS = new Set(['Ask', 'Trend', 'Snapshot', 'Map', 'Index', '%', 'Count', 'Export', 'New']);
   const handleScreenAsk = (e: React.MouseEvent) => {
-    // Only the Figma-export anchors carry static "Ask" pills: Mobility's map anchor
-    // and Digital Twin. Profile & Temporal are editable decks with real ✦ Ask.
-    if (activeTab === 'profile' || activeTab === 'temporal') return;
+    // Only Digital Twin still carries static Figma "Ask" pills scraped here.
+    // Profile, Temporal and (now) Mobility render real <AskPill>s, so exclude
+    // them to avoid double-pinning.
+    if (activeTab === 'profile' || activeTab === 'temporal' || activeTab === 'mobility') return;
     // Ignore clicks inside the editable deck — those route through the block's own
     // ✦ Ask (scope), not the legacy pin-to-chat affordance on the map anchor.
     if ((e.target as HTMLElement).closest?.('[data-editable-deck]')) return;
@@ -501,6 +503,8 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
             scopeId={scope?.blockId ?? null}
             onAskBlock={askBlock}
             onAddBlock={addBlock}
+            audience={askName}
+            onAskGraph={pinSection}
           />
         )}
         {activeTab === 'temporal' && (
