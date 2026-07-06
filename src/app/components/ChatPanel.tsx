@@ -597,8 +597,8 @@ export default function ChatPanel({
       {/* ════════ ALL CHAT SCREENS ════════ */}
       {screen !== 'blank' && (
         <div className="flex-1 flex flex-col min-h-0">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-8">
-            <div className="min-h-full flex flex-col justify-end max-w-[700px] pb-8 space-y-0">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 flex flex-col">
+            <div className="w-full max-w-[700px] my-auto pb-8 space-y-0">
 
               {/* ── Brief user message ── */}
               {entryMode === 'brief' && (
@@ -909,21 +909,19 @@ export default function ChatPanel({
                 </>
               )}
 
+              {/* Clarify widget — flows inline with the conversation it belongs to */}
+              {screen === 'clarifying' && showClarifyCard && !clarifySubmitted && (
+                <div className="pt-1">
+                  <FloatingClarifyWidget
+                    key={clarifyStep}
+                    step={clarifyStep}
+                    onSubmit={handleClarifyStep}
+                  />
+                </div>
+              )}
+
             </div>
           </div>
-
-          {/* Floating clarify widget — sits above the input bar */}
-          {screen === 'clarifying' && showClarifyCard && !clarifySubmitted && (
-            <div className="px-8 pb-3">
-              <div className="max-w-[700px]">
-                <FloatingClarifyWidget
-                  key={clarifyStep}
-                  step={clarifyStep}
-                  onSubmit={handleClarifyStep}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Input bar */}
           <div className="px-8 py-5 border-t border-gray-200">
