@@ -210,6 +210,125 @@
     .dd{grid-template-columns:1fr}
     .sec,.doc-head,.foot{padding-left:24px;padding-right:24px}
   }
+
+  /* ========================================================= */
+  /* ============  EDIT-WITH-LUMOS LAYER  ==================== */
+  /* ========================================================= */
+  .doc .sec{position:relative}
+  body.editing .sec:hover{background:#fcfbfd}
+  .sec.scoped{background:#faf7fc;box-shadow:inset 3px 0 0 var(--purple)}
+  .sec.proposing{background:#fbf7fd}
+  .sec.drag-ghost{opacity:.4}
+  .sec.drop-before::before,.sec.drop-after::after{content:'';position:absolute;left:44px;right:40px;height:2px;background:var(--purple);border-radius:2px;z-index:5}
+  .sec.drop-before::before{top:6px}
+  .sec.drop-after::after{bottom:2px}
+
+  .egutter{position:absolute;left:14px;top:30px;opacity:0;transition:opacity .12s;z-index:6}
+  .sec:hover .egutter{opacity:1}
+  .ehandle{width:22px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#b9b3bd;cursor:grab;font-size:15px;line-height:1;user-select:none}
+  .ehandle:hover{background:#efe9f2;color:var(--purple)}
+  .ehandle:active{cursor:grabbing}
+
+  .etools{position:absolute;right:22px;top:24px;display:flex;gap:5px;opacity:0;transition:opacity .12s;z-index:6}
+  .sec:hover .etools{opacity:1}
+  .etool{font-size:11.5px;display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.92);color:var(--ink-3);cursor:pointer;white-space:nowrap;font-family:'DM Sans'}
+  .etool:hover{border-color:#d8cbdf;color:var(--purple);background:#fff}
+  .etool.ask{color:var(--purple);border-color:#e6d8ec}
+
+  .einsert{position:absolute;left:44px;right:40px;bottom:-4px;height:12px;z-index:5;cursor:pointer}
+  .einsert .eline{position:absolute;left:0;right:0;top:5px;height:2px;background:var(--purple);border-radius:2px;opacity:0;transform:scaleX(.35);transition:.14s}
+  .einsert .eadd{position:absolute;left:50%;top:-8px;transform:translateX(-50%);background:var(--purple);color:#fff;font-size:11px;font-weight:600;padding:3px 11px;border-radius:999px;opacity:0;white-space:nowrap;transition:.14s;box-shadow:0 2px 6px rgba(107,60,114,.3)}
+  .einsert:hover .eline{opacity:.5;transform:scaleX(1)}
+  .einsert:hover .eadd{opacity:1}
+
+  .new-badge{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--green-tx);background:#eef7f0;padding:2px 7px;border-radius:5px;margin-left:8px;vertical-align:middle}
+
+  .genwrap{padding:22px 48px;animation:efade .2s ease}
+  @keyframes efade{from{opacity:0}to{opacity:1}}
+  .gencard{border:1px dashed #d8cbdf;border-radius:12px;padding:16px 18px;background:linear-gradient(90deg,#faf7fc,#f4eef7)}
+  .genhead{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--purple);font-weight:600}
+  .gensp{width:14px;height:14px;border:2px solid #d8bfe0;border-top-color:var(--purple);border-radius:50%;animation:espin .7s linear infinite;flex:none}
+  @keyframes espin{to{transform:rotate(360deg)}}
+  .shim{height:11px;border-radius:6px;margin-top:11px;background:linear-gradient(90deg,#efe6f3 25%,#e4d5ea 37%,#efe6f3 63%);background-size:400% 100%;animation:esh 1.3s ease infinite}
+  @keyframes esh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+  .propbar{margin-top:16px;border:1px solid #e2cfe9;background:#fbf5fd;border-radius:11px;padding:11px 13px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .propbar .pt{font-size:12px;color:var(--purple);font-weight:600;flex:1;min-width:150px}
+  .propbar .pt span{color:var(--ink-3);font-weight:400}
+  .propbtn{font-size:11.5px;padding:6px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:'DM Sans'}
+  .propbtn.acc{background:var(--purple);border-color:var(--purple);color:#fff}
+  .propbtn.acc:hover{background:var(--purple-d)}
+  .propbtn:hover{background:#f5f2f6}
+
+  /* block menu */
+  .emenu{position:fixed;z-index:80;min-width:192px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px -10px rgba(0,0,0,.28);padding:6px;display:none}
+  .emenu.show{display:block}
+  .emi{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .emi .k{width:16px;text-align:center;color:var(--muted);font-size:13px}
+  .emi:hover{background:#f5f2f6;color:var(--ink)}
+  .emi.danger:hover{background:#fdeeee;color:#b23}
+  .emi.danger .k{color:#c66}
+  .emenu .esep{height:1px;background:var(--line-2);margin:5px 6px}
+  .emenu .elabel{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 10px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+
+  /* ===== Ask Lumos docked panel ===== */
+  .assist{position:fixed;top:53px;right:0;bottom:0;width:372px;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;z-index:30;transform:translateX(100%);transition:transform .22s ease;box-shadow:-8px 0 30px -20px rgba(0,0,0,.25)}
+  body.assist-open .assist{transform:translateX(0)}
+  body.assist-open .stage{padding-right:396px}
+  .ahead{padding:14px 16px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:9px;flex:none}
+  .ahead .logo{width:24px;height:24px;border-radius:8px;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Jua';font-size:12px;flex:none}
+  .ahead .htxt b{font-size:13.5px;font-family:'Jua';font-weight:400;color:var(--ink);display:block}
+  .ahead .htxt small{font-size:11px;color:var(--muted)}
+  .ahead .x{margin-left:auto;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 7px;border-radius:7px;border:0;background:transparent}
+  .ahead .x:hover{background:#f4f2ef;color:var(--ink-2)}
+  .athread{flex:1;overflow-y:auto;padding:16px}
+  .empty{padding:8px 4px}
+  .empty .big{font-family:'Jua';font-size:16px;color:var(--ink);line-height:1.3}
+  .empty .sub{font-size:12.5px;color:var(--ink-3);margin-top:7px}
+  .cap{margin-top:20px}
+  .clab{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .caprow{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-2)}
+  .caprow:last-child{border-bottom:0}
+  .caprow .ci{width:24px;height:24px;border-radius:7px;background:var(--purple-tint);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+  .caprow .ct{font-size:12.5px;color:var(--ink-2)}
+  .caprow .ct b{color:var(--ink);font-weight:600}
+  .starters{margin-top:20px}
+  .starter{display:block;width:100%;text-align:left;font-size:12.5px;color:var(--ink-2);border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;margin-bottom:8px;cursor:pointer;font-family:'DM Sans'}
+  .starter:hover{border-color:#d8cbdf;background:#faf7fc;color:var(--purple)}
+  .msg{margin-bottom:14px;max-width:100%}
+  .msg.user{margin-left:auto;background:var(--purple);color:#fff;border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:12.5px;width:fit-content;max-width:85%}
+  .msg.bot{font-size:12.5px;color:var(--ink-2)}
+  .msg.bot .bl{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .msg.bot .bl .logo{width:20px;height:20px;border-radius:6px;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Jua';font-size:10px}
+  .msg.bot .bl b{font-size:12px;color:var(--ink)}
+  .msg.bot .body{background:#f7f5f8;border:1px solid var(--line-2);border-radius:12px;padding:11px 13px;line-height:1.5}
+  .msg.bot .body b{color:var(--ink);font-weight:600}
+  .actline{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .actline button{font-size:11.5px;padding:6px 11px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:'DM Sans'}
+  .actline button.go{background:var(--purple);border-color:var(--purple);color:#fff}
+  .actline button.go:hover{background:var(--purple-d)}
+  .actline button:hover{background:#f5f2f6}
+  .composer{flex:none;border-top:1px solid var(--line-2);padding:12px}
+  .scope-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+  .scope-chip{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--purple);background:var(--purple-tint);border:1px solid #e3d3ea;border-radius:999px;padding:4px 6px 4px 11px}
+  .scope-chip .lab{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .scope-chip .rm{cursor:pointer;width:16px;height:16px;border-radius:50%;background:rgba(107,60,114,.14);display:flex;align-items:center;justify-content:center;font-size:11px}
+  .scope-chip .rm:hover{background:rgba(107,60,114,.28)}
+  .scope-chip.add{color:var(--green-tx);background:#eef7f0;border-color:#c9e6d2}
+  .scope-chip.add .rm{background:rgba(30,122,66,.14)}
+  .cbox{border:1.5px solid #e6e1ea;border-radius:13px;padding:10px 12px;background:#fff;transition:border-color .12s}
+  .cbox:focus-within{border-color:var(--purple)}
+  .cbox textarea{width:100%;border:0;outline:none;resize:none;font-family:'DM Sans';font-size:13px;color:var(--ink);background:transparent;line-height:1.5;min-height:22px}
+  .cbox textarea::placeholder{color:#b6a9bd}
+  .crow{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .crow .hint{font-size:11px;color:var(--muted);flex:1}
+  .send{width:30px;height:30px;border-radius:9px;border:0;background:var(--purple);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+  .send:hover{background:var(--purple-d)}
+  .etoast{position:fixed;bottom:22px;left:calc(50% - 190px);transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:12.5px;padding:10px 16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.22s;z-index:90;display:flex;align-items:center;gap:12px}
+  body:not(.assist-open) .etoast{left:50%}
+  .etoast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .etoast .undo{color:#e7b6f0;font-weight:600;cursor:pointer}
+  @media(max-width:820px){ body.assist-open .stage{padding-right:24px} .assist{width:100%} }
 </style>
 </head>
 <body>
@@ -222,7 +341,7 @@
   <span class="spacer"></span>
   <button class="tbtn">⤢ Share</button>
   <button class="tbtn">↓ Export</button>
-  <button class="tbtn primary">✦ Ask Lumos</button>
+  <button class="tbtn primary" id="askToggle" onclick="LumosEdit.togglePanel()">✦ Ask Lumos</button>
 </div>
 
 <!-- ===== Doc switcher ===== -->
@@ -750,6 +869,395 @@
     html+='</tbody></table>';
     document.getElementById('heatmap').innerHTML=html;
   })();
+</script>
+
+<!-- ================= EDIT-WITH-LUMOS PANEL ================= -->
+<aside class="assist" id="assist">
+  <div class="ahead">
+    <span class="logo">✦</span>
+    <div class="htxt"><b>Ask Lumos</b><small id="aSub">Edit this document</small></div>
+    <button class="x" onclick="LumosEdit.togglePanel()">✕</button>
+  </div>
+  <div class="athread" id="aThread"></div>
+  <div class="composer">
+    <div class="scope-chips" id="aChips"></div>
+    <div class="cbox">
+      <textarea id="aComposer" rows="1" placeholder="Ask about the doc, or tell Lumos what to change…"></textarea>
+      <div class="crow">
+        <span class="hint" id="aHint">Hover a section for edit &amp; reorder controls</span>
+        <button class="send" onclick="LumosEdit.submit()">↑</button>
+      </div>
+    </div>
+  </div>
+</aside>
+<div class="emenu" id="eMenu"></div>
+<div class="etoast" id="eToast"></div>
+
+<script>
+/* =========================================================================
+   Edit-with-Lumos — Notion-style block controls + scoped Ask + add-section
+   Works over the existing hand-authored .doc / .sec markup (all 3 doc types).
+   ========================================================================= */
+window.LumosEdit = (function(){
+  const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const $ = id => document.getElementById(id);
+
+  let scopedSec = null;      // a .sec being edited (single-scope)
+  let addAfter  = undefined; // sentinel while adding: the .sec to insert after (null = top of doc)
+  let uid = 0;
+
+  function currentDoc(){ return document.querySelector('.doc.show'); }
+  function secs(doc){ return Array.from(doc.querySelectorAll(':scope > .sec')); }
+  function titleOf(sec){
+    const h = sec.querySelector('.sec-head h2');
+    if(!h) return 'this section';
+    return h.childNodes[0] ? h.childNodes[0].textContent.trim() : h.textContent.trim();
+  }
+  function editableOf(sec){
+    return sec.querySelector('.takeaway p') || sec.querySelector('.sec-sub')
+        || sec.querySelector('p') || sec.querySelector('.sec-head h2');
+  }
+  function renumber(doc){
+    let n = 0;
+    secs(doc).forEach(sec => { const num = sec.querySelector('.sec-num'); if(num){ n++; num.textContent = String(n).padStart(2,'0'); } });
+  }
+
+  /* ---------- decoration ---------- */
+  function decorateSec(sec){
+    if(sec.dataset.eDecorated) return;
+    sec.dataset.eDecorated = '1';
+
+    const gutter = document.createElement('div');
+    gutter.className = 'egutter';
+    gutter.innerHTML = '<div class="ehandle" draggable="true" title="Drag to reorder">⠿</div>';
+    sec.appendChild(gutter);
+
+    const tools = document.createElement('div');
+    tools.className = 'etools';
+    tools.innerHTML = '<button class="etool ask">✦ Ask</button><button class="etool more">⋯</button>';
+    sec.appendChild(tools);
+    tools.querySelector('.ask').addEventListener('click', () => scopeSection(sec));
+    tools.querySelector('.more').addEventListener('click', e => openMenu(e, sec));
+
+    const ins = document.createElement('div');
+    ins.className = 'einsert';
+    ins.innerHTML = '<div class="eline"></div><div class="eadd">+ Add section</div>';
+    ins.addEventListener('click', () => startAdd(sec));
+    sec.appendChild(ins);
+
+    wireDrag(sec, gutter.querySelector('.ehandle'));
+  }
+  function decorateAll(){ document.querySelectorAll('.doc').forEach(doc => secs(doc).forEach(decorateSec)); }
+
+  /* ---------- drag reorder ---------- */
+  let dragEl = null;
+  function clearMarks(){ document.querySelectorAll('.drop-before,.drop-after').forEach(s => s.classList.remove('drop-before','drop-after')); }
+  function wireDrag(sec, handle){
+    handle.addEventListener('dragstart', e => { dragEl = sec; sec.classList.add('drag-ghost'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text','x'); });
+    handle.addEventListener('dragend',   () => { clearMarks(); sec.classList.remove('drag-ghost'); dragEl=null; });
+    sec.addEventListener('dragover', e => {
+      if(!dragEl || dragEl===sec || dragEl.parentElement!==sec.parentElement) return;
+      e.preventDefault();
+      const r = sec.getBoundingClientRect(); const before = e.clientY < r.top + r.height/2;
+      sec.classList.toggle('drop-before', before); sec.classList.toggle('drop-after', !before);
+    });
+    sec.addEventListener('dragleave', () => sec.classList.remove('drop-before','drop-after'));
+    sec.addEventListener('drop', e => {
+      if(!dragEl || dragEl===sec) return;
+      e.preventDefault();
+      const r = sec.getBoundingClientRect(); const before = e.clientY < r.top + r.height/2;
+      if(before) sec.parentElement.insertBefore(dragEl, sec);
+      else       sec.parentElement.insertBefore(dragEl, sec.nextElementSibling);
+      clearMarks(); renumber(sec.parentElement); toast('Section moved');
+    });
+  }
+
+  /* ---------- block menu (⋯) ---------- */
+  const menu = () => $('eMenu');
+  let menuSec = null;
+  function openMenu(e, sec){
+    e.stopPropagation();
+    menuSec = sec;
+    menu().innerHTML =
+      '<div class="elabel">'+esc(titleOf(sec))+'</div>'+
+      '<div class="emi" data-a="ask"><span class="k">✦</span> Ask Lumos to edit…</div>'+
+      '<div class="esep"></div>'+
+      '<div class="emi" data-a="up"><span class="k">↑</span> Move up</div>'+
+      '<div class="emi" data-a="down"><span class="k">↓</span> Move down</div>'+
+      '<div class="emi" data-a="dup"><span class="k">⧉</span> Duplicate</div>'+
+      '<div class="esep"></div>'+
+      '<div class="emi danger" data-a="del"><span class="k">🗑</span> Delete section</div>';
+    menu().querySelectorAll('.emi').forEach(mi => mi.addEventListener('click', () => menuAction(mi.dataset.a)));
+    menu().classList.add('show');
+    const r = e.currentTarget.getBoundingClientRect();
+    menu().style.left = Math.min(r.left, window.innerWidth - 210) + 'px';
+    menu().style.top  = (r.bottom + 6) + 'px';
+  }
+  function closeMenu(){ menu().classList.remove('show'); menuSec=null; }
+  document.addEventListener('click', e => { if(!menu().contains(e.target)) closeMenu(); });
+
+  function menuAction(a){
+    const sec = menuSec, doc = sec.parentElement;
+    if(a==='ask'){ closeMenu(); scopeSection(sec); return; }
+    if(a==='up'){ const p = sec.previousElementSibling; if(p && p.classList.contains('sec')) doc.insertBefore(sec, p); renumber(doc); toast('Moved up'); }
+    if(a==='down'){ const n = sec.nextElementSibling; if(n && n.classList.contains('sec')) doc.insertBefore(n, sec); renumber(doc); toast('Moved down'); }
+    if(a==='dup'){
+      const copy = sec.cloneNode(true);
+      copy.removeAttribute('data-e-decorated');
+      copy.querySelectorAll('.egutter,.etools,.einsert,.propbar').forEach(n => n.remove());
+      copy.classList.remove('scoped','proposing');
+      const h = copy.querySelector('.sec-head h2'); const nb = copy.querySelector('.new-badge'); if(nb) nb.remove();
+      if(h) h.insertAdjacentHTML('beforeend',' <span class="new-badge">Copy</span>');
+      sec.parentElement.insertBefore(copy, sec.nextElementSibling);
+      decorateSec(copy); renumber(doc); toast('Section duplicated');
+      copy.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    if(a==='del'){
+      const anchor = sec.nextElementSibling;
+      sec.remove(); renumber(doc);
+      if(scopedSec===sec){ scopedSec=null; renderChips(); resetComposer(); }
+      toast('Section deleted', () => { doc.insertBefore(sec, anchor); decorateSec(sec); renumber(doc); });
+    }
+    closeMenu();
+  }
+
+  /* ---------- panel ---------- */
+  function openPanel(){ document.body.classList.add('assist-open'); $('askToggle').classList.add('primary'); }
+  function togglePanel(){ document.body.classList.toggle('assist-open'); }
+
+  function scopeSection(sec){
+    openPanel();
+    document.querySelectorAll('.sec.scoped').forEach(s => s.classList.remove('scoped'));
+    scopedSec = sec; addAfter = undefined;
+    sec.classList.add('scoped');
+    renderChips();
+    const ta = $('aComposer');
+    ta.placeholder = 'Tell Lumos how to change “'+titleOf(sec)+'”…';
+    $('aHint').textContent = 'Editing 1 section · change is previewed before it applies';
+    ta.focus();
+    sec.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  function startAdd(afterSec){
+    openPanel();
+    scopedSec = null; document.querySelectorAll('.sec.scoped').forEach(s => s.classList.remove('scoped'));
+    addAfter = afterSec || null;
+    renderChips();
+    const ta = $('aComposer');
+    ta.placeholder = 'Describe the new section — e.g. “Add a competitive context section: how BMW & Lexus are positioned against us in Singapore”';
+    $('aHint').textContent = 'New section will be generated and inserted here';
+    ta.focus();
+  }
+  function resetComposer(){
+    addAfter = undefined; scopedSec = null;
+    document.querySelectorAll('.sec.scoped').forEach(s => s.classList.remove('scoped'));
+    $('aComposer').placeholder = 'Ask about the doc, or tell Lumos what to change…';
+    $('aHint').textContent = 'Hover a section for edit & reorder controls';
+    renderChips();
+  }
+  function renderChips(){
+    const w = $('aChips'); w.innerHTML = '';
+    if(addAfter !== undefined){
+      w.innerHTML = '<span class="scope-chip add"><span class="lab">✚ New section'+(addAfter?' · after “'+esc(titleOf(addAfter))+'”':' · at top')+'</span><span class="rm" onclick="LumosEdit.reset()">✕</span></span>';
+      return;
+    }
+    if(scopedSec){
+      w.innerHTML = '<span class="scope-chip"><span class="lab">◆ '+esc(titleOf(scopedSec))+'</span><span class="rm" onclick="LumosEdit.reset()">✕</span></span>';
+    }
+  }
+
+  /* ---------- thread ---------- */
+  const thread = () => $('aThread');
+  function clearEmpty(){ const e = thread().querySelector('.empty'); if(e) e.remove(); }
+  function pushUser(t){ clearEmpty(); const m = document.createElement('div'); m.className='msg user'; m.textContent=t; thread().appendChild(m); thread().scrollTop = thread().scrollHeight; }
+  function pushBot(html){ const m = document.createElement('div'); m.className='msg bot'; m.innerHTML='<div class="bl"><span class="logo">✦</span><b>Lumos</b></div><div class="body">'+html+'</div>'; thread().appendChild(m); thread().scrollTop = thread().scrollHeight; return m; }
+
+  /* ---------- submit routing ---------- */
+  function submit(){
+    const ta = $('aComposer'); const text = ta.value.trim();
+    if(addAfter !== undefined){ pushUser(text || 'Add a section here'); ta.value=''; ta.style.height='auto'; doAdd(addAfter, text); }
+    else if(scopedSec){ pushUser(text || 'Rewrite this section'); ta.value=''; ta.style.height='auto'; doEdit(scopedSec, text); }
+    else if(text){ pushUser(text); ta.value=''; ta.style.height='auto'; doGeneral(text); }
+  }
+
+  /* ---------- edit a section: proposed change w/ Accept / Discard ---------- */
+  function rewrite(prompt, el){
+    const raw = (el.textContent || '').trim();
+    const p = (prompt||'').toLowerCase();
+    const first = raw.split(/(?<=[.!?])\s/)[0];
+    if(/short|concise|tight|punch|trim|snappy|brief/.test(p))      return { html:'<b>'+esc(first)+'</b>', sum:'tightened to one line' };
+    if(/number|stat|quantif|\bdata\b|metric|figure/.test(p))        return { html:esc(raw)+' <b>(218K intenders · ▲9% QoQ · S$4.9B addressable)</b>', sum:'added supporting figures' };
+    if(/formal|exec|professional|serious|board/.test(p))            return { html:'In summary, '+esc(raw.charAt(0).toLowerCase()+raw.slice(1)), sum:'more formal register' };
+    if(/simpl|plain|clear|jargon|accessible/.test(p))               return { html:esc(first), sum:'simplified' };
+    const words = raw.split(' ');
+    return { html:'<b>'+esc(words.slice(0,7).join(' '))+'</b> '+esc(words.slice(7).join(' ')), sum:'sharpened the emphasis' };
+  }
+  function doEdit(sec, prompt){
+    sec.classList.add('proposing'); sec.scrollIntoView({behavior:'smooth', block:'center'});
+    const bot = pushBot('Working on “'+esc(titleOf(sec))+'”…');
+    const secId = sec;  // capture
+    scopedSec = null; sec.classList.remove('scoped'); renderChips(); resetComposerText();
+    setTimeout(() => {
+      const el = editableOf(secId);
+      const prop = rewrite(prompt, el);
+      if(el){
+        el.dataset.oldHtml = el.innerHTML;
+        el.innerHTML = prop.html;
+        if(!secId.querySelector('.propbar')){
+          const bar = document.createElement('div');
+          bar.className = 'propbar';
+          bar.innerHTML = '<div class="pt">✦ Proposed change · <span>'+prop.sum+'</span></div>'+
+            '<button class="propbtn" onclick="LumosEdit.discard(this)">Discard</button>'+
+            '<button class="propbtn acc" onclick="LumosEdit.accept(this)">Accept</button>';
+          (el.closest('.sec')).appendChild(bar);
+        }
+      }
+      bot.querySelector('.body').innerHTML = 'Here’s a revised “'+esc(titleOf(secId))+'” — '+prop.sum+'. Review it in the doc.'+
+        '<div class="actline"><button class="go" onclick="LumosEdit.acceptSec()">Accept change</button><button onclick="LumosEdit.discardSec()">Discard</button></div>';
+      thread().scrollTop = thread().scrollHeight;
+      lastProposedSec = secId;
+    }, 1000);
+  }
+  let lastProposedSec = null;
+  function findBar(sec){ return sec ? sec.querySelector('.propbar') : null; }
+  function accept(btn){ const sec = btn.closest('.sec'); commitAccept(sec); }
+  function discard(btn){ const sec = btn.closest('.sec'); commitDiscard(sec); }
+  function acceptSec(){ if(lastProposedSec) commitAccept(lastProposedSec); }
+  function discardSec(){ if(lastProposedSec) commitDiscard(lastProposedSec); }
+  function commitAccept(sec){
+    const el = sec.querySelector('[data-old-html]'); if(el) delete el.dataset.oldHtml;
+    const bar = findBar(sec); if(bar) bar.remove();
+    sec.classList.remove('proposing'); toast('Change applied');
+  }
+  function commitDiscard(sec){
+    const el = sec.querySelector('[data-old-html]'); if(el){ el.innerHTML = el.dataset.oldHtml; delete el.dataset.oldHtml; }
+    const bar = findBar(sec); if(bar) bar.remove();
+    sec.classList.remove('proposing'); toast('Change discarded');
+  }
+
+  /* ---------- add a section: shimmer → generated block ---------- */
+  function guessTitle(p){
+    if(!p) return 'New section';
+    if(/compet/i.test(p)) return 'Competitive context';
+    if(/budget|spend|cost|invest/i.test(p)) return 'Budget & investment';
+    if(/risk|watch|caveat/i.test(p)) return 'Risks & watch-outs';
+    if(/measur|kpi|metric|success/i.test(p)) return 'Measurement plan';
+    if(/timeline|flight|phas|schedul/i.test(p)) return 'Timeline';
+    if(/channel|media/i.test(p)) return 'Channel plan';
+    return p.replace(/^add (a |an )?/i,'').split(/[.:—-]/)[0].slice(0,42).replace(/^\w/, c => c.toUpperCase());
+  }
+  function doAdd(afterSec, prompt){
+    const doc = currentDoc();
+    const title = guessTitle(prompt);
+    const bot = pushBot('Drafting a new section from your description… pulling the relevant Lumos signals now.');
+    resetComposer();
+
+    const gen = document.createElement('div');
+    gen.className = 'genwrap';
+    gen.innerHTML = '<div class="gencard"><div class="genhead"><span class="gensp"></span> Generating “'+esc(title)+'”…</div>'+
+      '<div class="shim" style="width:72%"></div><div class="shim" style="width:100%"></div><div class="shim" style="width:88%"></div></div>';
+    if(afterSec) doc.insertBefore(gen, afterSec.nextElementSibling);
+    else { const first = doc.querySelector(':scope > .sec'); doc.insertBefore(gen, first); }
+    gen.scrollIntoView({behavior:'smooth', block:'center'});
+
+    setTimeout(() => {
+      const sec = buildSection(title, prompt);
+      doc.insertBefore(sec, gen); gen.remove();
+      decorateSec(sec); renumber(doc);
+      const idx = secs(doc).indexOf(sec) + 1;
+      bot.querySelector('.body').innerHTML = 'Added <b>'+esc(title)+'</b> as section '+idx+', grounded in registration + footfall signals for the three audiences.'+
+        '<div class="actline"><button onclick="LumosEdit.refine(\''+sec.dataset.eId+'\')">Refine it</button><button onclick="LumosEdit.undoAdd(\''+sec.dataset.eId+'\')">Undo</button></div>';
+      thread().scrollTop = thread().scrollHeight;
+      sec.scrollIntoView({behavior:'smooth', block:'center'});
+      toast('Section added', () => removeById(sec.dataset.eId));
+    }, 1500);
+  }
+  function buildSection(title, prompt){
+    const sec = document.createElement('div');
+    sec.className = 'sec'; sec.dataset.eId = 'e'+(++uid);
+    const sub = prompt ? 'Generated from your prompt: “'+esc(prompt).slice(0,110)+'”' : 'Generated by Lumos from the underlying signals.';
+    sec.innerHTML =
+      '<div class="sec-head"><span class="sec-num">00</span><h2>'+esc(title)+'<span class="new-badge">New</span></h2></div>'+
+      '<p class="sec-sub">'+sub+'</p>'+
+      '<div class="takeaway"><span class="ic">◆</span><p>Across the three priority audiences, <b>'+esc(title.toLowerCase())+'</b> points to a clear opening — incumbents skew broad-reach and price cues, while our signal data makes <b>timing and place</b> the underused lever.</p></div>'+
+      '<div class="stats three" style="margin-top:14px">'+
+        '<div class="stat"><div class="big">3</div><div class="lbl">Key factors tracked</div></div>'+
+        '<div class="stat"><div class="big">38<span class="u">%</span></div><div class="lbl">Gap to close vs field</div></div>'+
+        '<div class="stat"><div class="big">2</div><div class="lbl">White-space openings</div></div>'+
+      '</div>';
+    return sec;
+  }
+  function removeById(id){ const s = document.querySelector('[data-e-id="'+id+'"]'); if(s){ const doc = s.parentElement; s.remove(); renumber(doc); } }
+  function undoAdd(id){ removeById(id); toast('Removed'); }
+  function refine(id){ const s = document.querySelector('[data-e-id="'+id+'"]'); if(s) scopeSection(s); }
+
+  /* ---------- general ask ---------- */
+  function doGeneral(text){
+    const b = pushBot('…');
+    setTimeout(() => {
+      const doc = currentDoc(); const n = secs(doc).length;
+      b.querySelector('.body').innerHTML = 'This document has <b>'+n+' sections</b>. I can <b>rewrite</b> any of them, <b>add</b> a new one, or <b>reorder</b> them. '+
+        'Hover a section and hit <b>✦ Ask</b> to scope me to it, or use <b>+ Add section</b> between blocks.';
+      thread().scrollTop = thread().scrollHeight;
+    }, 650);
+  }
+
+  /* ---------- empty state ---------- */
+  function emptyState(){
+    thread().innerHTML =
+      '<div class="empty">'+
+        '<div class="big">Edit this document with Lumos</div>'+
+        '<div class="sub">Ask a question about it, or tell me what to change — I preview every edit before it lands.</div>'+
+        '<div class="cap">'+
+          '<div class="clab">I can</div>'+
+          '<div class="caprow"><span class="ci">✎</span><div class="ct"><b>Rewrite a section</b> — hover it, hit ✦ Ask, tell me the change</div></div>'+
+          '<div class="caprow"><span class="ci">✚</span><div class="ct"><b>Add a section</b> — describe it and I’ll generate it from the data</div></div>'+
+          '<div class="caprow"><span class="ci">⠿</span><div class="ct"><b>Restructure</b> — drag to reorder, or ask me to move things</div></div>'+
+        '</div>'+
+        '<div class="starters">'+
+          '<div class="clab">Try one of these</div>'+
+          '<button class="starter" data-s="add">Add a competitive context section</button>'+
+          '<button class="starter" data-s="punch">Make the opening section punchier</button>'+
+          '<button class="starter" data-s="numbers">Add supporting numbers to the opening</button>'+
+        '</div>'+
+      '</div>';
+    thread().querySelectorAll('.starter').forEach(b => b.addEventListener('click', () => runStarter(b.dataset.s)));
+  }
+  function runStarter(s){
+    const doc = currentDoc(); const list = secs(doc);
+    if(s==='add'){ startAdd(list[list.length-1]); $('aComposer').value = 'Add a competitive context section: how BMW & Lexus are positioned against us in Singapore'; submit(); }
+    if(s==='punch'){ scopeSection(list[0]); $('aComposer').value = 'make it shorter and punchier'; submit(); }
+    if(s==='numbers'){ scopeSection(list[0]); $('aComposer').value = 'add supporting numbers'; submit(); }
+  }
+
+  /* ---------- toast ---------- */
+  let toastTimer;
+  function toast(msg, undo){
+    const t = $('eToast');
+    t.innerHTML = esc(msg) + (undo ? ' <span class="undo">Undo</span>' : '');
+    if(undo) t.querySelector('.undo').onclick = () => { undo(); hideToast(); };
+    t.classList.add('show'); clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, undo ? 4200 : 1800);
+  }
+  function hideToast(){ $('eToast').classList.remove('show'); }
+
+  function resetComposerText(){ $('aComposer').placeholder = 'Ask about the doc, or tell Lumos what to change…'; $('aHint').textContent = 'Hover a section for edit & reorder controls'; }
+
+  /* ---------- init ---------- */
+  function init(){
+    document.body.classList.add('editing');
+    decorateAll();
+    emptyState();
+    openPanel(); // Ask Lumos open by default — signals "this is editable"
+    const ta = $('aComposer');
+    ta.addEventListener('input', () => { ta.style.height='auto'; ta.style.height = Math.min(ta.scrollHeight,120)+'px'; });
+    ta.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); submit(); } });
+    // re-decorate if the doc is switched (standalone demo keeps the switcher)
+    window.addEventListener('hashchange', () => setTimeout(decorateAll, 30));
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+  return { togglePanel, submit, reset: resetComposer, accept, discard, acceptSec, discardSec, undoAdd, refine };
+})();
 </script>
 </body>
 </html>
