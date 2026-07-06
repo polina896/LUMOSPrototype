@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumos — Document Viewer Examples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#6b3c72; --purple-d:#5c2375; --purple-tint:#f1e9ff;
+    --ink:#1a1a1a; --ink-2:#444; --ink-3:#6c6c6c; --muted:#9a9a9a;
+    --line:#e9e7e4; --line-2:#f0efec; --canvas:#f4f2ef; --paper:#ffffff;
+    --green-bg:#e8f4ec; --green-tx:#1e7a42;
+    --blue-bg:#eaf0fb; --blue-tx:#2455a0;
+    --amber-bg:#fef3e2; --amber-tx:#995500;
+    --teal-bg:#e8f8f4; --teal-tx:#1a7a5e;
+    --violet-bg:#f1e9ff; --violet-tx:#6b3c72;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  .jua{font-family:'Jua',sans-serif;font-weight:400}
+
+  /* ---------- Viewer chrome ---------- */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:16px;padding:12px 24px}
+  .back{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+  .back:hover{background:#f4f2ef}
+  .topbar .doc-title{font-family:'Jua';font-size:15px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .type-chip{font-size:11px;padding:3px 9px;border-radius:6px;background:#f3f3f1;color:#555;white-space:nowrap}
+  .topbar .spacer{flex:1}
+  .tbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+  .tbtn:hover{background:#f5f5f3}
+  .tbtn.primary{background:var(--purple);border-color:var(--purple);color:#fff}
+  .tbtn.primary:hover{background:var(--purple-d)}
+
+  /* ---------- Doc switcher pills ---------- */
+  .switcher{display:flex;justify-content:center;gap:8px;padding:16px 24px 4px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-3);cursor:pointer}
+  .pill .dot{width:8px;height:8px;border-radius:50%}
+  .pill:hover{border-color:#d9d5d0}
+  .pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pill.active .kbd{color:rgba(255,255,255,.55)}
+  .pill .kbd{font-size:10px;color:var(--muted)}
+
+  /* ---------- Page ---------- */
+  .stage{padding:22px 24px 80px;display:flex;justify-content:center}
+  .page{width:100%;max-width:860px;background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03),0 16px 40px -24px rgba(0,0,0,.22);overflow:hidden}
+  .doc{display:none}
+  .doc.show{display:block}
+
+  /* doc header band */
+  .doc-head{padding:38px 48px 30px;border-bottom:1px solid var(--line-2);position:relative}
+  .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);font-weight:600;margin-bottom:12px}
+  .doc-head h1{font-family:'Jua';font-size:30px;line-height:1.18;color:var(--ink);letter-spacing:.1px}
+  .lede{font-size:15px;color:var(--ink-3);margin-top:12px;max-width:60ch}
+  .meta-row{display:flex;flex-wrap:wrap;gap:22px;margin-top:22px;padding-top:20px;border-top:1px dashed var(--line)}
+  .meta-row .m{display:flex;flex-direction:column;gap:3px}
+  .meta-row .m .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .meta-row .m .v{font-size:13px;color:var(--ink-2);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .tag{font-size:11.5px;padding:4px 10px;border-radius:6px}
+
+  /* section */
+  .sec{padding:34px 48px}
+  .sec + .sec{border-top:1px solid var(--line-2)}
+  .sec-num{font-family:'Jua';font-size:12px;color:var(--purple);background:var(--purple-tint);width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+  .sec-head h2{font-family:'Jua';font-size:19px;color:var(--ink)}
+  .sec-sub{font-size:13.5px;color:var(--ink-3);margin:2px 0 20px 37px;max-width:64ch}
+
+  /* takeaway hero */
+  .takeaway{background:linear-gradient(180deg,#faf7fc,#f6f1f8);border:1px solid #ece2f0;border-left:3px solid var(--purple);
+    border-radius:12px;padding:16px 18px;margin:0 0 22px;display:flex;gap:12px;align-items:flex-start}
+  .takeaway .ic{font-size:15px;line-height:1.3;flex:none}
+  .takeaway p{font-size:14.5px;color:#40304a}
+  .takeaway b{color:var(--purple);font-weight:700}
+
+  /* stat heroes */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 6px}
+  .stats.three{grid-template-columns:repeat(3,1fr)}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:#fdfdfc}
+  .stat .big{font-family:'Jua';font-size:26px;color:var(--ink);line-height:1}
+  .stat .big .u{font-size:14px;color:var(--ink-3)}
+  .stat .lbl{font-size:12px;color:var(--ink-3);margin-top:8px}
+  .stat .delta{font-size:11.5px;font-weight:600;margin-top:5px}
+  .up{color:var(--green-tx)} .down{color:#b23}
+
+  /* audience cards */
+  .aud-card{border:1px solid var(--line);border-radius:14px;padding:0;margin-bottom:14px;overflow:hidden}
+  .aud-top{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line-2)}
+  .aud-rank{font-family:'Jua';font-size:13px;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:#fff;flex:none}
+  .aud-name{font-family:'Jua';font-size:16px;color:var(--ink)}
+  .aud-who{font-size:12.5px;color:var(--ink-3);margin-top:1px}
+  .aud-size{margin-left:auto;text-align:right;flex:none}
+  .aud-size .n{font-family:'Jua';font-size:19px;color:var(--purple)}
+  .aud-size .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .aud-body{display:grid;grid-template-columns:1.3fr 1fr;gap:0}
+  .aud-col{padding:15px 18px}
+  .aud-col + .aud-col{border-left:1px solid var(--line-2)}
+  .aud-col h4{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .sig{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .sig .sname{font-size:12.5px;color:var(--ink-2);width:120px;flex:none}
+  .bar{flex:1;height:7px;border-radius:4px;background:#efedea;overflow:hidden}
+  .bar > span{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#8b5fa0,#6b3c72)}
+  .sig .sx{font-size:11.5px;font-weight:600;color:var(--purple);width:34px;text-align:right;flex:none}
+  .kv{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line-2)}
+  .kv:last-child{border-bottom:0}
+  .kv .kk{color:var(--ink-3)} .kv .vv{color:var(--ink-2);font-weight:600;text-align:right}
+
+  /* hotspots */
+  .hot{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .hot:last-child{border-bottom:0}
+  .hot .rank{font-family:'Jua';font-size:12px;color:var(--muted);width:20px;flex:none}
+  .hot .pin{width:9px;height:9px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--purple);flex:none}
+  .hot .place{font-size:13.5px;color:var(--ink);font-weight:500;flex:none;width:170px}
+  .hot .htrack{flex:1;height:8px;background:#f0eeec;border-radius:5px;overflow:hidden}
+  .hot .htrack > span{display:block;height:100%;background:linear-gradient(90deg,#c9a9d6,#6b3c72)}
+  .hot .reach{font-size:12.5px;color:var(--ink-2);font-weight:600;width:96px;text-align:right;flex:none}
+
+  /* heatmap */
+  .heat{margin-top:6px}
+  .heat table{border-collapse:separate;border-spacing:3px;width:100%}
+  .heat td,.heat th{text-align:center}
+  .heat th{font-size:10px;color:var(--muted);font-weight:500;padding-bottom:2px}
+  .heat .rowlab{font-size:10.5px;color:var(--ink-3);text-align:right;padding-right:6px;white-space:nowrap;font-weight:500}
+  .heat .cell{height:24px;border-radius:5px;font-size:10px;color:#fff;font-weight:600;position:relative}
+  .heat-legend{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--muted)}
+  .heat-legend .grad{width:120px;height:8px;border-radius:5px;background:linear-gradient(90deg,#efe7f2,#b98fca,#6b3c72,#3d1f4a)}
+  .star{position:absolute;top:-6px;right:-4px;font-size:11px}
+
+  /* matrix */
+  .matrix-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  table.matrix{border-collapse:collapse;width:100%;min-width:640px;font-size:12.5px}
+  table.matrix th,table.matrix td{text-align:left;padding:13px 14px;vertical-align:top;border-bottom:1px solid var(--line-2)}
+  table.matrix thead th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:#faf9f7;position:sticky;top:0}
+  table.matrix tbody tr:last-child td{border-bottom:0}
+  table.matrix .rowh{font-family:'Jua';font-size:13.5px;color:var(--ink);white-space:nowrap}
+  table.matrix .rowh .sz{display:block;font-family:'DM Sans';font-size:11px;color:var(--muted);font-weight:500;margin-top:3px}
+  table.matrix td .hook{color:var(--ink);font-weight:600;margin-bottom:4px}
+  table.matrix td .proof{color:var(--ink-3);font-size:11.5px}
+  .cta-chip{display:inline-block;font-size:11px;padding:3px 9px;border-radius:6px;background:var(--purple-tint);color:var(--purple);font-weight:600}
+  .chan{display:inline-block;font-size:11px;padding:3px 8px;border-radius:6px;background:#f3f3f1;color:#555;margin:0 4px 4px 0}
+
+  /* guardrails do/dont */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .dd .box{border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .dd .box h4{font-family:'Jua';font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .dd .do h4{color:var(--green-tx)} .dd .dont h4{color:#b23}
+  .dd ul{list-style:none}
+  .dd li{font-size:12.5px;color:var(--ink-2);padding:5px 0 5px 18px;position:relative}
+  .dd li::before{position:absolute;left:0;top:5px;font-size:11px}
+  .dd .do li::before{content:'✓';color:var(--green-tx)}
+  .dd .dont li::before{content:'✕';color:#b23}
+
+  /* funnel / channel plan */
+  .funnel{display:flex;flex-direction:column;gap:10px}
+  .fstage{display:flex;align-items:stretch;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .fstage .flabel{width:150px;flex:none;padding:14px 16px;background:#faf9f7;border-right:1px solid var(--line-2)}
+  .fstage .flabel .ft{font-family:'Jua';font-size:13px;color:var(--ink)}
+  .fstage .flabel .fg{font-size:11px;color:var(--muted);margin-top:2px}
+  .fstage .fbody{flex:1;padding:14px 16px;display:flex;flex-direction:column;justify-content:center}
+  .fstage .fbody .fc{font-size:12.5px;color:var(--ink-2)}
+  .fstage .fbody .fk{font-size:11px;color:var(--muted);margin-top:4px}
+  .fbar{width:110px;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Jua';font-size:15px;color:#fff}
+
+  /* timeline / flighting */
+  .flight{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .flight .fhead{display:grid;grid-template-columns:130px repeat(6,1fr);background:#faf9f7;border-bottom:1px solid var(--line-2)}
+  .flight .fhead div{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:9px 8px;text-align:center;font-weight:600}
+  .flight .fhead div:first-child{text-align:left}
+  .flight .frow{display:grid;grid-template-columns:130px repeat(6,1fr);align-items:center;border-bottom:1px solid var(--line-2)}
+  .flight .frow:last-child{border-bottom:0}
+  .flight .frow .fn{font-size:12.5px;color:var(--ink-2);font-weight:600;padding:10px 12px}
+  .flight .frow .track{grid-column:span 6;position:relative;height:34px;margin:0 8px}
+  .gbar{position:absolute;height:16px;top:9px;border-radius:8px;font-size:10px;color:#fff;display:flex;align-items:center;padding:0 8px;font-weight:600;white-space:nowrap;overflow:hidden}
+
+  /* recommendation list */
+  .plays{display:flex;flex-direction:column;gap:10px}
+  .play{display:flex;gap:14px;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .play .pn{font-family:'Jua';font-size:14px;color:#fff;background:var(--purple);width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+  .play .pt{font-size:13.5px;font-weight:700;color:var(--ink)}
+  .play .pd{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+  .play .pw{font-size:11.5px;color:var(--purple);margin-top:6px;font-weight:600}
+
+  /* kpi row */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;background:#fdfdfc}
+  .kpi .kn{font-family:'Jua';font-size:22px;color:var(--purple)}
+  .kpi .kl{font-size:11.5px;color:var(--ink-3);margin-top:5px}
+
+  /* footnote */
+  .foot{padding:22px 48px 34px;background:#faf9f7;border-top:1px solid var(--line-2);font-size:11.5px;color:var(--muted);line-height:1.7}
+  .foot b{color:var(--ink-3)}
+  .foot-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--purple);background:var(--purple-tint);padding:4px 10px;border-radius:6px;margin-bottom:10px}
+
+  .inline-ask{margin-top:20px;display:flex;align-items:center;gap:10px;border:1px dashed #d8cbdf;border-radius:11px;padding:11px 14px;background:#fbf9fc}
+  .inline-ask .lm{width:22px;height:22px;border-radius:7px;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Jua';font-size:12px;flex:none}
+  .inline-ask input{flex:1;border:0;background:transparent;font-family:'DM Sans';font-size:13px;color:var(--ink-2);outline:none}
+  .inline-ask input::placeholder{color:#b6a9bd}
+  .inline-ask .go{font-size:11.5px;color:var(--purple);font-weight:600;cursor:pointer}
+
+  @media(max-width:720px){
+    .stats,.stats.three,.kpis{grid-template-columns:repeat(2,1fr)}
+    .aud-body{grid-template-columns:1fr}
+    .aud-col + .aud-col{border-left:0;border-top:1px solid var(--line-2)}
+    .dd{grid-template-columns:1fr}
+    .sec,.doc-head,.foot{padding-left:24px;padding-right:24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Viewer top bar ===== -->
+<div class="topbar">
+  <a class="back" href="#" onclick="event.preventDefault();try{parent.postMessage('lumos:doc-back','*')}catch(e){}"><span style="font-size:15px">←</span> Documents</a>
+  <span class="doc-title" id="barTitle">Meridian Motors Singapore — Audience Strategy</span>
+  <span class="type-chip" id="barType">Audience Strategy</span>
+  <span class="spacer"></span>
+  <button class="tbtn">⤢ Share</button>
+  <button class="tbtn">↓ Export</button>
+  <button class="tbtn primary">✦ Ask Lumos</button>
+</div>
+
+<!-- ===== Doc switcher ===== -->
+<div class="switcher">
+  <button class="pill active" data-doc="strategy"><span class="dot" style="background:#8b5fa0"></span> Audience Strategy <span class="kbd">1</span></button>
+  <button class="pill" data-doc="matrix"><span class="dot" style="background:#2455a0"></span> Messaging Matrix <span class="kbd">2</span></button>
+  <button class="pill" data-doc="brief"><span class="dot" style="background:#1e7a42"></span> Campaign Brief <span class="kbd">3</span></button>
+</div>
+
+<div class="stage">
+<div class="page">
+
+<!-- =================================================================== -->
+<!-- DOC 1 — AUDIENCE STRATEGY -->
+<!-- =================================================================== -->
+<div class="doc show" id="doc-strategy">
+
+  <div class="doc-head">
+    <div class="kicker">Audience Strategy · Singapore Premium Auto</div>
+    <h1>Meridian Motors Singapore<br>Audience Strategy</h1>
+    <p class="lede">Three priority audiences for the Q1 model-year launch — who they are, where they move, and when to reach them — built on Lumos mobility, spend and identity signals across 4.1M Singapore-resident profiles.</p>
+    <div class="tags">
+      <span class="tag" style="background:var(--green-bg);color:var(--green-tx)">Affluent Professionals</span>
+      <span class="tag" style="background:var(--blue-bg);color:var(--blue-tx)">Tech-savvy Families</span>
+      <span class="tag" style="background:var(--amber-bg);color:var(--amber-tx)">Expat Executives</span>
+    </div>
+    <div class="meta-row">
+      <div class="m"><span class="k">Prepared for</span><span class="v">Meridian Motors · Marketing</span></div>
+      <div class="m"><span class="k">Market</span><span class="v">Singapore</span></div>
+      <div class="m"><span class="k">Window</span><span class="v">Q1 FY26 launch</span></div>
+      <div class="m"><span class="k">Created</span><span class="v">Today, 10:18 pm</span></div>
+      <div class="m"><span class="k">Confidence</span><span class="v">±2.4% · 95% CI</span></div>
+    </div>
+  </div>
+
+  <!-- Opportunity -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The opportunity</h2></div>
+    <p class="sec-sub">In-market demand for premium sedans and EVs is concentrated in a small, high-value, highly mobile population — reachable if timing and place are right.</p>
+    <div class="takeaway">
+      <span class="ic">◆</span>
+      <p>Just <b>three audiences hold 71% of qualified premium-auto intent</b> in Singapore, yet they cluster in predictable corridors — Orchard, Marina Bay and the East Coast — for only a few hours each week. Concentration is the opportunity.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="big">218K</div><div class="lbl">In-market premium-auto intenders</div><div class="delta up">▲ 9% vs last quarter</div></div>
+      <div class="stat"><div class="big">71<span class="u">%</span></div><div class="lbl">Of intent held by top 3 audiences</div><div class="delta">of 12 modelled segments</div></div>
+      <div class="stat"><div class="big">1.8<span class="u">×</span></div><div class="lbl">Peak index vs Singapore adult avg</div><div class="delta up">Affluent Professionals</div></div>
+      <div class="stat"><div class="big">S$4.9<span class="u">B</span></div><div class="lbl">Est. addressable annual spend</div><div class="delta">new + upgrade purchases</div></div>
+    </div>
+  </div>
+
+  <!-- Priority audiences -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Priority audiences</h2></div>
+    <p class="sec-sub">Ranked by qualified intent × addressable spend. Signal strength shown as index vs the Singapore adult baseline (100 = average).</p>
+
+    <!-- Aud 1 -->
+    <div class="aud-card">
+      <div class="aud-top">
+        <span class="aud-rank">1</span>
+        <div>
+          <div class="aud-name">Affluent Professionals</div>
+          <div class="aud-who">35–54 · household income S$250K+ · District 9–11 & Bukit Timah</div>
+        </div>
+        <div class="aud-size"><div class="n">96,400</div><div class="l">reachable</div></div>
+      </div>
+      <div class="aud-body">
+        <div class="aud-col">
+          <h4>Top signals · index vs avg</h4>
+          <div class="sig"><span class="sname">Luxury-auto dealer visits</span><span class="bar"><span style="width:92%"></span></span><span class="sx">184</span></div>
+          <div class="sig"><span class="sname">Premium fuel / EV charging</span><span class="bar"><span style="width:78%"></span></span><span class="sx">156</span></div>
+          <div class="sig"><span class="sname">Business-class travel</span><span class="bar"><span style="width:71%"></span></span><span class="sx">142</span></div>
+          <div class="sig"><span class="sname">Fine-dining & members' clubs</span><span class="bar"><span style="width:64%"></span></span><span class="sx">128</span></div>
+        </div>
+        <div class="aud-col">
+          <h4>How to reach</h4>
+          <div class="kv"><span class="kk">Best channel</span><span class="vv">DOOH · Orchard + CBD</span></div>
+          <div class="kv"><span class="kk">Best window</span><span class="vv">Weekdays 8–10am</span></div>
+          <div class="kv"><span class="kk">Dwell at hotspots</span><span class="vv">41 min median</span></div>
+          <div class="kv"><span class="kk">Digital overlap</span><span class="vv">LinkedIn · CTV · 82%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aud 2 -->
+    <div class="aud-card">
+      <div class="aud-top">
+        <span class="aud-rank">2</span>
+        <div>
+          <div class="aud-name">Tech-savvy Families</div>
+          <div class="aud-who">32–45 · dual-income · 1–2 kids · Punggol, Tampines, Bishan</div>
+        </div>
+        <div class="aud-size"><div class="n">74,900</div><div class="l">reachable</div></div>
+      </div>
+      <div class="aud-body">
+        <div class="aud-col">
+          <h4>Top signals · index vs avg</h4>
+          <div class="sig"><span class="sname">EV / hybrid research</span><span class="bar"><span style="width:88%"></span></span><span class="sx">176</span></div>
+          <div class="sig"><span class="sname">7-seater & SUV browsing</span><span class="bar"><span style="width:74%"></span></span><span class="sx">148</span></div>
+          <div class="sig"><span class="sname">Big-box & IKEA visits</span><span class="bar"><span style="width:69%"></span></span><span class="sx">138</span></div>
+          <div class="sig"><span class="sname">Weekend enrichment / schools</span><span class="bar"><span style="width:61%"></span></span><span class="sx">122</span></div>
+        </div>
+        <div class="aud-col">
+          <h4>How to reach</h4>
+          <div class="kv"><span class="kk">Best channel</span><span class="vv">Retail DOOH · YouTube</span></div>
+          <div class="kv"><span class="kk">Best window</span><span class="vv">Sat–Sun 10am–2pm</span></div>
+          <div class="kv"><span class="kk">Dwell at hotspots</span><span class="vv">63 min median</span></div>
+          <div class="kv"><span class="kk">Digital overlap</span><span class="vv">Meta · Search · 79%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aud 3 -->
+    <div class="aud-card">
+      <div class="aud-top">
+        <span class="aud-rank">3</span>
+        <div>
+          <div class="aud-name">Expat Executives</div>
+          <div class="aud-who">30–50 · relocation ≤3 yrs · condo tenancy · District 1, 4, 15</div>
+        </div>
+        <div class="aud-size"><div class="n">31,200</div><div class="l">reachable</div></div>
+      </div>
+      <div class="aud-body">
+        <div class="aud-col">
+          <h4>Top signals · index vs avg</h4>
+          <div class="sig"><span class="sname">Car-lease / subscription intent</span><span class="bar"><span style="width:95%"></span></span><span class="sx">191</span></div>
+          <div class="sig"><span class="sname">International schools</span><span class="bar"><span style="width:81%"></span></span><span class="sx">162</span></div>
+          <div class="sig"><span class="sname">Airport & serviced-apt travel</span><span class="bar"><span style="width:76%"></span></span><span class="sx">152</span></div>
+          <div class="sig"><span class="sname">Premium grocery (Cold Storage)</span><span class="bar"><span style="width:58%"></span></span><span class="sx">116</span></div>
+        </div>
+        <div class="aud-col">
+          <h4>How to reach</h4>
+          <div class="kv"><span class="kk">Best channel</span><span class="vv">CTV · Airport DOOH</span></div>
+          <div class="kv"><span class="kk">Best window</span><span class="vv">Weeknights 7–10pm</span></div>
+          <div class="kv"><span class="kk">Dwell at hotspots</span><span class="vv">38 min median</span></div>
+          <div class="kv"><span class="kk">Digital overlap</span><span class="vv">Instagram · CTV · 74%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Where they are -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Where they are</h2></div>
+    <p class="sec-sub">Footfall hotspots across the three audiences, ranked by unique reach — the OOH surfaces that put you in their path to the showroom.</p>
+    <div class="takeaway">
+      <span class="ic">◆</span>
+      <p>Five sites deliver <b>62% of combined weekly reach</b>. Orchard and Marina Bay alone touch two-thirds of Affluent Professionals before they ever visit a dealership.</p>
+    </div>
+    <div>
+      <div class="hot"><span class="rank">1</span><span class="pin"></span><span class="place">Orchard Road corridor</span><span class="htrack"><span style="width:100%"></span></span><span class="reach">148,200</span></div>
+      <div class="hot"><span class="rank">2</span><span class="pin"></span><span class="place">Marina Bay / CBD</span><span class="htrack"><span style="width:83%"></span></span><span class="reach">122,600</span></div>
+      <div class="hot"><span class="rank">3</span><span class="pin"></span><span class="place">East Coast Parkway</span><span class="htrack"><span style="width:61%"></span></span><span class="reach">90,400</span></div>
+      <div class="hot"><span class="rank">4</span><span class="pin"></span><span class="place">Jewel / Changi Airport</span><span class="htrack"><span style="width:47%"></span></span><span class="reach">69,900</span></div>
+      <div class="hot"><span class="rank">5</span><span class="pin"></span><span class="place">Tampines regional hub</span><span class="htrack"><span style="width:38%"></span></span><span class="reach">56,100</span></div>
+    </div>
+  </div>
+
+  <!-- When to reach -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">04</span><h2>When to reach them</h2></div>
+    <p class="sec-sub">Combined audience density by hour and day. Darker = higher index vs weekly average; ★ marks the single best window per day to be live.</p>
+    <div class="heat" id="heatmap"></div>
+    <div class="heat-legend"><span>Lower index</span><span class="grad"></span><span>Higher index</span><span style="margin-left:auto">★ best window to reach</span></div>
+  </div>
+
+  <!-- Recommended plays -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Recommended plays</h2></div>
+    <p class="sec-sub">How to turn the concentration above into a launch plan. Sequenced by funnel stage.</p>
+    <div class="plays">
+      <div class="play"><span class="pn">1</span><div>
+        <div class="pt">Own the morning Orchard–CBD corridor</div>
+        <div class="pd">Weekday 8–10am DOOH burst against Affluent Professionals, the peak density window. Anchor the new model-year hero.</div>
+        <div class="pw">▸ Reaches ~66% of Audience 1 · lowest cost-per-qualified-reach</div>
+      </div></div>
+      <div class="play"><span class="pn">2</span><div>
+        <div class="pt">Weekend retail + YouTube for Families</div>
+        <div class="pd">Sat–Sun 10am–2pm at Tampines & Jewel, synced to a 7-seater / EV YouTube sequence. Long 63-min dwell supports frequency without extra buys.</div>
+        <div class="pw">▸ Natural 3× frequency from dwell alone</div>
+      </div></div>
+      <div class="play"><span class="pn">3</span><div>
+        <div class="pt">Retarget the exposed to showroom & test-drive</div>
+        <div class="pd">Build an OOH-exposed seed from these five sites; retarget across CTV + Meta with a test-drive CTA and measure showroom visit-lift vs a hold-out control.</div>
+        <div class="pw">▸ Benchmark: +31% visit lift on comparable auto campaigns</div>
+      </div></div>
+    </div>
+    <div class="inline-ask">
+      <span class="lm">✦</span>
+      <input placeholder="Ask Lumos to model reach & frequency for these plays at a S$1.2M budget…">
+      <span class="go">Ask ▸</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- =================================================================== -->
+<!-- DOC 2 — MESSAGING MATRIX -->
+<!-- =================================================================== -->
+<div class="doc" id="doc-matrix">
+
+  <div class="doc-head">
+    <div class="kicker">Messaging Matrix · Launch Creative</div>
+    <h1>Meridian Motors<br>Launch Messaging Matrix</h1>
+    <p class="lede">The single source of truth for what we say to whom. Each audience gets a core value proposition, an emotional driver, proof points, and channel-ready hooks — grounded in Lumos signal data.</p>
+    <div class="tags">
+      <span class="tag" style="background:var(--green-bg);color:var(--green-tx)">Affluent Professionals</span>
+      <span class="tag" style="background:var(--amber-bg);color:var(--amber-tx)">Expat Executives</span>
+    </div>
+    <div class="meta-row">
+      <div class="m"><span class="k">Prepared for</span><span class="v">Meridian Motors · Brand</span></div>
+      <div class="m"><span class="k">Campaign</span><span class="v">Q1 model-year launch</span></div>
+      <div class="m"><span class="k">Version</span><span class="v">v2 · approved for build</span></div>
+      <div class="m"><span class="k">Created</span><span class="v">Today, 10:22 pm</span></div>
+    </div>
+  </div>
+
+  <!-- Positioning spine -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Positioning spine</h2></div>
+    <p class="sec-sub">The one line every execution ladders back to — then flexed per audience below.</p>
+    <div class="takeaway">
+      <span class="ic">◆</span>
+      <p><b>"Engineered for the life you've built."</b> — premium capability framed as earned reward, not status. Signal data shows both priority audiences over-index on <b>achievement and family-provision cues</b>, and under-respond to raw performance bragging.</p>
+    </div>
+    <div class="stats three">
+      <div class="stat"><div class="big">Reward</div><div class="lbl">Master emotional territory</div></div>
+      <div class="stat"><div class="big">Calm</div><div class="lbl">Tone · confident, not loud</div></div>
+      <div class="stat"><div class="big">Proof</div><div class="lbl">Every claim signal-backed</div></div>
+    </div>
+  </div>
+
+  <!-- The matrix -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><h2>The matrix</h2></div>
+    <p class="sec-sub">Rows are audiences; columns are the message system. Read left-to-right to build any execution.</p>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Audience</th>
+            <th>Core value prop</th>
+            <th>Emotional driver</th>
+            <th>Lead hook + proof</th>
+            <th>CTA · Channel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rowh">Affluent Professionals<span class="sz">96.4K reachable</span></td>
+            <td>Effortless command of your morning. The car that respects your time as much as you do.</td>
+            <td>Earned ease — reward for the standard you hold yourself to.</td>
+            <td>
+              <div class="hook">"Your 8am, upgraded."</div>
+              <div class="proof">Proof: 41-min dwell in Orchard/CBD → the commute is where they live. Lead with quiet luxury + adaptive drive.</div>
+            </td>
+            <td>
+              <span class="cta-chip">Book a private preview</span>
+              <div style="margin-top:8px">
+                <span class="chan">DOOH · Orchard</span><span class="chan">LinkedIn</span><span class="chan">CTV</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="rowh">Expat Executives<span class="sz">31.2K reachable</span></td>
+            <td>The easiest way to drive well in a new city — ownership or subscription, sorted in a week.</td>
+            <td>Belonging & control — arrive settled, no friction.</td>
+            <td>
+              <div class="hook">"New here. Already sorted."</div>
+              <div class="proof">Proof: 191 index on lease/subscription intent → lead with flexibility, English-first concierge, airport-to-driveway delivery.</div>
+            </td>
+            <td>
+              <span class="cta-chip">Explore flexible ownership</span>
+              <div style="margin-top:8px">
+                <span class="chan">CTV</span><span class="chan">Airport DOOH</span><span class="chan">Instagram</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Message ladders -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Proof-point library</h2></div>
+    <p class="sec-sub">Interchangeable proof points, ranked by resonance for each audience. Pull the top one for hero, others for supporting frames.</p>
+    <div class="aud-card">
+      <div class="aud-top"><span class="aud-rank" style="background:var(--green-tx)">A</span><div class="aud-name">Affluent Professionals</div></div>
+      <div class="aud-col" style="padding:16px 18px">
+        <div class="sig"><span class="sname">Adaptive quiet cabin</span><span class="bar"><span style="width:90%"></span></span><span class="sx">High</span></div>
+        <div class="sig"><span class="sname">Concierge servicing</span><span class="bar"><span style="width:74%"></span></span><span class="sx">Med</span></div>
+        <div class="sig"><span class="sname">Resale value retention</span><span class="bar"><span style="width:66%"></span></span><span class="sx">Med</span></div>
+        <div class="sig"><span class="sname">0–100 performance stat</span><span class="bar"><span style="width:28%"></span></span><span class="sx">Low</span></div>
+      </div>
+    </div>
+    <div class="aud-card">
+      <div class="aud-top"><span class="aud-rank" style="background:var(--amber-tx)">E</span><div class="aud-name">Expat Executives</div></div>
+      <div class="aud-col" style="padding:16px 18px">
+        <div class="sig"><span class="sname">Subscription flexibility</span><span class="bar"><span style="width:94%"></span></span><span class="sx">High</span></div>
+        <div class="sig"><span class="sname">Delivery to your door</span><span class="bar"><span style="width:80%"></span></span><span class="sx">High</span></div>
+        <div class="sig"><span class="sname">Family / school-run space</span><span class="bar"><span style="width:63%"></span></span><span class="sx">Med</span></div>
+        <div class="sig"><span class="sname">Heritage / brand history</span><span class="bar"><span style="width:31%"></span></span><span class="sx">Low</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guardrails -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Creative guardrails</h2></div>
+    <p class="sec-sub">What keeps every execution on-territory across both audiences.</p>
+    <div class="dd">
+      <div class="box do">
+        <h4>◇ Do</h4>
+        <ul>
+          <li>Lead with the moment (the commute, the arrival), not the spec sheet</li>
+          <li>Show the car in real Singapore context — Orchard, ECP, Changi</li>
+          <li>Keep copy calm and confident; one idea per frame</li>
+          <li>Always pair a hook with one signal-backed proof point</li>
+        </ul>
+      </div>
+      <div class="box dont">
+        <h4>◇ Don't</h4>
+        <ul>
+          <li>Don't lead with 0–100 times or top speed — both audiences under-index</li>
+          <li>Don't use price as the hook; it's a closing detail, not an opener</li>
+          <li>Don't crowd the frame — luxury reads as space</li>
+          <li>Don't reuse the same hero line across both audiences</li>
+        </ul>
+      </div>
+    </div>
+    <div class="inline-ask">
+      <span class="lm">✦</span>
+      <input placeholder="Ask Lumos to draft 3 DOOH headline variants for Expat Executives…">
+      <span class="go">Ask ▸</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- =================================================================== -->
+<!-- DOC 3 — CAMPAIGN BRIEF -->
+<!-- =================================================================== -->
+<div class="doc" id="doc-brief">
+
+  <div class="doc-head">
+    <div class="kicker">Campaign Brief · Q1 FY26</div>
+    <h1>Meridian Motors Q1<br>Campaign Brief</h1>
+    <p class="lede">The launch of the new model-year range across Singapore. This brief aligns objective, audience, channels, flighting and measurement into one plan — ready for agency and media partners.</p>
+    <div class="tags">
+      <span class="tag" style="background:var(--green-bg);color:var(--green-tx)">Affluent Professionals</span>
+      <span class="tag" style="background:var(--blue-bg);color:var(--blue-tx)">Tech-savvy Families</span>
+      <span class="tag" style="background:var(--amber-bg);color:var(--amber-tx)">Expat Executives</span>
+    </div>
+    <div class="meta-row">
+      <div class="m"><span class="k">Client</span><span class="v">Meridian Motors</span></div>
+      <div class="m"><span class="k">Flight</span><span class="v">6 Jan – 30 Mar 2026</span></div>
+      <div class="m"><span class="k">Working budget</span><span class="v">S$1.2M</span></div>
+      <div class="m"><span class="k">Objective</span><span class="v">Test-drive bookings</span></div>
+      <div class="m"><span class="k">Owner</span><span class="v">P. Nesterova</span></div>
+    </div>
+  </div>
+
+  <!-- Background -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Background & challenge</h2></div>
+    <div class="takeaway">
+      <span class="ic">◆</span>
+      <p>The new range lands in a market where <b>premium-auto intent is up 9% but attention is scarce</b> — our audiences are in-corridor for only a few hours a week. The challenge isn't awareness; it's <b>converting concentrated presence into showroom visits</b>.</p>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-left:0">Meridian is refreshing its sedan and EV line-up for FY26. Prior campaigns leaned on broad awareness and under-delivered on qualified test-drives. This quarter shifts spend toward the three audiences and five hotspots identified in the Audience Strategy, with a hard test-drive KPI and closed-loop footfall measurement.</p>
+  </div>
+
+  <!-- Objective + KPIs -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Objective & KPIs</h2></div>
+    <p class="sec-sub">One primary objective. Everything is measured against test-drive bookings and showroom visit-lift.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="kn">2,400</div><div class="kl">Test-drive bookings</div></div>
+      <div class="kpi"><div class="kn">+25%</div><div class="kl">Showroom visit-lift vs control</div></div>
+      <div class="kpi"><div class="kn">≤ S$500</div><div class="kl">Cost per qualified booking</div></div>
+      <div class="kpi"><div class="kn">3.2M</div><div class="kl">Qualified reach (de-dup)</div></div>
+    </div>
+  </div>
+
+  <!-- Audiences -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Target audiences</h2></div>
+    <p class="sec-sub">Prioritised from the Meridian Audience Strategy. Budget weighted to reachable intent.</p>
+    <div>
+      <div class="hot"><span class="pin" style="background:var(--green-tx)"></span><span class="place" style="width:190px">Affluent Professionals</span><span class="htrack"><span style="width:100%;background:linear-gradient(90deg,#a5d3b6,#1e7a42)"></span></span><span class="reach">96.4K · 50%</span></div>
+      <div class="hot"><span class="pin" style="background:var(--blue-tx)"></span><span class="place" style="width:190px">Tech-savvy Families</span><span class="htrack"><span style="width:66%;background:linear-gradient(90deg,#a9c3e8,#2455a0)"></span></span><span class="reach">74.9K · 32%</span></div>
+      <div class="hot"><span class="pin" style="background:var(--amber-tx)"></span><span class="place" style="width:190px">Expat Executives</span><span class="htrack"><span style="width:34%;background:linear-gradient(90deg,#f0cf9a,#995500)"></span></span><span class="reach">31.2K · 18%</span></div>
+    </div>
+  </div>
+
+  <!-- Channel plan / funnel -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Channel plan</h2></div>
+    <p class="sec-sub">Full-funnel, OOH-led into digital retargeting — using the exposed audience as the seed.</p>
+    <div class="funnel">
+      <div class="fstage">
+        <div class="flabel"><div class="ft">Awareness</div><div class="fg">Build exposed seed</div></div>
+        <div class="fbody"><div class="fc">Programmatic DOOH across the 5 priority hotspots, weighted to peak density windows.</div><div class="fk">Orchard · Marina Bay · ECP · Jewel · Tampines</div></div>
+        <div class="fbar" style="background:#6b3c72">50%</div>
+      </div>
+      <div class="fstage">
+        <div class="flabel"><div class="ft">Consideration</div><div class="fg">Extend & sequence</div></div>
+        <div class="fbody"><div class="fc">CTV + YouTube + Meta retargeting the OOH-exposed audience with model-specific creative.</div><div class="fk">Sequenced from hero → proof → offer</div></div>
+        <div class="fbar" style="background:#8b5fa0">35%</div>
+      </div>
+      <div class="fstage">
+        <div class="flabel"><div class="ft">Conversion</div><div class="fg">Drive the booking</div></div>
+        <div class="fbody"><div class="fc">Search + Meta lead-gen with test-drive CTA; retarget showroom non-visitors at 7 days.</div><div class="fk">Test-drive booking form + concierge follow-up</div></div>
+        <div class="fbar" style="background:#b57fc2">15%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flighting -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Flighting</h2></div>
+    <p class="sec-sub">13-week flight, Jan–Mar. OOH front-loaded to build the seed; digital sustains and converts.</p>
+    <div class="flight">
+      <div class="fhead"><div>Channel</div><div>Jan W1–2</div><div>Jan W3–4</div><div>Feb W1–2</div><div>Feb W3–4</div><div>Mar W1–2</div><div>Mar W3–4</div></div>
+      <div class="frow"><div class="fn">DOOH</div><div class="track"><span class="gbar" style="left:0%;width:52%;background:#6b3c72">Launch burst</span></div></div>
+      <div class="frow"><div class="fn">CTV / YouTube</div><div class="track"><span class="gbar" style="left:16%;width:70%;background:#8b5fa0">Sequenced retargeting</span></div></div>
+      <div class="frow"><div class="fn">Meta / Social</div><div class="track"><span class="gbar" style="left:24%;width:72%;background:#a86cb8">Always-on + offer</span></div></div>
+      <div class="frow"><div class="fn">Search</div><div class="track"><span class="gbar" style="left:8%;width:90%;background:#c08fce">Always-on capture</span></div></div>
+    </div>
+  </div>
+
+  <!-- Measurement + approvals -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Measurement & approvals</h2></div>
+    <p class="sec-sub">Closed-loop, exposed-vs-control. Lumos measures showroom visit-lift on the OOH-exposed seed.</p>
+    <div class="stats three">
+      <div class="stat"><div class="big">Exposed<br><span class="u" style="font-size:12px">vs control</span></div><div class="lbl">Visit-lift measured on the OOH seed via matched hold-out</div></div>
+      <div class="stat"><div class="big">Weekly</div><div class="lbl">In-flight optimisation against CPQB & pacing</div></div>
+      <div class="stat"><div class="big">Day 90</div><div class="lbl">Post-campaign report: bookings, lift, share shift</div></div>
+    </div>
+    <div class="meta-row" style="border-top:1px solid var(--line-2);margin-top:24px">
+      <div class="m"><span class="k">Client approval</span><span class="v">☐ Pending — Meridian CMO</span></div>
+      <div class="m"><span class="k">Media approval</span><span class="v">☑ Approved — Planning</span></div>
+      <div class="m"><span class="k">Creative</span><span class="v">→ See Messaging Matrix v2</span></div>
+      <div class="m"><span class="k">Go-live</span><span class="v">6 Jan 2026</span></div>
+    </div>
+    <div class="inline-ask">
+      <span class="lm">✦</span>
+      <input placeholder="Ask Lumos to project bookings at S$1.2M given these audiences & CPQB…">
+      <span class="go">Ask ▸</span>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /page -->
+</div><!-- /stage -->
+
+<script>
+  // ---- Doc switching ----
+  const pills = document.querySelectorAll('.pill');
+  const docs = { strategy: document.getElementById('doc-strategy'),
+                 matrix:   document.getElementById('doc-matrix'),
+                 brief:    document.getElementById('doc-brief') };
+  const titles = {
+    strategy: ['Meridian Motors Singapore — Audience Strategy','Audience Strategy'],
+    matrix:   ['Meridian Motors — Launch Messaging Matrix','Messaging Matrix'],
+    brief:    ['Meridian Motors Q1 — Campaign Brief','Campaign Brief']
+  };
+  function show(key){
+    pills.forEach(p=>p.classList.toggle('active', p.dataset.doc===key));
+    Object.entries(docs).forEach(([k,el])=>el.classList.toggle('show', k===key));
+    document.getElementById('barTitle').textContent = titles[key][0];
+    document.getElementById('barType').textContent = titles[key][1];
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  pills.forEach(p=>p.addEventListener('click',()=>show(p.dataset.doc)));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='1')show('strategy'); if(e.key==='2')show('matrix'); if(e.key==='3')show('brief');
+  });
+  // Open the doc named in the URL hash (set by the app's View button), e.g. #matrix
+  function showFromHash(){ const k=location.hash.replace('#',''); if(docs[k]) show(k); }
+  window.addEventListener('hashchange', showFromHash);
+  showFromHash();
+
+  // ---- Build density heatmap ----
+  (function(){
+    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const hours=['6a','8a','10a','12p','2p','4p','6p','8p'];
+    // index values 80–210, per [day][hour]
+    const data=[
+      [96,182,150,120,108,116,132,102],   // Mon
+      [98,178,148,118,106,112,128,104],   // Tue
+      [100,176,152,122,110,118,138,108],  // Wed
+      [102,180,156,124,112,120,142,114],  // Thu
+      [110,170,148,132,124,142,162,150],  // Fri
+      [118,150,196,206,178,150,138,132],  // Sat
+      [112,140,184,192,168,140,130,120]   // Sun
+    ];
+    // best window per day (index of max)
+    function color(v){
+      // map 80..210 to gradient stops
+      const t=Math.max(0,Math.min(1,(v-80)/130));
+      // interpolate light purple -> deep
+      const stops=[[239,231,242],[185,143,202],[107,60,114],[61,31,74]];
+      const seg=t*3, i=Math.min(2,Math.floor(seg)), f=seg-i;
+      const a=stops[i], b=stops[i+1];
+      const c=a.map((x,k)=>Math.round(x+(b[k]-x)*f));
+      return `rgb(${c[0]},${c[1]},${c[2]})`;
+    }
+    let html='<table><thead><tr><th></th>';
+    hours.forEach(h=>html+=`<th>${h}</th>`);
+    html+='</tr></thead><tbody>';
+    data.forEach((row,d)=>{
+      const max=Math.max(...row), maxi=row.indexOf(max);
+      html+=`<tr><td class="rowlab">${days[d]}</td>`;
+      row.forEach((v,h)=>{
+        const dark=v>150;
+        const star = h===maxi && max>140 ? '<span class="star">★</span>':'';
+        html+=`<td><div class="cell" style="background:${color(v)};color:${dark?'#fff':'#6b4a72'}">${v}${star}</div></td>`;
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    document.getElementById('heatmap').innerHTML=html;
+  })();
+</script>
+</body>
+</html>
