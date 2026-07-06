@@ -127,10 +127,10 @@
   .heat td,.heat th{text-align:center}
   .heat th{font-size:10px;color:var(--muted);font-weight:500;padding-bottom:2px}
   .heat .rowlab{font-size:10.5px;color:var(--ink-3);text-align:right;padding-right:6px;white-space:nowrap;font-weight:500}
-  .heat .cell{height:24px;border-radius:5px;font-size:10px;color:#fff;font-weight:600;position:relative}
+  .heat .cell{height:24px;border-radius:5px;font-size:10px;color:#fff;font-weight:600;position:relative;display:flex;align-items:center;justify-content:center}
   .heat-legend{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--muted)}
   .heat-legend .grad{width:120px;height:8px;border-radius:5px;background:linear-gradient(90deg,#efe7f2,#b98fca,#6b3c72,#3d1f4a)}
-  .star{position:absolute;top:-6px;right:-4px;font-size:11px}
+  .star{font-size:9px;line-height:1;margin-right:3px}
 
   /* matrix */
   .matrix-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
@@ -743,7 +743,7 @@
       row.forEach((v,h)=>{
         const dark=v>150;
         const star = h===maxi && max>140 ? '<span class="star">★</span>':'';
-        html+=`<td><div class="cell" style="background:${color(v)};color:${dark?'#fff':'#6b4a72'}">${v}${star}</div></td>`;
+        html+=`<td><div class="cell" style="background:${color(v)};color:${dark?'#fff':'#6b4a72'}">${star}${v}</div></td>`;
       });
       html+='</tr>';
     });
