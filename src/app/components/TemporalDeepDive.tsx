@@ -2,6 +2,7 @@ import AudienceDensity from './AudienceDensity';
 import { GlobalFilterBar } from './AudienceProfileContent';
 import { BlockDeck } from './DeepDiveBlock';
 import type { BlockConfig } from './deepDiveBlocks';
+import { AskPill, type ModuleRef } from './ModuleAsk';
 
 // ── Temporal & Seasonal deep-dive tab ────────────────────────────────────────
 // Now an editable block deck: the summary strip (hero) and the shared Audience
@@ -15,6 +16,10 @@ type DeckHostProps = {
   scopeId: string | null;
   onAskBlock: (config: BlockConfig) => void;
   onAddBlock: () => void;
+  // Audience display name + pin handler so the fixed density anchor can pin
+  // itself into the docked Ask Lumos panel, like the editable blocks can.
+  audience?: string;
+  onAskGraph?: (ref: ModuleRef) => void;
 };
 
 // ── Summary strip (hero) ──────────────────────────────────────────────────────
@@ -53,7 +58,7 @@ function SummaryStrip() {
 }
 
 // ── Tab ───────────────────────────────────────────────────────────────────────
-export default function TemporalDeepDive({ blocks, scopeId, onAskBlock, onAddBlock }: DeckHostProps) {
+export default function TemporalDeepDive({ blocks, scopeId, onAskBlock, onAddBlock, audience = 'this audience', onAskGraph }: DeckHostProps) {
   return (
     <div className="flex flex-col gap-3.5">
       <GlobalFilterBar />
@@ -66,6 +71,15 @@ export default function TemporalDeepDive({ blocks, scopeId, onAskBlock, onAddBlo
             <p className="font-['Jua',sans-serif] text-[15px] text-[#1a1a1a]">Peak days &amp; dayparts</p>
             <p className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a]">Hour × day · indexed density · ★ = best time to reach</p>
           </div>
+          {/* Pin this graph into the docked Ask Lumos chat — same affordance the
+              editable blocks carry, so the density anchor is askable too. */}
+          <AskPill
+            id={`aud:${AUD_ID}:temporal:density`}
+            label="Peak days & dayparts"
+            audience={audience}
+            state={['Residential']}
+            onAsk={onAskGraph}
+          />
         </div>
         <AudienceDensity audienceId={AUD_ID} mode="Residential" variant="expanded" earlyRiser hideTitle />
       </div>

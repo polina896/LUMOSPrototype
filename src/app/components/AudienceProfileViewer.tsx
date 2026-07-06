@@ -485,6 +485,8 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
             scopeId={scope?.blockId ?? null}
             onAskBlock={askBlock}
             onAddBlock={addBlock}
+            audience={askName}
+            onAskGraph={pinSection}
           />
         )}
         {activeTab === 'digital' && <DigitalTwinTab />}
