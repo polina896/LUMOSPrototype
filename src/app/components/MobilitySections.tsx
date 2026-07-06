@@ -135,7 +135,7 @@ function ReachBySite() {
 type SectionMeta = { id: string; title: string; subtitle: string; span: 1 | 3; Visual: () => JSX.Element };
 
 export const MOBILITY_SECTIONS: SectionMeta[] = [
-  { id: 'mob-where-live',     title: 'Where they live',           subtitle: 'Density of home origins · top over-indexing postcodes · hover → segment mix', span: 3, Visual: WhereTheyLive },
+  { id: 'mob-where-live',     title: 'Where they cluster',        subtitle: 'Home, daytime & spend presence · top over-indexing postcodes', span: 3, Visual: WhereTheyLive },
   { id: 'mob-where-transact', title: 'Where they transact',       subtitle: 'Spend density · top districts',                   span: 1, Visual: WhereTheyTransact },
   { id: 'mob-catchment',      title: 'Catchment & origin flows',  subtitle: 'How far they travel · median & 90th pct',         span: 1, Visual: Catchment },
   { id: 'mob-competitor',     title: 'Competitor & POI visitation', subtitle: 'Rival venues · share of visits',                span: 1, Visual: Competitor },
