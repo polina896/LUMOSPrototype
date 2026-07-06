@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar, { type RecentAnalysis } from './components/Sidebar';
 import DocumentsPanel from './components/DocumentsPanel';
 import ChatPanel from './components/ChatPanel';
@@ -123,6 +123,17 @@ export default function App() {
     setProfileViewerId(null);
     setProfileViewerName(null);
   };
+
+  // When the chat finishes assembling the strategy doc (screen === 'result'),
+  // surface the artifact panel automatically. It shares the right-hand slot with
+  // the Data Explorer, so if the Explorer is still open the doc has nowhere to
+  // render — dismiss it (and its detail panel) the moment we reach the result.
+  useEffect(() => {
+    if (screen === 'result') {
+      setShowDataExplorer(false);
+      setSelectedAudienceId(null);
+    }
+  }, [screen]);
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
