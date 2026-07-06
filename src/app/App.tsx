@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar, { type RecentAnalysis } from './components/Sidebar';
 import DocumentsPanel from './components/DocumentsPanel';
 import ChatPanel from './components/ChatPanel';
@@ -13,6 +13,14 @@ import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
 export type Screen = 'blank' | 'planning' | 'clarifying' | 'insights' | 'profiles' | 'deep-dive' | 'result';
+
+export interface SavedDocument {
+  id: string;
+  name: string;
+  type: string;
+  tags: string[];
+  timestamp: string;
+}
 
 // Audience size map for the named audiences in the Audience Library
 const AUDIENCE_SIZE_MAP: Record<string, string> = {
@@ -37,6 +45,15 @@ export default function App() {
   const [savedAudienceIds, setSavedAudienceIds] = useState<AudienceId[]>([]);
   const saveAudience = (id: AudienceId) =>
     setSavedAudienceIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  // Strategy docs saved from the Data Explorer preview — surfaced in the Documents tab.
+  const [savedDocuments, setSavedDocuments] = useState<SavedDocument[]>([]);
+  const saveDocument = (doc: Omit<SavedDocument, 'id' | 'timestamp'>) =>
+    setSavedDocuments((prev) => {
+      if (prev.some((d) => d.name === doc.name)) return prev;
+      const now = new Date();
+      const timestamp = 'Today, ' + now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+      return [{ ...doc, id: `saved-doc-${Date.now()}`, timestamp }, ...prev];
+    });
   const [showDataExplorer, setShowDataExplorer] = useState(false);
   const [showAudiences, setShowAudiences] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
@@ -107,6 +124,17 @@ export default function App() {
     setProfileViewerName(null);
   };
 
+  // When the chat finishes assembling the strategy doc (screen === 'result'),
+  // surface the artifact panel automatically. It shares the right-hand slot with
+  // the Data Explorer, so if the Explorer is still open the doc has nowhere to
+  // render — dismiss it (and its detail panel) the moment we reach the result.
+  useEffect(() => {
+    if (screen === 'result') {
+      setShowDataExplorer(false);
+      setSelectedAudienceId(null);
+    }
+  }, [screen]);
+
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
       <Sidebar
@@ -142,7 +170,7 @@ export default function App() {
           onExit={() => setCompareActive(false)}
         />
       ) : showDocuments ? (
-        <DocumentsPanel />
+        <DocumentsPanel savedDocuments={savedDocuments} />
       ) : showAudiences ? (
         profileViewerId ? (
           <AudienceProfileViewer
@@ -221,6 +249,8 @@ export default function App() {
           onOpenFullPage={(id, name) => openAudience(id, name)}
           savedAudienceIds={savedAudienceIds}
           onSaveAudience={saveAudience}
+          onSaveDocument={saveDocument}
+          savedDocumentNames={savedDocuments.map((d) => d.name)}
         />
       ) : null}
     </div>

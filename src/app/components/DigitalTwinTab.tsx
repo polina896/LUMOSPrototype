@@ -50,131 +50,131 @@ const WHOLE: Persona = {
   id: 'whole',
   name: 'Whole audience',
   avatar: '∑',
-  role: '612k · blended',
+  role: '387k · blended',
   voice: 'aggregate',
   starters: [
-    'What do they buy?',
-    'Which competitor stores do they visit?',
+    'What do they drive now?',
+    'Which competitor showrooms do they visit?',
     'Best channel & time to reach them?',
-    'How would they react to a $260 launch?',
+    'How would they react to a S$180k launch?',
     'Stress-test message A vs B',
   ],
   seeded: [
-    { role: 'you', text: 'What do they actually buy, and which competitor stores do they visit?' },
+    { role: 'you', text: 'What do they actually drive now, and which competitor showrooms do they visit?' },
     {
       role: 'twin',
-      text: 'They skew heavily to sports nutrition (1.9×) and athleisure (1.8×), avg basket $48, mostly in-store. On visitation, 42% have been to rebel Sport in the last 3 months (1.6× metro), 31% a lululemon store, 27% Nike or a specialty running store.',
-      grounded: 'Purchase patterns · Competitor & POI visitation',
+      text: 'They skew heavily to premium sedans (2.1×) and continental marques (1.8×), typically on their second or third car with an outstanding loan around S$95k. On visitation, 42% have been to a BMW or Mercedes-Benz showroom in the last 3 months (1.6× vs Singapore avg), 31% to Audi, 27% Lexus or a premium used-car dealer.',
+      grounded: 'Vehicle ownership · Competitor showroom visitation',
       trust: [{ label: 'measured', kind: 'measured' }],
     },
     { role: 'you', text: 'Best way and time to reach them for a launch?' },
     {
       role: 'twin',
-      text: 'OOH around home at Sat 6–9am is the strongest single window (2.3×). Social indexes on weekday evenings and retail media on weekends. A “tested on your weekend route” framing lands better than race-day performance for this crowd.',
+      text: 'Connected TV and YouTube on weekday evenings 7–9pm is the strongest single window (2.3×). OOH along the Orchard–CBD corridor indexes on weekday mornings, and dealership districts on weekends. A “book a private test drive” framing lands better than horsepower claims for this crowd.',
       grounded: 'Peak dayparts · Best time by channel · Brand affinity',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'phrasing modelled', kind: 'modelled' }],
     },
   ],
 };
 
-const MARA: Persona = {
-  id: 'mara',
-  name: 'Mara, 34',
+const MARCUS: Persona = {
+  id: 'marcus',
+  name: 'Marcus, 38',
   avatar: 'M',
-  role: 'Weekend Runner · Brunswick',
+  role: 'Upgrade-Ready Professional · Tanglin',
   lms: 'LMS-0131',
   basisShare: '34%',
   voice: 'character',
-  starters: ['What would make you switch brands?', 'React to this tagline', 'What do you buy after a run?', '$260 launch — yes or no?'],
+  starters: ['What would make you switch brands?', 'React to this tagline', 'What do you look for in your next car?', 'S$180k launch — yes or no?'],
   seeded: [
-    { role: 'you', text: 'Would you pay $260 for a premium running shoe?' },
+    { role: 'you', text: 'Would you pay S$180k for a premium sedan?' },
     {
       role: 'twin',
-      text: 'Honestly? Maybe — but you’d have to earn it. I normally spend around $180 and I replace them when my knees start complaining, not on a schedule. If it genuinely helped my Saturday long run I’d stretch, but “pro-grade” on its own doesn’t move me.',
-      grounded: 'Basket & price sensitivity · Category purchase cycle',
+      text: 'Honestly? Maybe — but you’d have to earn it. I’m driving a five-year-old Continental and I’ll change when the COE math tips, not on a schedule. If it genuinely upgrades the daily drive and holds its resale I’d stretch, but “most powerful in class” on its own doesn’t move me.',
+      grounded: 'Vehicle value & price sensitivity · Ownership cycle',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
     { role: 'you', text: 'Where would an ad actually reach you?' },
     {
       role: 'twin',
-      text: 'Out and about near home early Saturday — I’m on my route by 7. During the week it’s Instagram in the evenings once the kids are down. Radio and race-day banners mostly wash over me.',
-      grounded: 'Peak dayparts · Channel affinity (Brunswick)',
+      text: 'Evenings once the kids are down — YouTube and connected TV. On the road it’s the Orchard–CBD corridor on my morning commute. Radio and horsepower banners mostly wash over me.',
+      grounded: 'Peak dayparts · Channel affinity (Central)',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
   ],
 };
 
-const DANIEL: Persona = {
-  id: 'daniel',
-  name: 'Daniel, 41',
+const DEEPA: Persona = {
+  id: 'deepa',
+  name: 'Deepa, 43',
   avatar: 'D',
-  role: 'Family Trailgoer · Sandringham',
+  role: 'Family SUV Upgrader · Bishan',
   lms: 'LMS-0119',
   basisShare: '22%',
   voice: 'character',
-  starters: ['What gets the family out?', 'React to this tagline', 'Would you upgrade your gear?', 'Where do you shop?'],
+  starters: ['What gets the family upgrading?', 'React to this tagline', 'Would you go EV next?', 'Where do you shop for a car?'],
   seeded: [
-    { role: 'you', text: 'What actually gets you buying new running gear?' },
+    { role: 'you', text: 'What actually gets you into a new car?' },
     {
       role: 'twin',
-      text: 'It’s usually the kids, honestly — a family trail day at the You Yangs and someone’s shoes are shot. I buy practical and durable over flashy, and I’ll wait for a sale unless something’s broken. Weekends are when I’m actually in the shops.',
+      text: 'It’s usually the family, honestly — a second kid and the current SUV feels tight on the weekend runs up to Johor. I buy practical and safe over flashy, and I’ll wait for a year-end deal unless the COE’s up. Weekends are when we actually get to a showroom.',
       grounded: 'Purchase triggers · Weekend mobility · Price sensitivity',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
   ],
 };
 
-const INITIAL_PERSONAS = [WHOLE, MARA, DANIEL];
+const INITIAL_PERSONAS = [WHOLE, MARCUS, DEEPA];
 
-// The Sam persona minted by the create flow (starts with an empty thread).
-const SAM: Persona = {
-  id: 'sam',
-  name: 'Sam, 29',
+// The Sana persona minted by the create flow (starts with an empty thread).
+const SANA: Persona = {
+  id: 'sana',
+  name: 'Sana, 31',
   avatar: 'S',
-  role: 'Weekend Runner · Fitzroy',
+  role: 'Upgrade-Ready Professional · Novena',
   lms: 'LMS-0148',
   basisShare: '34%',
   voice: 'character',
   isNew: true,
   starters: [
-    'Test marathon copy — would you buy $260 shoes?',
-    'What do you buy after a run?',
+    'Test launch copy — would you book a S$180k test drive?',
+    'What do you look for in your next car?',
     'Where would an ad reach you?',
     'React to this tagline',
   ],
   seeded: [],
 };
 
-// The Melbourne Marathon copy-test exchange — injected when Sam's marathon
-// starter is used. Demonstrates pressure-testing copy for a purchase nudge.
-function marathonCopyTest(): ChatMsg[] {
+// The Singapore Motor Show launch copy-test exchange — injected when Sana's
+// launch starter is used. Demonstrates pressure-testing copy for a purchase nudge.
+function launchCopyTest(): ChatMsg[] {
   return [
     {
       role: 'you',
-      text: 'It’s ~3 weeks out from the Melbourne Marathon. Which of these would get you to invest in a new pair of $260 shoes?',
+      text: 'It’s ~3 weeks out from the Singapore Motor Show. Which of these would get you to book a test drive for the new S$180k sedan?',
       variants: [
-        { lab: 'A', text: '“Race-day tested — shave minutes off your PB.”' },
-        { lab: 'B', text: '“Your city. Your marathon. New shoes for Melbourne.”' },
-        { lab: 'C', text: '“Built to outlast your whole training block.”' },
+        { lab: 'A', text: '“Class-leading performance — the most powerful in its segment.”' },
+        { lab: 'B', text: '“Your city. Your drive. The new sedan, built for Singapore.”' },
+        { lab: 'C', text: '“Engineered to outlast your COE — value that holds.”' },
       ],
     },
     {
       role: 'twin',
-      text: 'Three weeks out I’m deep in taper and precious about my legs — so the timing’s right, this is exactly when I think about gear.',
+      text: 'Three weeks out from the Show is exactly when I’m weighing an upgrade — so the timing’s right, this is when I actually think about the next car.',
       reactions: [
-        { tag: 'cold', heat: 'cold', text: 'A — leaves me cold. I don’t chase a PB, I run for the Saturday habit. “Shave minutes” feels aimed at someone faster than me.' },
-        { tag: 'leans in', heat: 'hot', text: 'B — this lands. It’s my marathon, my streets, Fitzroy to the Tan. Nod to Melbourne and the event I’m actually in and I lean in.' },
-        { tag: 'opens wallet', heat: 'hot', text: 'C — the one that opens my wallet. I buy on value, and “outlast your training block” tells me $260 is justified, not hype.' },
+        { tag: 'cold', heat: 'cold', text: 'A — leaves me cold. I don’t chase power figures, I drive the daily commute. “Most powerful” feels aimed at someone else.' },
+        { tag: 'leans in', heat: 'hot', text: 'B — this lands. It’s my city, Orchard to the East Coast. Nod to Singapore and the Show I’m actually going to and I lean in.' },
+        { tag: 'opens wallet', heat: 'hot', text: 'C — the one that opens my wallet. I buy on value and resale, and “outlast your COE” tells me S$180k is justified, not hype.' },
       ],
-      grounded: 'Price sensitivity · Local running (58%) · Event affinity — Melb Marathon 3.2×',
+      grounded: 'Price sensitivity · Local driving (58%) · Event affinity — Singapore Motor Show 3.2×',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
-    { role: 'you', text: 'So — would you actually buy at $260 before race day?' },
+    { role: 'you', text: 'So — would you actually book at S$180k before the Show?' },
     {
       role: 'twin',
-      text: 'Probably yes — but only if B and C run together. Frame it as “gear up for your Melbourne Marathon — built to last well beyond it,” put it in the fortnight before, near home or on my Saturday route. Lead on raw performance and I scroll straight past.',
-      verdict: 'Nudge read: conversion likely if event-timed local framing (B) is paired with a value/durability hook (C), delivered in the 2 weeks pre-race via OOH near home. Pure-performance framing (A) does not move him.',
-      grounded: 'Basket & price sensitivity ($48 avg / $180 shoe spend) · Peak dayparts · Event calendar',
+      text: 'Probably yes — but only if B and C run together. Frame it as “built for Singapore — value that outlasts your COE,” put it in the fortnight before the Show, on my evening YouTube or the Orchard commute. Lead on raw horsepower and I scroll straight past.',
+      verdict: 'Nudge read: booking likely if event-timed local framing (B) is paired with a value/resale hook (C), delivered in the 2 weeks pre-Show via CTV + Orchard OOH. Pure-performance framing (A) does not move her.',
+      grounded: 'Price sensitivity (S$95k outstanding loan / premium-sedan spend) · Peak dayparts · Event calendar',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice & verdict modelled', kind: 'modelled' }],
     },
   ];
@@ -182,10 +182,10 @@ function marathonCopyTest(): ChatMsg[] {
 
 // ── segments offered by the create flow ──────────────────────────────────────
 const SEGMENTS = [
-  { id: 'weekend', name: 'Weekend Runners', share: 34, size: '~208k', idx: 'athleisure 1.8×' },
-  { id: 'family', name: 'Family Trailgoers', share: 22, size: '~135k', idx: 'kids’ outdoor 2.1×' },
-  { id: 'commuter', name: 'Early-morning Commuter-runners', share: 18, size: '~110k', idx: 'transit + gym 1.6×' },
-  { id: 'event', name: 'Event Chasers', share: 14, size: '~86k', idx: 'marathon sign-ups 3.2×' },
+  { id: 'upgrade', name: 'Upgrade-Ready Professionals', share: 34, size: '~132k', idx: 'premium sedan 1.8×' },
+  { id: 'family', name: 'Family SUV Upgraders', share: 22, size: '~85k', idx: 'safety & space 2.1×' },
+  { id: 'ev', name: 'EV-Curious Commuters', share: 18, size: '~70k', idx: 'EV research 1.6×' },
+  { id: 'event', name: 'Motor Show Intenders', share: 14, size: '~54k', idx: 'show sign-ups 3.2×' },
 ];
 
 // ── small presentational bits ────────────────────────────────────────────────
@@ -257,22 +257,22 @@ export default function DigitalTwinTab() {
   const send = (text: string) => {
     const q = text.trim();
     if (!q) return;
-    // Special: Sam's marathon starter injects the full copy-test exchange.
-    if (selectedId === 'sam' && /marathon/i.test(q)) {
-      append('sam', marathonCopyTest());
+    // Special: Sana's launch starter injects the full copy-test exchange.
+    if (selectedId === 'sana' && /launch|test drive|180k/i.test(q)) {
+      append('sana', launchCopyTest());
     } else {
       append(selectedId, [{ role: 'you', text: q }, stub(q)]);
     }
     setDraft('');
   };
 
-  // create flow → save mints Sam, selects him, lands on his empty thread.
+  // create flow → save mints Sana, selects her, lands on her empty thread.
   const savePersona = () => {
-    if (!personas.some((p) => p.id === 'sam')) {
-      setPersonas((ps) => [...ps, SAM]);
-      setThreads((t) => ({ ...t, sam: [] }));
+    if (!personas.some((p) => p.id === 'sana')) {
+      setPersonas((ps) => [...ps, SANA]);
+      setThreads((t) => ({ ...t, sana: [] }));
     }
-    setSelectedId('sam');
+    setSelectedId('sana');
     setCreateStep(null);
   };
 
@@ -396,7 +396,7 @@ export default function DigitalTwinTab() {
             <div className="m-auto text-center py-7 text-[#9a9a9a]">
               <div className="font-['Jua',sans-serif] text-[15px] text-[#6b6b6b] mb-[5px]">Ask {firstName} anything</div>
               <div className="text-[11px]">
-                {firstName} answers in character, grounded on the Weekend Runners segment
+                {firstName} answers in character, grounded on the Upgrade-Ready Professionals segment
               </div>
             </div>
           ) : (
@@ -571,8 +571,8 @@ export default function DigitalTwinTab() {
                   <div className="flex items-center gap-[13px] pb-[14px] border-b border-dashed border-[#e5e5e2]">
                     <span className="w-[54px] h-[54px] rounded-full bg-[#bebde7] text-[#6b3c72] flex items-center justify-center text-[22px] font-['Jua',sans-serif] shrink-0">S</span>
                     <div className="flex-1">
-                      <div className="font-['Jua',sans-serif] text-[17px] text-[#1a1a1a]">Sam, 29</div>
-                      <div className="text-[11px] text-[#6b6b6b] mt-[3px]">Weekend Runner · Fitzroy</div>
+                      <div className="font-['Jua',sans-serif] text-[17px] text-[#1a1a1a]">Sana, 31</div>
+                      <div className="text-[11px] text-[#6b6b6b] mt-[3px]">Upgrade-Ready Professional · Novena</div>
                       <div className="flex items-center gap-2 mt-[6px]">
                         <TrustPill t={{ label: 'identity modelled', kind: 'modelled' }} />
                         <TrustPill t={{ label: 'LMS-0148', kind: 'measured' }} />
@@ -586,24 +586,24 @@ export default function DigitalTwinTab() {
                   <div className="flex items-center gap-2 mt-[13px] mb-[6px] text-[10px] uppercase tracking-[0.06em] text-[#9a9a9a]">
                     Name <TrustPill t={{ label: 'modelled — edit freely', kind: 'modelled' }} />
                   </div>
-                  <div className="border border-[#e5e5e2] rounded-[9px] px-[11px] py-[9px] text-[12px] bg-[#fafaf8]">Sam</div>
+                  <div className="border border-[#e5e5e2] rounded-[9px] px-[11px] py-[9px] text-[12px] bg-[#fafaf8]">Sana</div>
 
                   <div className="flex items-center gap-2 mt-[13px] mb-[6px] text-[10px] uppercase tracking-[0.06em] text-[#9a9a9a]">
                     One-line bio <TrustPill t={{ label: 'modelled', kind: 'modelled' }} />
                   </div>
                   <div className="border border-[#e5e5e2] rounded-[9px] px-[11px] py-[9px] text-[12px] bg-[#fafaf8] leading-[1.5]">
-                    Runs the Capital City Trail most Saturdays; shops the category actively, buys on value not hype.
+                    Drives the Orchard–CBD commute daily; shops the category actively, buys on value and resale not hype.
                   </div>
 
                   <div className="flex items-center gap-2 mt-4 mb-[6px] text-[10px] uppercase tracking-[0.06em] text-[#9a9a9a]">
                     Defining atoms <TrustPill t={{ label: 'measured — fixed by the segment', kind: 'measured' }} />
                   </div>
                   {[
-                    { k: 'Top behaviours', v: 'Sports nutrition, athleisure', i: '1.9× / 1.8×' },
-                    { k: 'Competitor / POI', v: 'rebel Sport, lululemon', i: '1.6×' },
-                    { k: 'Peak daypart', v: 'Sat 6–9am', i: '2.3×' },
-                    { k: 'Channel affinity', v: 'OOH near home · IG evenings', i: '1.7×' },
-                    { k: 'Avg basket', v: '$48', i: '—' },
+                    { k: 'Top behaviours', v: 'Premium sedan, continental marque', i: '2.1× / 1.8×' },
+                    { k: 'Competitor / POI', v: 'BMW, Mercedes-Benz showrooms', i: '1.6×' },
+                    { k: 'Peak daypart', v: 'Weekday 7–9pm', i: '2.3×' },
+                    { k: 'Channel affinity', v: 'CTV evenings · Orchard OOH', i: '1.7×' },
+                    { k: 'Vehicle budget', v: 'S$180k', i: '—' },
                   ].map((a, i, arr) => (
                     <div key={a.k} className={`flex items-baseline gap-[10px] text-[12px] py-[9px] ${i < arr.length - 1 ? 'border-b border-[#e5e5e2]' : ''}`}>
                       <span className="text-[#6b6b6b] shrink-0 w-[118px]">{a.k}</span>
@@ -615,8 +615,8 @@ export default function DigitalTwinTab() {
                   <div className="flex gap-2 mt-[14px] text-[11px] text-[#6b6b6b] bg-[#fafaf8] border border-[#e5e5e2] rounded-[9px] px-3 py-[10px]">
                     <Info className="w-[13px] h-[13px] text-[#6b3c72] shrink-0 mt-[2px]" />
                     <span>
-                      Represents <b className="text-[#1a1a1a]">Weekend Runners</b> — 34% of the audience (~208k). Editing name &amp; bio
-                      changes how Sam presents; the <b className="text-[#1a1a1a]">data comes from the segment</b>.
+                      Represents <b className="text-[#1a1a1a]">Upgrade-Ready Professionals</b> — 34% of the audience (~132k). Editing name &amp; bio
+                      changes how Sana presents; the <b className="text-[#1a1a1a]">data comes from the segment</b>.
                     </span>
                   </div>
                 </div>

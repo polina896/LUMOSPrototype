@@ -17,7 +17,7 @@ const fmtHour = (h: number) => String(h).padStart(2, '0') + ':00';
 const fmtClock = (h: number) => `${h % 12 === 0 ? 12 : h % 12}${h < 12 ? 'am' : 'pm'}`;
 
 // mode → time-of-day shape (weekday, weekend). earlyRiser shifts the morning
-// peak to dawn (fitness / marathon audiences active before work & at weekends).
+// peak earlier (for audiences whose activity concentrates before the work day).
 function hourWeight(mode: GeoModeKey, h: number, weekend: boolean, earlyRiser = false): number {
   if (earlyRiser && mode === 'Residential') {
     // Flatter distribution so the Sat-morning peak indexes ~2.3× (not a spike),

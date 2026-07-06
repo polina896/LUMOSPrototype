@@ -29,6 +29,15 @@ interface DocRow {
   tags: string[];
   type: string;
   timestamp: string;
+  isNew?: boolean;
+}
+
+export interface SavedDocument {
+  id: string;
+  name: string;
+  type: string;
+  tags: string[];
+  timestamp: string;
 }
 
 interface DocGroup {
@@ -71,7 +80,7 @@ const DOC_GROUPS: DocGroup[] = [
   },
 ];
 
-export default function DocumentsPanel() {
+export default function DocumentsPanel({ savedDocuments = [] }: { savedDocuments?: SavedDocument[] }) {
   const [search, setSearch] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<DocKey | null>(null);
@@ -84,15 +93,33 @@ export default function DocumentsPanel() {
     return <DocumentViewer initialDoc={viewingDoc} onBack={() => setViewingDoc(null)} />;
   }
 
+  // Merge any strategy docs saved from the Data Explorer preview into their
+  // type group, newest first, tagged NEW — mirrors the save-audience flow.
+  const groups: DocGroup[] = savedDocuments.length
+    ? (() => {
+        const merged = DOC_GROUPS.map((g) => ({ ...g, docs: [...g.docs] }));
+        for (const doc of savedDocuments) {
+          const row: DocRow = { ...doc, isNew: true };
+          const group = merged.find((g) => g.type === doc.type);
+          if (group) {
+            group.docs = [row, ...group.docs];
+          } else {
+            merged.unshift({ type: doc.type, icon: <FileText className="w-3.5 h-3.5" />, docs: [row] });
+          }
+        }
+        return merged;
+      })()
+    : DOC_GROUPS;
+
   const filtered = search.trim()
-    ? DOC_GROUPS.map((g) => ({
+    ? groups.map((g) => ({
         ...g,
         docs: g.docs.filter((d) =>
           d.name.toLowerCase().includes(search.toLowerCase()) ||
           d.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
         ),
       })).filter((g) => g.docs.length > 0)
-    : DOC_GROUPS;
+    : groups;
 
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafaf9]">
@@ -177,7 +204,12 @@ export default function DocumentsPanel() {
                               <FileText className="w-3.5 h-3.5 text-[#6b3c72]" />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a] leading-tight mb-1.5">{doc.name}</p>
+                              <p className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a] leading-tight mb-1.5 flex items-center gap-2">
+                                {doc.name}
+                                {doc.isNew && (
+                                  <span className="flex-none px-[7px] py-[1px] rounded-full bg-[#1D9E75] text-white text-[10px] font-bold tracking-wide">NEW</span>
+                                )}
+                              </p>
                               <div className="flex flex-wrap gap-1">
                                 {doc.tags.map((tag) => {
                                   const p = TAG_PALETTES[tag] ?? { bg: '#f3f3f1', text: '#555' };
