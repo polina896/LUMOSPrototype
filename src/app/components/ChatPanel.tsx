@@ -598,7 +598,7 @@ export default function ChatPanel({
       {screen !== 'blank' && (
         <div className="flex-1 flex flex-col min-h-0">
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-8">
-            <div className="max-w-[700px] pb-8 space-y-0">
+            <div className="min-h-full flex flex-col justify-end max-w-[700px] pb-8 space-y-0">
 
               {/* ── Brief user message ── */}
               {entryMode === 'brief' && (
