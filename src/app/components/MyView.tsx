@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import DeepDiveBlock from './DeepDiveBlock';
 import type { BlockConfig } from './deepDiveBlocks';
 
@@ -53,13 +53,20 @@ export function BlockPinButton({ id }: { id: string }) {
 }
 
 // ── Types passed down from the viewer ─────────────────────────────────────────
-export type Catalog = { key: string; label: string; blocks: BlockConfig[] }[];
+// A module is either an editable deck block (rendered by DeepDiveBlock) or an
+// "anchor" — a fixed, hand-built card (the Mobility map, the Temporal density
+// heatmap) that can't be a config-driven block but is still pinnable. Anchors
+// carry their own render() so My View can show them alongside deck blocks.
+export type AnchorModule = { id: string; title: string; source: string; span?: number; render: () => ReactNode };
+export type CatalogItem = { id: string; title: string; subtitle?: string };
+export type Catalog = { key: string; label: string; items: CatalogItem[] }[];
 
 interface MyViewTabProps {
-  order: string[];                          // pinned block ids, in display order
-  blockMap: Record<string, BlockConfig>;    // id → config (across every tab)
+  order: string[];                          // pinned module ids, in display order
+  blockMap: Record<string, BlockConfig>;    // id → deck-block config (across every tab)
+  anchors: Record<string, AnchorModule>;    // id → fixed anchor module
   sourceOf: Record<string, string>;         // id → source-tab label
-  catalog: Catalog;                         // all blocks grouped by source tab
+  catalog: Catalog;                         // every pinnable module, grouped by source tab
   scopeId: string | null;
   onReorder: (next: string[]) => void;
   onToggle: (id: string) => void;
@@ -68,13 +75,13 @@ interface MyViewTabProps {
 }
 
 export function MyViewTab({
-  order, blockMap, sourceOf, catalog, scopeId, onReorder, onToggle, onAsk, onBrowse,
+  order, blockMap, anchors, sourceOf, catalog, scopeId, onReorder, onToggle, onAsk, onBrowse,
 }: MyViewTabProps) {
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const dragId = useRef<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
-  const pinnedIds = order.filter((id) => blockMap[id]);
+  const pinnedIds = order.filter((id) => blockMap[id] || anchors[id]);
 
   const handleDrop = (targetId: string) => {
     const from = pinnedIds.indexOf(dragId.current ?? '');
@@ -145,18 +152,19 @@ export function MyViewTab({
           </button>
           <div className="font-['Jua',sans-serif] text-[10px] uppercase tracking-[0.1em] text-[#9a9a9a] mt-8 mb-3">Suggested for this audience</div>
           <div className="flex flex-wrap gap-2 justify-center">
-            {catalog.flatMap((g) => g.blocks.map((b) => ({ b, label: g.label })))
+            {catalog.flatMap((g) => g.items.map((it) => ({ it, label: g.label })))
+              .filter(({ it }) => !order.includes(it.id))
               .filter((_, i) => i < 3)
-              .map(({ b, label }) => (
+              .map(({ it, label }) => (
                 <button
-                  key={b.id}
-                  onClick={() => onToggle(b.id)}
+                  key={it.id}
+                  onClick={() => onToggle(it.id)}
                   className="flex items-center gap-2 rounded-[10px] border border-[#e5e5e2] bg-[#fafaf8] px-3 py-2 font-['Jua',sans-serif] text-[12px] text-[#1a1a1a] hover:border-[#d9c9e0] transition-colors"
                 >
                   <span className="w-[18px] h-[18px] rounded-[5px] bg-[#f1e9ff] text-[#6b3c72] flex items-center justify-center">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
                   </span>
-                  {b.title}
+                  {it.title}
                   <span className="text-[9px] text-[#9a9a9a]">· {label}</span>
                 </button>
               ))}
@@ -167,6 +175,8 @@ export function MyViewTab({
         <div className="grid grid-cols-3 gap-3 items-start">
           {pinnedIds.map((id) => {
             const b = blockMap[id];
+            const anchor = anchors[id];
+            const span3 = b ? b.span === 3 : anchor?.span === 3;
             return (
               <div
                 key={id}
@@ -176,13 +186,13 @@ export function MyViewTab({
                 onDragLeave={() => setOverId((o) => (o === id ? null : o))}
                 onDrop={(e) => { e.preventDefault(); handleDrop(id); }}
                 onDragEnd={() => { dragId.current = null; setOverId(null); }}
-                className={`relative ${b.span === 3 ? 'col-span-3' : 'col-span-1'} ${dragId.current === id ? 'opacity-40' : ''} ${overId === id ? 'ring-2 ring-[#d9c9e0] rounded-[14px]' : ''}`}
+                className={`relative ${span3 ? 'col-span-3' : 'col-span-1'} ${dragId.current === id ? 'opacity-40' : ''} ${overId === id ? 'ring-2 ring-[#d9c9e0] rounded-[14px]' : ''}`}
               >
                 {/* source chip — this dashboard mixes modules from different tabs */}
                 <span className="absolute -top-2 left-3 z-10 px-2 py-[1px] rounded-full bg-white border border-[#e5e5e2] font-['Jua',sans-serif] text-[9px] text-[#9a9a9a] whitespace-nowrap">
                   {sourceOf[id]}
                 </span>
-                <DeepDiveBlock config={b} active={scopeId === id} onAsk={onAsk} />
+                {b ? <DeepDiveBlock config={b} active={scopeId === id} onAsk={onAsk} /> : anchor?.render()}
               </div>
             );
           })}
@@ -208,12 +218,12 @@ export function MyViewTab({
               {catalog.map((group) => (
                 <div key={group.key}>
                   <div className="font-['Jua',sans-serif] text-[10px] uppercase tracking-[0.09em] text-[#9a9a9a] mt-4 mb-2">{group.label}</div>
-                  {group.blocks.map((b) => {
-                    const on = order.includes(b.id);
+                  {group.items.map((it) => {
+                    const on = order.includes(it.id);
                     return (
                       <button
-                        key={b.id}
-                        onClick={() => onToggle(b.id)}
+                        key={it.id}
+                        onClick={() => onToggle(it.id)}
                         className="w-full flex items-center gap-3 rounded-[11px] border px-3 py-2.5 mb-2 text-left transition-colors"
                         style={on ? { borderColor: GOLD, background: GOLD_SOFT } : { borderColor: '#e5e5e2', background: 'white' }}
                       >
@@ -221,8 +231,8 @@ export function MyViewTab({
                           <PinIcon filled={on} size={16} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <div className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a] truncate">{b.title}</div>
-                          {b.subtitle && <div className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a] truncate">{b.subtitle}</div>}
+                          <div className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a] truncate">{it.title}</div>
+                          {it.subtitle && <div className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a] truncate">{it.subtitle}</div>}
                         </div>
                         {/* toggle */}
                         <span className="relative w-10 h-[23px] rounded-full shrink-0 transition-colors" style={{ background: on ? GOLD : '#e5e5e2' }}>

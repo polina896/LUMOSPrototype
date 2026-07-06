@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
-import MobilityDeepDive from "./MobilityDeepDive";
-import TemporalDeepDive from "./TemporalDeepDive";
+import MobilityDeepDive, { MobilityOverviewCard, MOBILITY_OVERVIEW_ID } from "./MobilityDeepDive";
+import TemporalDeepDive, { PeakDaysDaypartsCard, TEMPORAL_DENSITY_ID } from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
 import DigitalTwinTab from "./DigitalTwinTab";
-import { MyViewProvider, MyViewTab, PinIcon, type Catalog } from "./MyView";
+import { MyViewProvider, MyViewTab, PinIcon, type Catalog, type AnchorModule } from "./MyView";
 import {
   seedBlocks,
   seedMobilityBlocks,
@@ -93,14 +93,23 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   const togglePin = (id: string) =>
     setMyViewIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
 
-  // Flatten every deck's blocks so My View can resolve a pinned id to its config
-  // and know which tab it came from. Digital Twin has no blocks, so it's absent.
+  // Flatten every deck's blocks + the fixed anchors (Mobility map, Temporal
+  // density) so My View can resolve a pinned id to its renderer and know which
+  // tab it came from. Digital Twin has no pinnable modules.
   const { blockMap, sourceOf, catalog } = useMemo(() => {
     const bm: Record<string, BlockConfig> = {};
     const src: Record<string, string> = {};
+    // Anchor catalog items, keyed by the deck they belong beside.
+    const anchorItems: Record<DeckKey, { id: string; title: string; subtitle?: string }[]> = {
+      profile: [],
+      mobility: [{ id: MOBILITY_OVERVIEW_ID, title: 'Where they live & move', subtitle: 'Map · catchment · visitation' }],
+      temporal: [{ id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', subtitle: 'Hour × day · indexed density' }],
+    };
     const cat: Catalog = (['profile', 'mobility', 'temporal'] as DeckKey[]).map((k) => {
       decks[k].forEach((b) => { bm[b.id] = b; src[b.id] = DECK_LABELS[k]; });
-      return { key: k, label: DECK_LABELS[k], blocks: decks[k] };
+      anchorItems[k].forEach((a) => { src[a.id] = DECK_LABELS[k]; });
+      const deckItems = decks[k].map((b) => ({ id: b.id, title: b.title, subtitle: b.subtitle }));
+      return { key: k, label: DECK_LABELS[k], items: [...anchorItems[k], ...deckItems] };
     });
     return { blockMap: bm, sourceOf: src, catalog: cat };
   }, [decks]);
@@ -174,6 +183,20 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     setPinned((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
   };
   const unpinSection = (id: string) => setPinned((prev) => prev.filter((r) => r.id !== id));
+
+  // Fixed anchors — hand-built cards that aren't config-driven blocks but are
+  // still pinnable: the Temporal density heatmap and the Mobility map overview
+  // (the map's sub-sections are one Figma export, so they pin as one module).
+  const anchors: Record<string, AnchorModule> = {
+    [TEMPORAL_DENSITY_ID]: {
+      id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', source: DECK_LABELS.temporal, span: 3,
+      render: () => <PeakDaysDaypartsCard audience={askName} onAskGraph={pinSection} />,
+    },
+    [MOBILITY_OVERVIEW_ID]: {
+      id: MOBILITY_OVERVIEW_ID, title: 'Where they live & move', source: DECK_LABELS.mobility, span: 3,
+      render: () => <MobilityOverviewCard />,
+    },
+  };
 
   const handleTabClick = (tab: DeepDiveTab) => {
     setActiveTab(tab);
@@ -435,7 +458,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
                     className="text-[10px] px-[6px] py-[1px] rounded-full leading-none"
                     style={activeTab === key ? { background: 'rgba(198,146,20,0.16)' } : { background: 'rgba(0,0,0,0.06)' }}
                   >
-                    {myViewIds.filter((id) => blockMap[id]).length}
+                    {myViewIds.filter((id) => blockMap[id] || anchors[id]).length}
                   </span>
                 )}
               </button>
@@ -454,6 +477,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           <MyViewTab
             order={myViewIds}
             blockMap={blockMap}
+            anchors={anchors}
             sourceOf={sourceOf}
             catalog={catalog}
             scopeId={scope?.blockId ?? null}
