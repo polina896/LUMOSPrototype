@@ -49,7 +49,7 @@ export function PeakDaysDaypartsCard({ audience = 'this audience', onAskGraph }:
           <BlockPinButton id={TEMPORAL_DENSITY_ID} />
         </div>
       </div>
-      <AudienceDensity audienceId={AUD_ID} mode="Residential" variant="expanded" earlyRiser hideTitle />
+      <AudienceDensity audienceId={AUD_ID} mode="Residential" variant="expanded" hideTitle />
     </div>
   );
 }
@@ -57,10 +57,10 @@ export function PeakDaysDaypartsCard({ audience = 'this audience', onAskGraph }:
 // ── Summary strip (hero) ──────────────────────────────────────────────────────
 function SummaryStrip() {
   const stats = [
-    { label: 'Peak window', value: 'Sat 6–9am' },
-    { label: 'Peak index', value: '2.3×' },
+    { label: 'Peak window', value: 'Sat 10am–1pm' },
+    { label: 'Peak index', value: '2.1×' },
     { label: 'Weekly reach YoY', value: '418k', badge: '▲ +14%' },
-    { label: 'Marathon lift', value: '+58%' },
+    { label: 'Motor Show lift', value: '+52%' },
   ];
   return (
     <div className="rounded-[14px] border border-[#e7dff0] bg-gradient-to-b from-[#f6f0fb] to-[#fbf8fe] px-5 py-4">

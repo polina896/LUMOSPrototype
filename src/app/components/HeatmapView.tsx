@@ -1,22 +1,22 @@
 import { useState } from 'react';
 import { ChevronDown, Calendar } from 'lucide-react';
 import type { StyleConfig } from './CustomizationPopover';
-import SydneyHeatmap from './SydneyHeatmap';
+import SingaporeHeatmap from './SingaporeHeatmap';
 
 interface HeatmapViewProps {
   styleConfig: StyleConfig;
 }
 
 const postcodeData = [
-  { rank: 1, area: 'Liverpool', postcode: '2132', index: 214, reach: '350k' },
-  { rank: 2, area: 'Bankstown', postcode: '2311', index: 189, reach: '120k' },
-  { rank: 3, area: 'Campbelltown', postcode: '2003', index: 160, reach: '100k' },
-  { rank: 4, area: 'Quaker Hill', postcode: '2766', index: 120, reach: '50k' },
-  { rank: 5, area: 'Cabramatta', postcode: '2168', index: 100, reach: '23k' },
+  { rank: 1, area: 'Orchard / River Valley', postcode: '238843', index: 214, reach: '350k' },
+  { rank: 2, area: 'Bukit Timah', postcode: '279623', index: 189, reach: '120k' },
+  { rank: 3, area: 'Bishan / Ang Mo Kio', postcode: '579837', index: 160, reach: '100k' },
+  { rank: 4, area: 'Tampines / Pasir Ris', postcode: '520512', index: 120, reach: '50k' },
+  { rank: 5, area: 'Jurong East', postcode: '600233', index: 100, reach: '23k' },
 ];
 
 export default function HeatmapView({ styleConfig }: HeatmapViewProps) {
-  const [showBy, setShowBy] = useState<'Postcodes' | 'LGA'>('Postcodes');
+  const [showBy, setShowBy] = useState<'Postcodes' | 'District'>('Postcodes');
 
   // Get color palette based on chartPalette setting
   const getPaletteColors = () => {
@@ -85,15 +85,15 @@ export default function HeatmapView({ styleConfig }: HeatmapViewProps) {
               Postcodes
             </button>
             <button
-              onClick={() => setShowBy('LGA')}
+              onClick={() => setShowBy('District')}
               style={{
                 fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
-                backgroundColor: showBy === 'LGA' ? `${styleConfig.brandColor}15` : 'transparent',
-                color: showBy === 'LGA' ? '#0a0a0a' : '#827398',
+                backgroundColor: showBy === 'District' ? `${styleConfig.brandColor}15` : 'transparent',
+                color: showBy === 'District' ? '#0a0a0a' : '#827398',
               }}
               className="px-3 py-1 rounded text-[10px] font-medium transition-colors"
             >
-              LGA
+              District
             </button>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function HeatmapView({ styleConfig }: HeatmapViewProps) {
 
       {/* Map Visualization */}
       <div className="relative bg-white rounded-lg overflow-hidden h-[400px]">
-        <SydneyHeatmap styleConfig={styleConfig} />
+        <SingaporeHeatmap styleConfig={styleConfig} />
       </div>
 
       {/* Legend */}

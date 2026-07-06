@@ -1,6 +1,6 @@
 import type { StyleConfig } from './CustomizationPopover';
 
-interface SydneyHeatmapProps {
+interface SingaporeHeatmapProps {
   styleConfig: StyleConfig;
 }
 
@@ -11,118 +11,120 @@ interface Region {
   path: string;
 }
 
+// Singapore planning areas, shaded by premium-auto intent concentration.
+// (Stylised blobs — positions are indicative, not a survey-accurate map.)
 const regions: Region[] = [
   {
-    id: 'liverpool',
-    name: 'Liverpool',
+    id: 'orchard',
+    name: 'Orchard',
     index: 214,
     path: 'M 150 280 L 180 265 L 210 270 L 220 300 L 200 320 L 170 315 Z',
   },
   {
-    id: 'bankstown',
-    name: 'Bankstown',
+    id: 'tanglin',
+    name: 'Tanglin',
     index: 206,
     path: 'M 220 240 L 250 230 L 275 245 L 270 275 L 240 285 L 210 270 Z',
   },
   {
-    id: 'campbelltown',
-    name: 'Campbelltown',
+    id: 'bukittimah',
+    name: 'Bukit Timah',
     index: 189,
     path: 'M 200 350 L 230 340 L 255 360 L 245 390 L 215 395 L 190 380 Z',
   },
   {
-    id: 'penrith',
-    name: 'Penrith',
+    id: 'marineparade',
+    name: 'Marine Parade',
     index: 168,
     path: 'M 80 220 L 115 210 L 140 225 L 135 255 L 105 265 L 75 250 Z',
   },
   {
-    id: 'parramatta',
-    name: 'Parramatta',
+    id: 'bukitmerah',
+    name: 'Bukit Merah',
     index: 160,
     path: 'M 180 210 L 210 200 L 235 215 L 230 245 L 200 255 L 175 240 Z',
   },
   {
-    id: 'blacktown',
-    name: 'Blacktown',
+    id: 'novena',
+    name: 'Novena',
     index: 182,
     path: 'M 140 185 L 170 175 L 195 190 L 190 220 L 160 230 L 135 215 Z',
   },
   {
-    id: 'cabramatta',
-    name: 'Cabramatta',
+    id: 'queenstown',
+    name: 'Queenstown',
     index: 160,
     path: 'M 170 290 L 195 280 L 215 295 L 210 320 L 185 325 L 165 310 Z',
   },
   {
-    id: 'camden',
-    name: 'Camden',
+    id: 'bishan',
+    name: 'Bishan',
     index: 189,
     path: 'M 130 330 L 160 320 L 180 335 L 175 365 L 145 370 L 125 355 Z',
   },
   {
-    id: 'stgeorge',
-    name: 'St George',
+    id: 'clementi',
+    name: 'Clementi',
     index: 124,
     path: 'M 260 310 L 285 300 L 305 315 L 300 345 L 275 350 L 255 335 Z',
   },
   {
-    id: 'sutherland',
-    name: 'Sutherland',
+    id: 'serangoon',
+    name: 'Serangoon',
     index: 131,
     path: 'M 245 420 L 275 410 L 295 425 L 290 455 L 260 460 L 240 445 Z',
   },
   {
-    id: 'innerwest',
-    name: 'Inner West',
+    id: 'angmokio',
+    name: 'Ang Mo Kio',
     index: 128,
     path: 'M 240 200 L 265 190 L 285 205 L 280 235 L 255 240 L 235 225 Z',
   },
   {
-    id: 'northshore',
-    name: 'N. Shore',
+    id: 'jurongeast',
+    name: 'Jurong East',
     index: 92,
     path: 'M 280 140 L 305 130 L 325 145 L 320 175 L 295 180 L 275 165 Z',
   },
   {
-    id: 'northernbeaches',
-    name: 'N. Beaches',
+    id: 'toapayoh',
+    name: 'Toa Payoh',
     index: 142,
     path: 'M 350 100 L 375 90 L 395 105 L 390 135 L 365 140 L 345 125 Z',
   },
   {
-    id: 'hornsby',
-    name: 'Hornsby',
+    id: 'woodlands',
+    name: 'Woodlands',
     index: 78,
     path: 'M 240 80 L 265 70 L 285 85 L 280 115 L 255 120 L 235 105 Z',
   },
   {
-    id: 'easternsuburbs',
-    name: 'East',
+    id: 'sengkang',
+    name: 'Sengkang',
     index: 88,
     path: 'M 330 240 L 355 230 L 375 245 L 370 275 L 345 280 L 325 265 Z',
   },
   {
-    id: 'cbd',
-    name: 'CBD',
+    id: 'punggol',
+    name: 'Punggol',
     index: 74,
     path: 'M 290 210 L 310 205 L 325 215 L 320 240 L 300 245 L 285 235 Z',
   },
   {
-    id: 'botany',
-    name: 'Botany Bay',
+    id: 'bedok',
+    name: 'Bedok',
     index: 110,
     path: 'M 310 360 L 335 350 L 355 365 L 350 395 L 325 400 L 305 385 Z',
   },
   {
-    id: 'quakershill',
-    name: 'Quakers Hill',
+    id: 'tampines',
+    name: 'Tampines',
     index: 120,
     path: 'M 115 155 L 140 145 L 160 160 L 155 190 L 130 195 L 110 180 Z',
   },
 ];
 
-export default function SydneyHeatmap({ styleConfig }: SydneyHeatmapProps) {
+export default function SingaporeHeatmap({ styleConfig }: SingaporeHeatmapProps) {
   const getPaletteColors = () => {
     switch (styleConfig.chartPalette) {
       case 'sequential':
@@ -208,7 +210,7 @@ export default function SydneyHeatmap({ styleConfig }: SydneyHeatmapProps) {
           className="text-[11px] italic"
           fill="#90a4ae"
         >
-          Pacific Ocean
+          Singapore Strait
         </text>
         <text
           x="420"
@@ -217,7 +219,7 @@ export default function SydneyHeatmap({ styleConfig }: SydneyHeatmapProps) {
           className="text-[11px] italic"
           fill="#90a4ae"
         >
-          Botany Bay
+          Marina Bay
         </text>
         <text
           x="420"
@@ -226,7 +228,7 @@ export default function SydneyHeatmap({ styleConfig }: SydneyHeatmapProps) {
           className="text-[11px] italic"
           fill="#90a4ae"
         >
-          Sydney Harbour
+          Johor Strait
         </text>
       </svg>
     </div>

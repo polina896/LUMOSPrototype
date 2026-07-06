@@ -151,12 +151,12 @@ export default function PostcodeEditModal({
                 ) : insightType === 'horizontal' ? (
                   <div className="w-full h-full p-6 overflow-y-auto">
                     <div className="space-y-3">
-                      <PostcodeRow rank={1} area="Surry Hills" index={228} households={8400} styleConfig={styleConfig} />
-                      <PostcodeRow rank={2} area="Bondi" index={214} households={12100} styleConfig={styleConfig} />
-                      <PostcodeRow rank={3} area="Parramatta" index={202} households={9700} styleConfig={styleConfig} />
-                      <PostcodeRow rank={4} area="Manly" index={187} households={7200} styleConfig={styleConfig} />
-                      <PostcodeRow rank={5} area="Newtown" index={176} households={5800} styleConfig={styleConfig} />
-                      <PostcodeRow rank={6} area="Penrith" index={168} households={10400} styleConfig={styleConfig} />
+                      <PostcodeRow rank={1} area="Orchard / River Valley" index={228} households={8400} styleConfig={styleConfig} />
+                      <PostcodeRow rank={2} area="Tanglin" index={214} households={12100} styleConfig={styleConfig} />
+                      <PostcodeRow rank={3} area="Bukit Timah" index={202} households={9700} styleConfig={styleConfig} />
+                      <PostcodeRow rank={4} area="Novena" index={187} households={7200} styleConfig={styleConfig} />
+                      <PostcodeRow rank={5} area="Marine Parade" index={176} households={5800} styleConfig={styleConfig} />
+                      <PostcodeRow rank={6} area="Bishan / Ang Mo Kio" index={168} households={10400} styleConfig={styleConfig} />
                     </div>
                   </div>
                 ) : (
