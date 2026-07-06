@@ -1,11 +1,18 @@
+import { useState } from 'react';
+import {
+  GEO_UUD, ModeSwitchers, MapAndPostcodes, BackgroundVerticalBorder,
+  type GeoModeKey, type DayKey,
+} from '@/imports/Screen2Mobility-1';
 import { AskPill, type ModuleRef } from './ModuleAsk';
 import { BlockPinButton } from './MyView';
 
 // ── Mobility & Movement — native section cards ────────────────────────────────
 // The map sections used to live inside one Figma export (Screen2Mobility), so
-// they couldn't be pinned individually. Rebuilt here as self-contained native
-// cards: each carries an Ask pill + a My View pin, and is registered as an anchor
-// so My View can re-render any of them. Data mirrors the previous Figma screen.
+// they couldn't be pinned individually. Split out here as self-contained cards:
+// each carries an Ask pill + a My View pin, and is registered as an anchor so My
+// View can re-render any of them. "Where they live" reuses the exact designed
+// sub-components (takeaway + mode switchers + choropleth map + postcodes) from
+// the Figma export; the rest are lightweight native charts.
 
 const CARD = 'bg-white rounded-[14px] border border-[#e5e5e2] p-[17px] flex flex-col';
 const TITLE = "font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-[21px]";
@@ -27,37 +34,18 @@ function BarRow({ label, pct, val, hot }: { label: string; pct: number; val: str
 
 // ── Visuals ───────────────────────────────────────────────────────────────────
 
-function MapMini() {
-  return (
-    <div
-      className="relative h-[196px] rounded-[10px] overflow-hidden border border-[#e5e5e2]"
-      style={{ background: 'radial-gradient(120px 90px at 30% 42%, rgba(107,60,114,0.50), rgba(107,60,114,0) 70%), radial-gradient(95px 72px at 62% 60%, rgba(107,60,114,0.40), rgba(107,60,114,0) 70%), radial-gradient(70px 55px at 78% 30%, rgba(107,60,114,0.28), rgba(107,60,114,0) 70%), #edeaf0' }}
-    >
-      <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(#e5e5e2 1px, transparent 1px), linear-gradient(90deg, #e5e5e2 1px, transparent 1px)', backgroundSize: '34px 34px', opacity: 0.5 }} />
-      {[['30%', '42%'], ['62%', '60%'], ['78%', '30%']].map(([l, t], i) => (
-        <span key={i} className="absolute w-3 h-3 border-2 border-white" style={{ background: '#6b3c72', borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)', left: l, top: t }} />
-      ))}
-      <span className="absolute font-['Jua',sans-serif] text-[9px] text-[#6b3c72] bg-white/85 rounded px-1.5 py-0.5" style={{ left: '20%', top: '28%' }}>Tampines 3.8×</span>
-      <span className="absolute font-['Jua',sans-serif] text-[9px] text-[#6b3c72] bg-white/85 rounded px-1.5 py-0.5" style={{ left: '56%', top: '70%' }}>Bishan 2.9×</span>
-      <span className="absolute font-['Jua',sans-serif] text-[9px] text-[#6b3c72] bg-white/90 rounded px-1.5 py-0.5" style={{ left: '10px', top: '8px' }}>SINGAPORE</span>
-    </div>
-  );
-}
-
+// Where they live — reuses the exact designed body from the Figma export:
+// purple takeaway + Residential/Daytime/Transaction × Weekday/Weekend switchers
+// + the Singapore choropleth map & top-postcodes list, with the same state.
 function WhereTheyLive() {
+  const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
+  const [dayType, setDayType] = useState<DayKey>('Weekday');
+  const view = GEO_UUD[whereMode][dayType];
   return (
-    <div className="grid grid-cols-[1.6fr_1fr] gap-4">
-      <MapMini />
-      <div className="flex flex-col gap-2.5">
-        <div className={LABEL}>Top home districts</div>
-        <BarRow label="D15 · Tampines" pct={100} val="3.8×" hot />
-        <BarRow label="D20 · Bishan" pct={78} val="2.9×" />
-        <BarRow label="D5 · Buona Vista" pct={64} val="2.4×" />
-        <BarRow label="D10 · Tanglin" pct={55} val="2.1×" />
-        <div className="mt-1.5 pt-2.5 border-t border-dashed border-[#e5e5e2]">
-          <span className={NOTE}>Median travel <b className="text-[#1a1a1a]">14.2km</b> · 90th pct 52km</span>
-        </div>
-      </div>
+    <div className="flex flex-col gap-3">
+      <BackgroundVerticalBorder />
+      <ModeSwitchers whereMode={whereMode} setWhereMode={setWhereMode} dayType={dayType} setDayType={setDayType} />
+      <MapAndPostcodes view={view} caption={`${whereMode} · ${dayType}`} />
     </div>
   );
 }
@@ -147,7 +135,7 @@ function ReachBySite() {
 type SectionMeta = { id: string; title: string; subtitle: string; span: 1 | 3; Visual: () => JSX.Element };
 
 export const MOBILITY_SECTIONS: SectionMeta[] = [
-  { id: 'mob-where-live',     title: 'Where they live',           subtitle: 'Home-origin density · top over-indexing districts', span: 3, Visual: WhereTheyLive },
+  { id: 'mob-where-live',     title: 'Where they live',           subtitle: 'Density of home origins · top over-indexing postcodes · hover → segment mix', span: 3, Visual: WhereTheyLive },
   { id: 'mob-where-transact', title: 'Where they transact',       subtitle: 'Spend density · top districts',                   span: 1, Visual: WhereTheyTransact },
   { id: 'mob-catchment',      title: 'Catchment & origin flows',  subtitle: 'How far they travel · median & 90th pct',         span: 1, Visual: Catchment },
   { id: 'mob-competitor',     title: 'Competitor & POI visitation', subtitle: 'Rival venues · share of visits',                span: 1, Visual: Competitor },

@@ -1468,7 +1468,7 @@ function SegPill({ label, active, onClick }: { label: string; active: boolean; o
   );
 }
 
-function ModeSwitchers({ whereMode, setWhereMode, dayType, setDayType }: { whereMode: GeoModeKey; setWhereMode: (m: GeoModeKey) => void; dayType: DayKey; setDayType: (d: DayKey) => void }) {
+export function ModeSwitchers({ whereMode, setWhereMode, dayType, setDayType }: { whereMode: GeoModeKey; setWhereMode: (m: GeoModeKey) => void; dayType: DayKey; setDayType: (d: DayKey) => void }) {
   return (
     <div className="content-stretch flex gap-[12px] items-center justify-between relative shrink-0 w-full" data-name="Mode + day-part controls">
       <div className="flex gap-[2px] items-center bg-[#f3f3f1] rounded-[8px] p-[3px] shrink-0">
@@ -1489,9 +1489,9 @@ function ModeSwitchers({ whereMode, setWhereMode, dayType, setDayType }: { where
 // Mirrors the Data-Explorer sidebar: switching mode / day-part swaps the heatmap
 // fills, hover chip and top postcodes. The blob SHAPES stay fixed (same as the
 // sidebar) — only the data driving them changes.
-type GeoModeKey = 'Residential' | 'Daytime' | 'Transaction';
-type DayKey = 'Weekday' | 'Weekend';
-type GeoView = {
+export type GeoModeKey = 'Residential' | 'Daytime' | 'Transaction';
+export type DayKey = 'Weekday' | 'Weekend';
+export type GeoView = {
   fills: string[]; // 7 colours, one per heat blob (light = low density, dark = high)
   hover: { code: string; mix: string };
   postLabel: string;
@@ -1503,7 +1503,7 @@ const HEAT_PATHS = [
   svgPaths.p39bc5600, svgPaths.pbae8c40, svgPaths.pf0a5400, svgPaths.p2a414000,
 ];
 
-const GEO_UUD: Record<GeoModeKey, Record<DayKey, GeoView>> = {
+export const GEO_UUD: Record<GeoModeKey, Record<DayKey, GeoView>> = {
   Residential: {
     Weekday: {
       fills: ['#9A6BA1', '#6B3C72', '#CDB6D2', '#B890BD', '#6B3C72', '#D8C6DC', '#EFE7F1'],
@@ -1651,7 +1651,7 @@ function Postcodes({ view }: { view: GeoView }) {
   );
 }
 
-function MapAndPostcodes({ view, caption }: { view: GeoView; caption: string }) {
+export function MapAndPostcodes({ view, caption }: { view: GeoView; caption: string }) {
   return (
     <div className="h-[200px] relative shrink-0 w-full" data-name="Container">
       <div className="gap-x-[14px] gap-y-[14px] grid grid-cols-[minmax(0,1.40fr)_minmax(0,1fr)] grid-rows-[200px] relative size-full">
@@ -1662,7 +1662,7 @@ function MapAndPostcodes({ view, caption }: { view: GeoView; caption: string }) 
   );
 }
 
-function BackgroundVerticalBorder() {
+export function BackgroundVerticalBorder() {
   return (
     <div className="bg-[#f1e9ff] relative rounded-[10px] shrink-0 w-full" data-name="Background+VerticalBorder">
       <div aria-hidden className="absolute border-[#6b3c72] border-l-3 border-solid inset-0 pointer-events-none rounded-[10px]" />
