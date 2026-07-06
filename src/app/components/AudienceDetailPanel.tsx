@@ -679,6 +679,12 @@ export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, 
                     </div>
                   </div>
 
+                  {/* expand CTA — sits directly under the map */}
+                  <button onClick={() => setMapExpanded(true)} className="flex items-center gap-1.5 mt-3 font-['Jua',sans-serif] text-[12px] text-[#6b3c72] hover:opacity-70 transition-opacity">
+                    Expand map
+                    <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6" /></svg>
+                  </button>
+
                   {/* short insight */}
                   <div className="flex gap-2 items-start font-['Jua',sans-serif] text-[12px] text-[#1a1a1a] leading-[1.5] mt-2.5">
                     <svg className="w-[14px] h-[14px] text-[#6b3c72] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -695,12 +701,6 @@ export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, 
                   <div className="mt-3 pt-3 border-t border-[#eeebef]">
                     <AudienceDensity audienceId={audienceId} mode={whereMode} variant="panel" />
                   </div>
-
-                  {/* expand CTA */}
-                  <button onClick={() => setMapExpanded(true)} className="flex items-center gap-1.5 mt-3 font-['Jua',sans-serif] text-[12px] text-[#6b3c72] hover:opacity-70 transition-opacity">
-                    Expand map
-                    <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6" /></svg>
-                  </button>
                 </>
               )}
             </div>
