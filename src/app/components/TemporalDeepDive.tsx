@@ -1,6 +1,7 @@
 import AudienceDensity from './AudienceDensity';
 import { GlobalFilterBar } from './AudienceProfileContent';
 import { BlockDeck } from './DeepDiveBlock';
+import { BlockPinButton } from './MyView';
 import type { BlockConfig } from './deepDiveBlocks';
 import { AskPill, type ModuleRef } from './ModuleAsk';
 
@@ -10,6 +11,9 @@ import { AskPill, type ModuleRef } from './ModuleAsk';
 // daypart analysis below becomes an editable deck of blocks (seedTemporalBlocks).
 
 const AUD_ID = 'urban-upgrade-drivers';
+
+// Stable id for the density anchor so it can be pinned to My View.
+export const TEMPORAL_DENSITY_ID = 'tmp-density';
 
 type DeckHostProps = {
   blocks: BlockConfig[];
@@ -21,6 +25,34 @@ type DeckHostProps = {
   audience?: string;
   onAskGraph?: (ref: ModuleRef) => void;
 };
+
+// ── Peak days & dayparts — the shared Audience Density hour × day heatmap. ──
+// A fixed anchor (not a config-driven block). It carries two affordances: the
+// "Ask Lumos" pill (pin into the docked chat) and the My View pin (add to the
+// dashboard). Exported so My View can re-render it when pinned.
+export function PeakDaysDaypartsCard({ audience = 'this audience', onAskGraph }: { audience?: string; onAskGraph?: (ref: ModuleRef) => void }) {
+  return (
+    <div className="rounded-[14px] border border-[#e5e5e2] bg-white px-5 py-4">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex flex-col gap-0.5">
+          <p className="font-['Jua',sans-serif] text-[15px] text-[#1a1a1a]">Peak days &amp; dayparts</p>
+          <p className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a]">Hour × day · indexed density · ★ = best time to reach</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <AskPill
+            id={`aud:${AUD_ID}:temporal:density`}
+            label="Peak days & dayparts"
+            audience={audience}
+            state={['Residential']}
+            onAsk={onAskGraph}
+          />
+          <BlockPinButton id={TEMPORAL_DENSITY_ID} />
+        </div>
+      </div>
+      <AudienceDensity audienceId={AUD_ID} mode="Residential" variant="expanded" earlyRiser hideTitle />
+    </div>
+  );
+}
 
 // ── Summary strip (hero) ──────────────────────────────────────────────────────
 function SummaryStrip() {
@@ -65,24 +97,7 @@ export default function TemporalDeepDive({ blocks, scopeId, onAskBlock, onAddBlo
       <SummaryStrip />
 
       {/* Fixed anchor: the shared Audience Density hour × day heatmap. */}
-      <div className="rounded-[14px] border border-[#e5e5e2] bg-white px-5 py-4">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex flex-col gap-0.5">
-            <p className="font-['Jua',sans-serif] text-[15px] text-[#1a1a1a]">Peak days &amp; dayparts</p>
-            <p className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a]">Hour × day · indexed density · ★ = best time to reach</p>
-          </div>
-          {/* Pin this graph into the docked Ask Lumos chat — same affordance the
-              editable blocks carry, so the density anchor is askable too. */}
-          <AskPill
-            id={`aud:${AUD_ID}:temporal:density`}
-            label="Peak days & dayparts"
-            audience={audience}
-            state={['Residential']}
-            onAsk={onAskGraph}
-          />
-        </div>
-        <AudienceDensity audienceId={AUD_ID} mode="Residential" variant="expanded" earlyRiser hideTitle />
-      </div>
+      <PeakDaysDaypartsCard audience={audience} onAskGraph={onAskGraph} />
 
       {/* Editable deck: seasonal / daypart analysis. */}
       <BlockDeck blocks={blocks} scopeId={scopeId} onAsk={onAskBlock} onAdd={onAddBlock} />
