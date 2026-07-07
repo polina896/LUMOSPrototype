@@ -57,6 +57,9 @@ export default function App() {
   const [showDataExplorer, setShowDataExplorer] = useState(false);
   const [showAudiences, setShowAudiences] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
+  // Bumped every time the Documents nav is clicked, so DocumentsPanel remounts
+  // to its landing state (never lingering on a doc viewer or template gallery).
+  const [documentsNavKey, setDocumentsNavKey] = useState(0);
   const [profileViewerId, setProfileViewerId] = useState<string | null>(null);
   const [profileViewerName, setProfileViewerName] = useState<string | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]);
@@ -151,7 +154,7 @@ export default function App() {
           if (!next) closeDeepDive();
         }}
         showDocuments={showDocuments}
-        onToggleDocuments={() => { setShowDocuments((v) => !v); setShowAudiences(false); setShowDataExplorer(false); setCompareActive(false); setCreateAudienceActive(false); closeDeepDive(); }}
+        onToggleDocuments={() => { setShowDocuments(true); setDocumentsNavKey((k) => k + 1); setShowAudiences(false); setShowDataExplorer(false); setCompareActive(false); setCreateAudienceActive(false); closeDeepDive(); }}
         recentAnalyses={recentAnalyses}
         activeAnalysisId={activeAnalysisId}
         onSelectAnalysis={(id) => setActiveAnalysisId(id)}
@@ -170,7 +173,7 @@ export default function App() {
           onExit={() => setCompareActive(false)}
         />
       ) : showDocuments ? (
-        <DocumentsPanel savedDocuments={savedDocuments} />
+        <DocumentsPanel key={documentsNavKey} savedDocuments={savedDocuments} />
       ) : showAudiences ? (
         profileViewerId ? (
           <AudienceProfileViewer
