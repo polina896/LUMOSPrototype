@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import DeepDiveBlock from './DeepDiveBlock';
 import type { BlockConfig } from './deepDiveBlocks';
 
@@ -78,20 +78,20 @@ export function MyViewTab({
   order, blockMap, anchors, sourceOf, catalog, scopeId, onReorder, onToggle, onAsk, onBrowse,
 }: MyViewTabProps) {
   const [customizeOpen, setCustomizeOpen] = useState(false);
-  const dragId = useRef<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
   const pinnedIds = order.filter((id) => blockMap[id] || anchors[id]);
 
   const handleDrop = (targetId: string) => {
-    const from = pinnedIds.indexOf(dragId.current ?? '');
+    const from = pinnedIds.indexOf(dragId ?? '');
     const to = pinnedIds.indexOf(targetId);
-    if (from === -1 || to === -1 || from === to) { dragId.current = null; setOverId(null); return; }
+    if (from === -1 || to === -1 || from === to) { setDragId(null); setOverId(null); return; }
     const next = [...pinnedIds];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
     onReorder(next);
-    dragId.current = null;
+    setDragId(null);
     setOverId(null);
   };
 
@@ -180,17 +180,26 @@ export function MyViewTab({
             return (
               <div
                 key={id}
-                draggable
-                onDragStart={() => { dragId.current = id; }}
-                onDragOver={(e) => { e.preventDefault(); if (id !== dragId.current) setOverId(id); }}
+                onDragOver={(e) => { if (!dragId) return; e.preventDefault(); if (id !== dragId) setOverId(id); }}
                 onDragLeave={() => setOverId((o) => (o === id ? null : o))}
                 onDrop={(e) => { e.preventDefault(); handleDrop(id); }}
-                onDragEnd={() => { dragId.current = null; setOverId(null); }}
-                className={`relative ${span3 ? 'col-span-3' : 'col-span-1'} ${dragId.current === id ? 'opacity-40' : ''} ${overId === id ? 'ring-2 ring-[#d9c9e0] rounded-[14px]' : ''}`}
+                className={`relative transition-opacity ${span3 ? 'col-span-3' : 'col-span-1'} ${dragId === id ? 'opacity-40' : ''} ${overId === id ? 'ring-2 ring-[#d9c9e0] rounded-[14px]' : ''}`}
               >
                 {/* source chip — this dashboard mixes modules from different tabs */}
                 <span className="absolute -top-2 left-3 z-10 px-2 py-[1px] rounded-full bg-white border border-[#e5e5e2] font-['Jua',sans-serif] text-[9px] text-[#9a9a9a] whitespace-nowrap">
                   {sourceOf[id]}
+                </span>
+                {/* drag handle — the one thing you grab to reorder. Native DnD can't
+                    reliably start from the card body (charts/SVGs/buttons swallow it),
+                    so reordering hangs off this dedicated grip. */}
+                <span
+                  draggable
+                  onDragStart={(e) => { setDragId(id); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id); }}
+                  onDragEnd={() => { setDragId(null); setOverId(null); }}
+                  title="Drag to reorder"
+                  className="absolute -top-2 right-3 z-10 flex items-center justify-center w-[22px] h-[18px] rounded-full bg-white border border-[#e5e5e2] text-[#9a9a9a] cursor-grab active:cursor-grabbing hover:text-[#6b6b6b] hover:border-[#d9c9e0]"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01" /></svg>
                 </span>
                 {b ? <DeepDiveBlock config={b} active={scopeId === id} onAsk={onAsk} /> : anchor?.render()}
               </div>
