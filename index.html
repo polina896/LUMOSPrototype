@@ -9,7 +9,14 @@
       <meta name="description" content="Easily upload and manage files and images, enabling users to organize, share, and collaborate on visual content efficiently." />
       <meta name="robots" content="noindex, nofollow" />
       <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
-      
+
+      <!-- LumosMap feature: Leaflet (required by lumos-map.js) + its display fonts -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+      <!-- LumosMap module — attaches window.LumosMap; must load after Leaflet -->
+      <script src="/lumos-map.js"></script>
+
     </head>
 
     <body>

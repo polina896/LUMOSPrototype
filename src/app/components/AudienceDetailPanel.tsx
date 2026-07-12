@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bookmark, Download, MoreHorizontal, FileText, ArrowRight, Maximize2, Plus, Minus, X, Check } from 'lucide-react';
+import { Bookmark, Download, MoreHorizontal, FileText, ArrowRight, Maximize2, X, Check } from 'lucide-react';
 import { AUDIENCES, type AudienceId } from '../audienceData';
 import type { Screen } from '../App';
 import DataSourcesPopover from './DataSourcesPopover';
@@ -187,90 +187,8 @@ const EXTENDED: Record<string, {
   },
 };
 
-// ── Geo intelligence: residential / daytime / transaction, weekday vs weekend ──
-
-type GeoDistrict = { id: string; x: number; y: number; color: string; textColor: string };
-type GeoView = { districts: GeoDistrict[]; insight: string; insightBold: string; window: string; times: { slot: string; pct: number }[] };
-type GeoMode = { mapLabel: string; weekday: GeoView; weekend: GeoView };
-type GeoData = { Residential: GeoMode; Daytime: GeoMode; Transaction: GeoMode };
 export type GeoModeKey = 'Residential' | 'Daytime' | 'Transaction';
 export type DayTypeKey = 'Weekday' | 'Weekend';
-
-const GEO_TONE = {
-  hi:    { color: '#6B3C72', textColor: '#ffffff' },
-  mid:   { color: '#8A5C90', textColor: '#ffffff' },
-  lo:    { color: '#BEBDE7', textColor: '#4a2a50' },
-  faint: { color: '#D9CCE3', textColor: '#4a2a50' },
-} as const;
-const GEO_POS = [{ x: 100, y: 78 }, { x: 158, y: 74 }, { x: 216, y: 78 }, { x: 286, y: 92 }];
-const GEO_SLOTS = ['Morning', 'Midday', 'Afternoon', 'Evening'] as const;
-type Tone = keyof typeof GEO_TONE;
-
-function gv(
-  ids: [string, string, string, string],
-  tones: [Tone, Tone, Tone, Tone],
-  insight: string, insightBold: string, windowLabel: string, times: [number, number, number, number],
-): GeoView {
-  return {
-    districts: ids.map((id, i) => ({ id, x: GEO_POS[i].x, y: GEO_POS[i].y, ...GEO_TONE[tones[i]] })),
-    insight, insightBold, window: windowLabel,
-    times: GEO_SLOTS.map((slot, i) => ({ slot, pct: times[i] })),
-  };
-}
-
-const GEO: Record<string, GeoData> = {
-  'premium-sedan-intenders': {
-    Residential: {
-      mapLabel: 'Home districts',
-      weekday: gv(['D10', 'D11', 'D9', 'D15'], ['hi', 'mid', 'lo', 'faint'], "Anchored in prime districts 9–11 — Singapore's affluent central core.", 'districts 9–11', 'Weekday 7–10pm', [12, 16, 28, 44]),
-      weekend: gv(['D10', 'D11', 'D9', 'D15'], ['hi', 'mid', 'lo', 'faint'], 'Home on weekend mornings, planning showroom visits before midday.', 'weekend mornings', 'Weekend 9am–12pm', [42, 32, 18, 14]),
-    },
-    Daytime: {
-      mapLabel: 'Daytime hotspots',
-      weekday: gv(['D1', 'D2', 'D6', 'D9'], ['hi', 'mid', 'mid', 'lo'], 'Office hours cluster in the CBD around Raffles Place & Marina.', 'the CBD', 'Weekday 12–2pm', [18, 42, 28, 12]),
-      weekend: gv(['D9', 'D10', 'D11', 'D15'], ['hi', 'mid', 'lo', 'faint'], 'Weekends shift to Orchard & lifestyle enclaves.', 'Orchard & lifestyle enclaves', 'Weekend 11am–2pm', [22, 40, 30, 8]),
-    },
-    Transaction: {
-      mapLabel: 'Spend & showroom zones',
-      weekday: gv(['D9', 'D1', 'D10', 'D6'], ['hi', 'mid', 'lo', 'faint'], 'Weekday spend skews to premium retail & dining in Orchard.', 'premium retail & dining', 'Weekday 6–9pm', [10, 22, 30, 38]),
-      weekend: gv(['D14', 'D3', 'D9', 'D15'], ['hi', 'mid', 'lo', 'faint'], 'Saturday showroom visits peak in the dealership belt (D3, D14).', 'showroom visits', 'Saturday 11am–3pm', [20, 40, 32, 8]),
-    },
-  },
-  'ev-upgrade-shoppers': {
-    Residential: {
-      mapLabel: 'Home districts',
-      weekday: gv(['D5', 'D20', 'D12', 'D19'], ['hi', 'mid', 'lo', 'faint'], 'Cluster near one-north & Bishan — close to charging hubs.', 'charging hubs', 'Weekday 7–9am', [44, 24, 20, 12]),
-      weekend: gv(['D5', 'D20', 'D12', 'D19'], ['hi', 'mid', 'lo', 'faint'], 'Home-based weekend mornings, comparing models online.', 'weekend mornings', 'Weekend 9–11am', [40, 30, 18, 12]),
-    },
-    Daytime: {
-      mapLabel: 'Daytime hotspots',
-      weekday: gv(['D1', 'D5', 'D3', 'D12'], ['hi', 'mid', 'mid', 'lo'], 'Daytime in the one-north & CBD tech corridor.', 'tech corridor', 'Weekday 7–9am', [40, 26, 22, 12]),
-      weekend: gv(['D5', 'D12', 'D19', 'D20'], ['hi', 'mid', 'lo', 'faint'], 'Weekends near charging stops & lifestyle malls.', 'charging stops', 'Weekend 10am–1pm', [22, 38, 28, 12]),
-    },
-    Transaction: {
-      mapLabel: 'Spend & showroom zones',
-      weekday: gv(['D1', 'D5', 'D3', 'D12'], ['hi', 'mid', 'lo', 'faint'], 'Weekday spend is digital-first — app & online, low foot traffic.', 'digital-first', 'Weekday 7–9am', [38, 24, 24, 14]),
-      weekend: gv(['D5', 'D14', 'D12', 'D19'], ['hi', 'mid', 'lo', 'faint'], 'Weekend test-drives cluster near EV showrooms & charging points.', 'test-drives', 'Weekend 11am–2pm', [20, 40, 28, 12]),
-    },
-  },
-  'family-suv-upgraders': {
-    Residential: {
-      mapLabel: 'Home districts',
-      weekday: gv(['D18', 'D16', 'D19', 'D27'], ['hi', 'mid', 'lo', 'faint'], 'Heartland HDB & condo belts in the east and west.', 'east and west', 'Weekday 8–10pm', [16, 18, 30, 36]),
-      weekend: gv(['D18', 'D16', 'D19', 'D27'], ['hi', 'mid', 'lo', 'faint'], 'Home base for weekend family routines & school runs.', 'weekend family routines', 'Weekend 9am–12pm', [38, 30, 20, 12]),
-    },
-    Daytime: {
-      mapLabel: 'Daytime hotspots',
-      weekday: gv(['D18', 'D1', 'D16', 'D19'], ['hi', 'mid', 'lo', 'faint'], 'Split between workplaces and school-zone corridors.', 'school-zone corridors', 'Weekday 8–9am', [36, 22, 28, 14]),
-      weekend: gv(['D18', 'D16', 'D19', 'D27'], ['hi', 'mid', 'lo', 'faint'], 'Weekends at malls, enrichment centres & nature parks.', 'malls & nature parks', 'Weekend 10am–1pm', [24, 38, 30, 8]),
-    },
-    Transaction: {
-      mapLabel: 'Spend & showroom zones',
-      weekday: gv(['D18', 'D16', 'D19', 'D1'], ['hi', 'mid', 'lo', 'faint'], 'Weekday spend near home — groceries, enrichment, fuel.', 'near home', 'Weekday 6–8pm', [12, 20, 32, 36]),
-      weekend: gv(['D18', 'D22', 'D3', 'D16'], ['hi', 'mid', 'lo', 'faint'], 'Saturday showroom visits with the family in tow.', 'with the family', 'Saturday 1–4pm', [16, 30, 42, 12]),
-    },
-  },
-};
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
@@ -304,24 +222,6 @@ function BarRow({ label, pct, lead, val }: { label: string; pct: number; lead: b
   );
 }
 
-function SegControl({ options, active, onChange }: { options: string[]; active: string; onChange: (t: string) => void }) {
-  return (
-    <div className="inline-flex bg-[#f1ecf3] rounded-[8px] p-[3px] gap-[2px]">
-      {options.map((o) => (
-        <button
-          key={o}
-          onClick={() => onChange(o)}
-          className={`font-['Jua',sans-serif] text-[11px] px-2.5 py-[5px] rounded-[6px] transition-colors whitespace-nowrap ${
-            active === o ? 'bg-white text-[#6b3c72] shadow-[0_1px_2px_rgba(0,0,0,0.07)]' : 'text-[#9a9a9a] hover:text-[#6b6b6b]'
-          }`}
-        >
-          {o}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function TakeawayInline({ text }: { text: React.ReactNode }) {
   return (
     <div className="flex gap-2 items-start bg-[#f1e9ff] rounded-[10px] px-3 py-2 mt-3">
@@ -343,145 +243,15 @@ function SectionHead({ num, title, aside, reserveAsk }: { num: string; title: st
   );
 }
 
-function MapSVG({ districts }: { districts: { id: string; x: number; y: number; color: string; textColor: string }[] }) {
-  const polys = [
-    { pts: '60,57 120,45 150,74 110,98 65,90', i: 0 },
-    { pts: '150,74 120,45 185,37 215,66 180,94 110,98', i: 1 },
-    { pts: '215,66 185,37 255,45 270,82 230,98 180,94', i: 2 },
-    { pts: '270,82 255,45 320,62 330,103 285,115 230,98', i: 3 },
-    { pts: '180,94 230,98 285,115 250,139 175,135 130,123 110,98', i: 4 },
-    { pts: '330,103 320,62 360,78 355,123 285,115', i: 5 },
-  ];
-  const colors = districts.map(d => d.color);
-  const fills = [colors[0] ?? '#BEBDE7', colors[1] ?? '#D9CCE3', colors[2] ?? '#BEBDE7', colors[3] ?? '#6B3C72', '#D9CCE3', '#F1E9FF'];
-
-  return (
-    <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" className="block w-full h-auto">
-      <rect width="400" height="150" fill="#FAFAF8"/>
-      {polys.map((p) => (
-        <polygon key={p.i} points={p.pts} fill={fills[p.i]} />
-      ))}
-      {districts.map((d) => (
-        <text key={d.id} x={d.x} y={d.y} fontFamily="Jua" fontSize="10" fill={d.textColor}>{d.id}</text>
-      ))}
-    </svg>
-  );
-}
-
-// ── Expand-map view: intermediate inspection layer over the sidebar ──────────
-function ExpandedMapModal({
-  audienceId, audienceName, whereMode, setWhereMode, dayType, setDayType, geoMode, view, onClose,
-}: {
-  audienceId: AudienceId; audienceName: string;
-  whereMode: GeoModeKey; setWhereMode: (m: GeoModeKey) => void;
-  dayType: DayTypeKey; setDayType: (d: DayTypeKey) => void;
-  geoMode: GeoMode; view: GeoView; onClose: () => void;
-}) {
-  // Esc closes — matches click-outside and the explicit X.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
-      style={{ background: 'rgba(26,12,30,0.45)' }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-[14px] border border-[#e5e5e2] shadow-2xl flex flex-col overflow-hidden w-full"
-        style={{ maxWidth: 940, maxHeight: '88vh' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header — continuity lockup: audience + current state chip */}
-        <div className="flex-none flex items-start justify-between gap-4 px-5 py-3.5 border-b border-[#e5e5e2]">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 mb-1">
-              <svg className="w-[12px] h-[12px] text-[#6b3c72] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6" /></svg>
-              <span className="font-['Jua',sans-serif] text-[10px] uppercase tracking-[0.08em] text-[#9a9a9a]">Expanded map · inspection view</span>
-            </div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="font-['Jua',sans-serif] text-[16px] text-[#1a1a1a] truncate">{audienceName}</span>
-              <span className="inline-flex items-center gap-1.5 font-['Jua',sans-serif] text-[11px] text-[#6b3c72] bg-[#f1e9ff] px-2 py-0.5 rounded-[7px] whitespace-nowrap">{geoMode.mapLabel} · {dayType}</span>
-            </div>
-          </div>
-          <button onClick={onClose} title="Close (Esc)" className="shrink-0 w-[30px] h-[30px] flex items-center justify-center border border-[#e5e5e2] rounded-lg hover:bg-gray-50 transition-colors">
-            <X className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-        </div>
-
-        {/* Controls — same switches as the sidebar, mutating shared state */}
-        <div className="flex-none flex items-center justify-between gap-2 px-5 py-3 border-b border-[#e5e5e2] flex-wrap bg-[#fafaf9]">
-          <SegControl options={['Residential', 'Daytime', 'Transaction']} active={whereMode} onChange={(v) => setWhereMode(v as GeoModeKey)} />
-          <SegControl options={['Weekday', 'Weekend']} active={dayType} onChange={(v) => setDayType(v as DayTypeKey)} />
-        </div>
-
-        {/* Body — map dominant on top, supporting context stacked below */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-5 flex flex-col gap-4">
-          {/* large primary map */}
-          <div className="relative border border-[#e5e5e2] rounded-[12px] overflow-hidden bg-[#fafaf8] min-h-[300px] flex items-center">
-            <span className="absolute left-3 top-3 font-['Jua',sans-serif] text-[10px] uppercase tracking-[0.08em] text-[#9a9a9a] z-10">{geoMode.mapLabel} · {dayType}</span>
-            <div className="absolute top-3 right-3 flex flex-col bg-white/90 border border-[#e5e5e2] rounded-lg overflow-hidden z-10">
-              <button className="w-[28px] h-[28px] flex items-center justify-center text-[#6b6b6b] hover:text-[#6b3c72] border-b border-[#e5e5e2] transition-colors"><Plus className="w-3.5 h-3.5" /></button>
-              <button className="w-[28px] h-[28px] flex items-center justify-center text-[#6b6b6b] hover:text-[#6b3c72] transition-colors"><Minus className="w-3.5 h-3.5" /></button>
-            </div>
-            <MapSVG districts={view.districts} />
-            <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-white/85 px-2 py-1 rounded-[6px]">
-              <span className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a]">Low</span>
-              <div className="w-[48px] h-[6px] rounded-[4px]" style={{ background: 'linear-gradient(90deg, #F1E9FF, #6B3C72)' }} />
-              <span className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a]">High</span>
-            </div>
-          </div>
-
-          {/* concise insight for the selected state */}
-          <div className="flex gap-2 items-start bg-[#f1e9ff] rounded-[10px] px-3 py-2.5">
-            <svg className="w-[14px] h-[14px] text-[#6b3c72] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" /></svg>
-            <span className="font-['Jua',sans-serif] text-[12px] text-[#1a1a1a] leading-[1.5]">
-              {view.insight.split(view.insightBold).map((part, i) =>
-                i === 0 ? part : <span key={i}><strong className="text-[#6b3c72]">{view.insightBold}</strong>{part}</span>
-              )}
-            </span>
-          </div>
-
-          {/* density — hour × day heatmap, under the map */}
-          <div className="pt-1 border-t border-[#eeebef]">
-            <AudienceDensity audienceId={audienceId} mode={whereMode} variant="expanded" />
-          </div>
-        </div>
-
-        {/* Footer — progressive path to the deeper report */}
-        <div className="flex-none border-t border-[#e5e5e2] px-5 py-3 flex items-center gap-2.5 bg-white flex-wrap">
-          <p className="font-['Jua',sans-serif] text-[11px] text-[#9a9a9a] mr-auto">Inspecting geography — open the full report for deeper analysis.</p>
-          <button className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#6b3c72] hover:bg-[#5c2375] text-white rounded-lg font-['Jua',sans-serif] text-[13px] transition-colors">
-            <Bookmark className="w-3.5 h-3.5" />Save audience
-          </button>
-          <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-[#e5e5e2] bg-white rounded-lg font-['Jua',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-            Open full report
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Main component ───────────────────────────────────────────────────────────
 
 export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, onOpenFullPage, isSaved = false, onSave }: { audienceId: AudienceId; screen?: Screen; onClose?: () => void; onAskInChat?: (ref: ModuleRef) => void; onOpenFullPage?: (id: AudienceId, name: string) => void; isSaved?: boolean; onSave?: (id: AudienceId) => void }) {
   const [whoTab, setWhoTab] = useState('Demographics');
-  const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
-  const [dayType, setDayType] = useState<DayTypeKey>('Weekday');
-  const [mapExpanded, setMapExpanded] = useState(false);
   const [howTab, setHowTab] = useState('Brief');
   const [showExport, setShowExport] = useState(false);
 
   const audience = AUDIENCES.find((a) => a.id === audienceId)!;
   const ext = EXTENDED[audienceId];
-  const geo = GEO[audienceId];
-  const geoMode = geo?.[whereMode];
-  const view = dayType === 'Weekday' ? geoMode?.weekday : geoMode?.weekend;
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -650,59 +420,14 @@ export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, 
             </div>
             </Module>
 
-            {/* §2 WHERE THEY ARE — geo intelligence */}
-            <Module id={`aud:${audienceId}:where`} label="Where they are" audience={audience.name} state={[whereMode, dayType]} onAsk={onAskInChat}>
+            {/* §2 WHEN TO REACH THEM — temporal density */}
+            {/* The Residential/Daytime/Transaction × Weekday/Weekend lens now lives
+                on the LumosMap, so this section drops the switches and focuses on
+                timing: the hour × day density heatmap and its best-window takeaway. */}
+            <Module id={`aud:${audienceId}:when`} label="When to reach them" audience={audience.name} onAsk={onAskInChat}>
             <div className="py-4 border-b border-[#e5e5e2]">
-              <SectionHead num="2" title="Where they are" aside="Geo intelligence" reserveAsk />
-
-              {geo && view && (
-                <>
-                  {/* location mode + weekday/weekend switches */}
-                  <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-                    <SegControl options={['Residential', 'Daytime', 'Transaction']} active={whereMode} onChange={(v) => setWhereMode(v as GeoModeKey)} />
-                    <SegControl options={['Weekday', 'Weekend']} active={dayType} onChange={(v) => setDayType(v as DayTypeKey)} />
-                  </div>
-
-                  {/* map — primary geo anchor */}
-                  <div className="relative border border-[#e5e5e2] rounded-[10px] overflow-hidden bg-[#fafaf8]">
-                    <span className="absolute left-2 top-2 font-['Jua',sans-serif] text-[9.5px] uppercase tracking-[0.08em] text-[#9a9a9a] z-10">{geoMode!.mapLabel} · {dayType}</span>
-                    <div className="absolute top-2 right-2 flex flex-col bg-white/90 border border-[#e5e5e2] rounded-lg overflow-hidden z-10">
-                      <button className="w-[26px] h-[26px] flex items-center justify-center text-[#6b6b6b] hover:text-[#6b3c72] border-b border-[#e5e5e2] transition-colors"><Plus className="w-3.5 h-3.5" /></button>
-                      <button className="w-[26px] h-[26px] flex items-center justify-center text-[#6b6b6b] hover:text-[#6b3c72] border-b border-[#e5e5e2] transition-colors"><Minus className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setMapExpanded(true)} title="Expand map" className="w-[26px] h-[26px] flex items-center justify-center text-[#6b6b6b] hover:text-[#6b3c72] transition-colors"><Maximize2 className="w-3 h-3" /></button>
-                    </div>
-                    <MapSVG districts={view.districts} />
-                    <div className="absolute right-2 bottom-2 flex items-center gap-1.5 bg-white/85 px-1.5 py-0.5 rounded-[6px]">
-                      <span className="font-['Jua',sans-serif] text-[9.5px] text-[#9a9a9a]">Low</span>
-                      <div className="w-[40px] h-[6px] rounded-[4px]" style={{ background: 'linear-gradient(90deg, #F1E9FF, #6B3C72)' }} />
-                      <span className="font-['Jua',sans-serif] text-[9.5px] text-[#9a9a9a]">High</span>
-                    </div>
-                  </div>
-
-                  {/* expand CTA — sits directly under the map */}
-                  <button onClick={() => setMapExpanded(true)} className="flex items-center gap-1.5 mt-3 font-['Jua',sans-serif] text-[12px] text-[#6b3c72] hover:opacity-70 transition-opacity">
-                    Expand map
-                    <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 14v6h6M20 10V4h-6M14 10l6-6M10 14l-6 6" /></svg>
-                  </button>
-
-                  {/* short insight */}
-                  <div className="flex gap-2 items-start font-['Jua',sans-serif] text-[12px] text-[#1a1a1a] leading-[1.5] mt-2.5">
-                    <svg className="w-[14px] h-[14px] text-[#6b3c72] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" />
-                    </svg>
-                    <span>
-                      {view.insight.split(view.insightBold).map((part, i) =>
-                        i === 0 ? part : <span key={i}><strong className="text-[#6b3c72]">{view.insightBold}</strong>{part}</span>
-                      )}
-                    </span>
-                  </div>
-
-                  {/* density — when they're present & best time to reach, tied to the selected mode */}
-                  <div className="mt-3 pt-3 border-t border-[#eeebef]">
-                    <AudienceDensity audienceId={audienceId} mode={whereMode} variant="panel" />
-                  </div>
-                </>
-              )}
+              <SectionHead num="2" title="When to reach them" aside="Best time to reach" reserveAsk />
+              <AudienceDensity audienceId={audienceId} mode="Residential" variant="panel" />
             </div>
             </Module>
 
@@ -802,18 +527,6 @@ export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, 
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-
-          {/* ── Expand-map view ── */}
-          {mapExpanded && geo && view && geoMode && ext && (
-            <ExpandedMapModal
-              audienceId={audienceId}
-              audienceName={audience.name}
-              whereMode={whereMode} setWhereMode={setWhereMode}
-              dayType={dayType} setDayType={setDayType}
-              geoMode={geoMode} view={view}
-              onClose={() => setMapExpanded(false)}
-            />
-          )}
       </>
     </div>
   );
