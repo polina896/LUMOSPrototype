@@ -9,6 +9,7 @@ import AudienceLibrary from './components/AudienceLibrary';
 import AudienceProfileViewer from './components/AudienceProfileViewer';
 import CompareFlow, { type SavedAudience } from './components/CompareFlow';
 import CreateAudienceFlow from './components/CreateAudienceFlow';
+import LumosMapStage from './components/LumosMapStage';
 import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
@@ -138,6 +139,11 @@ export default function App() {
     }
   }, [screen]);
 
+  // Once the chat has confirmed the audience segments, the chat collapses to a
+  // slim left rail and the LumosMap opens as the center stage (the geographic map
+  // no longer lives inside the audience detail panel).
+  const segmentsIdentified = screen === 'profiles' || screen === 'deep-dive';
+
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
       <Sidebar
@@ -189,22 +195,37 @@ export default function App() {
           />
         )
       ) : (
-        <ChatPanel
-          screen={screen}
-          setScreen={setScreen}
-          onAddTextBlock={onAddTextBlock}
-          setIsGeneratingBlock={setIsGeneratingBlock}
-          entryMode={entryMode}
-          setEntryMode={setEntryMode}
-          setIsAnalysisComplete={setIsAnalysisComplete}
-          selectedAudienceId={selectedAudienceId}
-          setSelectedAudienceId={setSelectedAudienceId}
-          onNewAnalysis={handleNewAnalysis}
-          chatContext={chatContext}
-          onRemoveChatContext={removeChatContext}
-          onClearChatContext={() => setChatContext([])}
-          onStartCompare={startCompare}
-        />
+        <>
+          {/* Chat — full width until segments are identified, then a slim left rail */}
+          <div className={`flex min-h-0 transition-[width] duration-300 ease-out ${segmentsIdentified ? 'w-[380px] flex-shrink-0' : 'flex-1'}`}>
+            <ChatPanel
+              screen={screen}
+              setScreen={setScreen}
+              onAddTextBlock={onAddTextBlock}
+              setIsGeneratingBlock={setIsGeneratingBlock}
+              entryMode={entryMode}
+              setEntryMode={setEntryMode}
+              setIsAnalysisComplete={setIsAnalysisComplete}
+              selectedAudienceId={selectedAudienceId}
+              setSelectedAudienceId={setSelectedAudienceId}
+              onNewAnalysis={handleNewAnalysis}
+              chatContext={chatContext}
+              onRemoveChatContext={removeChatContext}
+              onClearChatContext={() => setChatContext([])}
+              onStartCompare={startCompare}
+            />
+          </div>
+
+          {/* LumosMap center stage — appears once segments resolve */}
+          {segmentsIdentified && !showDataExplorer && (
+            <div className="flex-1 min-w-0 border-l border-[#d3d3d0] bg-[#EDEBF2]">
+              <LumosMapStage
+                selectedAudienceId={selectedAudienceId}
+                onSelectAudience={setSelectedAudienceId}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {!createAudienceActive && !compareActive && !showAudiences && !showDocuments && showDataExplorer ? (
