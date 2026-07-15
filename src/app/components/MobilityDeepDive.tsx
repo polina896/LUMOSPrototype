@@ -1,14 +1,16 @@
 import { GlobalFilterBar } from './AudienceProfileContent';
 import { BlockDeck } from './DeepDiveBlock';
+import MobilityMapHero from './mobility/MobilityMapHero';
 import { MOBILITY_SECTIONS, MobilitySectionCard } from './MobilitySections';
 import type { ModuleRef } from './ModuleAsk';
 import type { BlockConfig } from './deepDiveBlocks';
 
 // ── Mobility & Movement deep-dive tab ────────────────────────────────────────
-// The map view used to be one Figma export (Screen2Mobility) whose sections
-// couldn't be pinned individually. Rebuilt as native, individually-pinnable
-// section cards (see MobilitySections.tsx) — each carries its own Ask pill + My
-// View pin. Below them sits the editable block deck (seedMobilityBlocks).
+// Map-first: a live Leaflet planning-area choropleth (MobilityMapHero) is the
+// hero, carrying the signal/weekday toggles, hotspots and a where-they-are rail.
+// Below it sit native, individually-pinnable supporting cards (MobilitySections)
+// — Peak movement hours, catchment, competitor, frequency, reach — each with its
+// own Ask pill + My View pin. Then the editable block deck (seedMobilityBlocks).
 
 type DeckHostProps = {
   blocks: BlockConfig[];
@@ -25,6 +27,9 @@ export default function MobilityDeepDive({ blocks, scopeId, onAskBlock, onAddBlo
   return (
     <div className="flex flex-col gap-3.5">
       <GlobalFilterBar />
+
+      {/* Map hero — the live choropleth, pinnable as its own My View module. */}
+      <MobilityMapHero audience={audience} onAskGraph={onAskGraph} />
 
       {/* Native section cards — each individually pinnable to My View. */}
       <div className="grid grid-cols-3 gap-3 items-start">

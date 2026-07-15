@@ -1,18 +1,14 @@
-import { useState } from 'react';
-import {
-  GEO_UUD, ModeSwitchers, MapAndPostcodes, BackgroundVerticalBorder,
-  type GeoModeKey, type DayKey,
-} from '@/imports/Screen2Mobility-1';
 import { AskPill, type ModuleRef } from './ModuleAsk';
 import { BlockPinButton } from './MyView';
+import PeakHoursHeatmap from './mobility/PeakHoursHeatmap';
 
 // ── Mobility & Movement — native section cards ────────────────────────────────
-// The map sections used to live inside one Figma export (Screen2Mobility), so
-// they couldn't be pinned individually. Split out here as self-contained cards:
-// each carries an Ask pill + a My View pin, and is registered as an anchor so My
-// View can re-render any of them. "Where they live" reuses the exact designed
-// sub-components (takeaway + mode switchers + choropleth map + postcodes) from
-// the Figma export; the rest are lightweight native charts.
+// The map is now the hero of this tab (see MobilityMapHero), so the old Figma
+// choropleth ("Where they live") and its "Where they transact" companion are
+// dropped — the map's Residential/Daytime/Transaction signals already cover
+// them. What remains are self-contained supporting cards: each carries an Ask
+// pill + a My View pin and is registered as an anchor so My View can re-render
+// any of them.
 
 const CARD = 'bg-white rounded-[14px] border border-[#e5e5e2] p-[17px] flex flex-col';
 const TITLE = "font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-[21px]";
@@ -34,34 +30,6 @@ function BarRow({ label, pct, val, hot }: { label: string; pct: number; val: str
 
 // ── Visuals ───────────────────────────────────────────────────────────────────
 
-// Where they live — reuses the exact designed body from the Figma export:
-// purple takeaway + Residential/Daytime/Transaction × Weekday/Weekend switchers
-// + the Singapore choropleth map & top-postcodes list, with the same state.
-function WhereTheyLive() {
-  const [whereMode, setWhereMode] = useState<GeoModeKey>('Residential');
-  const [dayType, setDayType] = useState<DayKey>('Weekday');
-  const view = GEO_UUD[whereMode][dayType];
-  return (
-    <div className="flex flex-col gap-3">
-      <BackgroundVerticalBorder />
-      <ModeSwitchers whereMode={whereMode} setWhereMode={setWhereMode} dayType={dayType} setDayType={setDayType} />
-      <MapAndPostcodes view={view} caption={`${whereMode} · ${dayType}`} />
-    </div>
-  );
-}
-
-function WhereTheyTransact() {
-  return (
-    <div className="flex flex-col gap-3">
-      <BarRow label="Orchard · D9" pct={100} val="2.6×" hot />
-      <BarRow label="Marina · D1" pct={72} val="1.9×" />
-      <BarRow label="Tanglin · D10" pct={58} val="1.6×" />
-      <BarRow label="Novena · D11" pct={46} val="1.3×" />
-      <span className={NOTE}>Spend clusters near premium retail — Orchard over-indexes <b className="text-[#1a1a1a]">2.6×</b>.</span>
-    </div>
-  );
-}
-
 function Catchment() {
   const bands = [['0–5km', 18], ['5–15km', 42], ['15–30km', 28], ['30km+', 12]] as const;
   return (
@@ -80,6 +48,7 @@ function Catchment() {
           <span key={lab} className="flex items-center gap-1.5 font-['Jua',sans-serif] text-[11px] text-[#6b6b6b]"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: ['#d9c9e0', '#b89fc4', '#8a5f92', '#6b3c72'][i] }} />{lab}</span>
         ))}
       </div>
+      <div className="pt-2 border-t border-dashed border-[#e5e5e2]"><span className={NOTE}>Half travel <b className="text-[#1a1a1a]">5–15km</b> · a <b className="text-[#1a1a1a]">12%</b> long-haul tail drives 30km+ to reach premium dealers.</span></div>
     </div>
   );
 }
@@ -135,8 +104,7 @@ function ReachBySite() {
 type SectionMeta = { id: string; title: string; subtitle: string; span: 1 | 3; Visual: () => JSX.Element };
 
 export const MOBILITY_SECTIONS: SectionMeta[] = [
-  { id: 'mob-where-live',     title: 'Where they cluster',        subtitle: 'Home, daytime & spend presence · top over-indexing postcodes', span: 3, Visual: WhereTheyLive },
-  { id: 'mob-where-transact', title: 'Where they transact',       subtitle: 'Spend density · top districts',                   span: 1, Visual: WhereTheyTransact },
+  { id: 'mob-peak-hours',     title: 'Peak movement hours',       subtitle: 'When this audience is on the move · hour × day · indexed (1.0 = average)', span: 3, Visual: PeakHoursHeatmap },
   { id: 'mob-catchment',      title: 'Catchment & origin flows',  subtitle: 'How far they travel · median & 90th pct',         span: 1, Visual: Catchment },
   { id: 'mob-competitor',     title: 'Competitor & POI visitation', subtitle: 'Rival venues · share of visits',                span: 1, Visual: Competitor },
   { id: 'mob-frequency',      title: 'Frequency & recency',       subtitle: 'Visitor mix · median gap',                        span: 1, Visual: Frequency },

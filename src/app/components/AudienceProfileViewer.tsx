@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import AudienceProfileContent from "./AudienceProfileContent";
 import MobilityDeepDive from "./MobilityDeepDive";
 import { MOBILITY_SECTIONS, MobilitySectionCard } from "./MobilitySections";
+import MobilityMapHero, { MOBILITY_MAP_ID, MOBILITY_MAP_TITLE } from "./mobility/MobilityMapHero";
 import TemporalDeepDive, { PeakDaysDaypartsCard, TEMPORAL_DENSITY_ID } from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
@@ -104,7 +105,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     // sections are now individual native cards (MOBILITY_SECTIONS).
     const anchorItems: Record<DeckKey, { id: string; title: string; subtitle?: string }[]> = {
       profile: [],
-      mobility: MOBILITY_SECTIONS.map((s) => ({ id: s.id, title: s.title, subtitle: s.subtitle })),
+      mobility: [
+        { id: MOBILITY_MAP_ID, title: MOBILITY_MAP_TITLE, subtitle: 'Live choropleth · where they are' },
+        ...MOBILITY_SECTIONS.map((s) => ({ id: s.id, title: s.title, subtitle: s.subtitle })),
+      ],
       temporal: [{ id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', subtitle: 'Hour × day · indexed density' }],
     };
     const cat: Catalog = (['profile', 'mobility', 'temporal'] as DeckKey[]).map((k) => {
@@ -192,6 +196,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     [TEMPORAL_DENSITY_ID]: {
       id: TEMPORAL_DENSITY_ID, title: 'Peak days & dayparts', source: DECK_LABELS.temporal, span: 3,
       render: () => <PeakDaysDaypartsCard audience={askName} onAskGraph={pinSection} />,
+    },
+    [MOBILITY_MAP_ID]: {
+      id: MOBILITY_MAP_ID, title: MOBILITY_MAP_TITLE, source: DECK_LABELS.mobility, span: 3,
+      render: () => <MobilityMapHero audience={askName} onAskGraph={pinSection} />,
     },
     ...Object.fromEntries(MOBILITY_SECTIONS.map((s) => [s.id, {
       id: s.id, title: s.title, source: DECK_LABELS.mobility, span: s.span,
