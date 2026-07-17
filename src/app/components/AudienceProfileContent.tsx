@@ -1,5 +1,7 @@
 import { RotateCcw, MessageSquare } from 'lucide-react';
 import { BlockDeck } from './DeepDiveBlock';
+import ProfileMapHero, { ProfileAreaDossier } from './profile/ProfileMapHero';
+import type { ModuleRef } from './ModuleAsk';
 import type { BlockConfig } from './deepDiveBlocks';
 
 // ── Audience Profile tab ──────────────────────────────────────────────────────
@@ -109,16 +111,23 @@ export default function AudienceProfileContent({
   scopeId,
   onAskBlock,
   onAddBlock,
+  audience,
+  onAskGraph,
 }: {
   blocks: BlockConfig[];
   scopeId: string | null;
   onAskBlock: (config: BlockConfig) => void;
   onAddBlock: () => void;
+  audience?: string;
+  onAskGraph?: (ref: ModuleRef) => void;
 }) {
   return (
     <div className="flex flex-col gap-[14px]">
       <GlobalFilterBar />
       <TakeawayHero />
+      {/* Companion map — colours by who lives there; income & lifestage rows two-way link to it. */}
+      <ProfileMapHero audience={audience} onAskGraph={onAskGraph} />
+      <ProfileAreaDossier audience={audience} onAskGraph={onAskGraph} />
       <BlockDeck blocks={blocks} scopeId={scopeId} onAsk={onAskBlock} onAdd={onAddBlock} />
     </div>
   );

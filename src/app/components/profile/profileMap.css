@@ -1,0 +1,77 @@
+/* ── Audience Profile companion map — profile-specific chrome ─────────────────
+   Reuses the shared .maphero base (see mobilityMap.css); adds the place
+   readout, map-linked cards and the area-dossier table. Everything renders in
+   Jua to match the app. */
+.profilehero { grid-template-columns: 1fr 360px; }
+.profilehero .map-stage { height: 700px; }
+@media (max-width: 1100px) {
+  .profilehero { grid-template-columns: 1fr; }
+  .profilehero .map-stage { height: 520px; }
+}
+.profilehero,
+.profilehero * { font-family: 'Jua', sans-serif; }
+
+.profilehero .map-rail.split { gap: 14px; overflow-y: auto; }
+
+/* place readout */
+.profilehero .readout { background: var(--panel); border: 1px solid var(--accent-tint); border-radius: 12px; padding: 13px; }
+.profilehero .ro-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 11px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.profilehero .ro-name { font-size: 16px; color: var(--text); }
+.profilehero .ro-sub { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+.profilehero .ro-rows { display: flex; flex-direction: column; gap: 10px; }
+.profilehero .ro-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; }
+.profilehero .ro-row .k { color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+.profilehero .ro-row .k svg { width: 13px; height: 13px; color: var(--accent); flex: 0 0 13px; }
+.profilehero .ro-row .v { color: var(--text); text-align: right; }
+.profilehero .ro-hint { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 10.5px; color: var(--text-faint); display: flex; align-items: center; gap: 6px; }
+.profilehero .ro-hint svg { width: 12px; height: 12px; color: var(--accent); flex: 0 0 12px; }
+.profilehero .ro-band { display: inline-block; font-size: 9px; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-tint); border-radius: 5px; padding: 1px 7px; }
+
+/* linked cards */
+.profilehero .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.profilehero .card-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.profilehero .card-title { font-size: 13px; color: var(--text); }
+.profilehero .card-sub { font-size: 10.5px; color: var(--text-faint); margin-top: 2px; }
+.profilehero .tagx { font-size: 8.5px; color: var(--accent); background: var(--accent-soft); border-radius: 5px; padding: 1px 6px; vertical-align: middle; margin-left: 4px; letter-spacing: .04em; }
+
+.profilehero .bar-row { display: grid; grid-template-columns: 1fr 1.4fr auto; align-items: center; gap: 10px; margin-bottom: 6px; }
+.profilehero .bar-label { font-size: 12px; color: var(--text); white-space: nowrap; }
+.profilehero .bar-track { height: 14px; background: var(--bg); border-radius: 5px; overflow: hidden; }
+.profilehero .bar-fill { height: 100%; border-radius: 5px; background: var(--accent-tint); }
+.profilehero .bar-fill.hot { background: var(--accent); }
+.profilehero .bar-val { font-size: 11.5px; color: var(--text-muted); text-align: right; }
+.profilehero .bar-val b { color: var(--accent); }
+
+.profilehero .bandrow { cursor: pointer; border-radius: 8px; padding: 3px 6px; margin: 0 -6px; }
+.profilehero .bandrow:hover { background: var(--accent-soft); }
+.profilehero .bandrow .maplink { opacity: 0; font-size: 9px; color: var(--accent); margin-left: 6px; transition: opacity .12s; }
+.profilehero .bandrow:hover .maplink { opacity: 1; }
+.profilehero .linknote { font-size: 10.5px; color: var(--text-faint); margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); display: flex; align-items: center; gap: 7px; line-height: 1.4; }
+.profilehero .linknote svg { width: 13px; height: 13px; color: var(--accent); flex: 0 0 13px; }
+
+.profilehero .seg-bar { display: flex; height: 24px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.profilehero .seg-bar span { display: flex; align-items: center; justify-content: center; font-size: 10.5px; color: #fff; }
+.profilehero .seg-bar span.light { color: var(--accent); }
+.profilehero .seg-row { display: flex; align-items: center; gap: 9px; margin: 0 -6px; padding: 6px; border-radius: 8px; cursor: pointer; }
+.profilehero .seg-row:hover { background: var(--accent-soft); }
+.profilehero .seg-row .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; }
+.profilehero .seg-row .sname { font-size: 12.5px; flex: 1; color: var(--text); }
+.profilehero .seg-row .sval { font-size: 12.5px; color: var(--accent); }
+.profilehero .seg-row .maplink { opacity: 0; font-size: 9px; color: var(--accent); }
+.profilehero .seg-row:hover .maplink { opacity: 1; }
+
+/* area dossier table (full-width card below the hero) */
+.profile-dossier { background: var(--panel, #fff); border: 1px solid #e5e5e2; border-radius: 14px; padding: 16px; font-family: 'Jua', sans-serif; }
+.profile-dossier .dh { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.profile-dossier .dh .card-title { font-size: 14px; color: #1a1a1a; }
+.profile-dossier .dh .card-title .tagx { font-size: 8.5px; color: #6b3c72; background: #f1e9ff; border-radius: 5px; padding: 1px 6px; vertical-align: middle; margin-left: 4px; letter-spacing: .04em; }
+.profile-dossier .dh .card-sub { font-size: 11px; color: #9a9a9a; margin-top: 2px; }
+table.dossier { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Jua', sans-serif; }
+table.dossier th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: #9a9a9a; font-weight: normal; padding: 7px 10px; border-bottom: 1px solid #e5e5e2; }
+table.dossier th.num, table.dossier td.num { text-align: right; }
+table.dossier td { padding: 9px 10px; border-bottom: 1px solid #e5e5e2; color: #6b6b6b; }
+table.dossier tr:last-child td { border-bottom: 0; }
+table.dossier td b { color: #1a1a1a; font-weight: 400; }
+table.dossier tbody tr { cursor: pointer; }
+table.dossier tbody tr:hover { background: #f1e9ff; }
+table.dossier .sub { font-size: 10px; color: #9a9a9a; }
