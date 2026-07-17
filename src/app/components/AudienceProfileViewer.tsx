@@ -3,6 +3,7 @@ import AudienceProfileContent from "./AudienceProfileContent";
 import MobilityDeepDive from "./MobilityDeepDive";
 import { MOBILITY_SECTIONS, MobilitySectionCard } from "./MobilitySections";
 import MobilityMapHero, { MOBILITY_MAP_ID, MOBILITY_MAP_TITLE } from "./mobility/MobilityMapHero";
+import ProfileMapHero, { PROFILE_MAP_ID, PROFILE_MAP_TITLE } from "./profile/ProfileMapHero";
 import TemporalDeepDive, { PeakDaysDaypartsCard, TEMPORAL_DENSITY_ID } from "./TemporalDeepDive";
 import AskLumosPanel, { type AskMsg } from "./AskLumosPanel";
 import type { ModuleRef } from "./ModuleAsk";
@@ -104,7 +105,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     // Anchor catalog items, keyed by the deck they belong beside. Mobility's
     // sections are now individual native cards (MOBILITY_SECTIONS).
     const anchorItems: Record<DeckKey, { id: string; title: string; subtitle?: string }[]> = {
-      profile: [],
+      profile: [
+        { id: PROFILE_MAP_ID, title: PROFILE_MAP_TITLE, subtitle: 'Live choropleth · where they live' },
+      ],
       mobility: [
         { id: MOBILITY_MAP_ID, title: MOBILITY_MAP_TITLE, subtitle: 'Live choropleth · where they are' },
         ...MOBILITY_SECTIONS.map((s) => ({ id: s.id, title: s.title, subtitle: s.subtitle })),
@@ -200,6 +203,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     [MOBILITY_MAP_ID]: {
       id: MOBILITY_MAP_ID, title: MOBILITY_MAP_TITLE, source: DECK_LABELS.mobility, span: 3,
       render: () => <MobilityMapHero audience={askName} onAskGraph={pinSection} />,
+    },
+    [PROFILE_MAP_ID]: {
+      id: PROFILE_MAP_ID, title: PROFILE_MAP_TITLE, source: DECK_LABELS.profile, span: 3,
+      render: () => <ProfileMapHero audience={askName} onAskGraph={pinSection} />,
     },
     ...Object.fromEntries(MOBILITY_SECTIONS.map((s) => [s.id, {
       id: s.id, title: s.title, source: DECK_LABELS.mobility, span: s.span,
@@ -503,6 +510,8 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
             scopeId={scope?.blockId ?? null}
             onAskBlock={askBlock}
             onAddBlock={addBlock}
+            audience={askName}
+            onAskGraph={pinSection}
           />
         )}
         {activeTab === 'mobility' && (
