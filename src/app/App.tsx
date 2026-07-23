@@ -247,8 +247,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Audience detail side panel — slides in when an audience is selected */}
-          {selectedAudienceId && (
+          {/* Audience detail side panel — hidden for now (we don't need the right-hand audience info) */}
+          {false && selectedAudienceId && (
             <div className="w-[420px] flex-shrink-0 border-l border-[#d3d3d0] overflow-hidden flex flex-col bg-white">
               <AudienceDetailPanel
                 audienceId={selectedAudienceId}
