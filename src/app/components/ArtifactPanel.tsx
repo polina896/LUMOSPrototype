@@ -45,34 +45,9 @@ export default function ArtifactPanel({
     return null;
   }
 
-  if (screen === 'profiles') {
-    if (!selectedAudienceId) return null;
-    return (
-      <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} isSaved={savedAudienceIds.includes(selectedAudienceId)} onSave={onSaveAudience} />
-      </div>
-    );
-  }
-
-  if (screen === 'deep-dive') {
-    if (!selectedAudienceId) {
-      return (
-        <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col items-center justify-center gap-4 text-center p-10">
-          <div className="w-14 h-14 rounded-full bg-[#f5eeff] flex items-center justify-center">
-            <Users className="w-7 h-7 text-[#732d93]" />
-          </div>
-          <div>
-            <p className="font-['Jua',sans-serif] text-[15px] text-[#1a1a1a] mb-1">Select an audience</p>
-            <p className="font-['Jua',sans-serif] text-[13px] text-[#888] leading-relaxed">Click on an audience card to explore the full profile and insights.</p>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} isSaved={savedAudienceIds.includes(selectedAudienceId)} onSave={onSaveAudience} />
-      </div>
-    );
+  // Right-hand audience detail/profile panel hidden for now — the LumosMap takes the full stage.
+  if (screen === 'profiles' || screen === 'deep-dive') {
+    return null;
   }
 
   if (screen === 'result') {
