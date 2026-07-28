@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bookmark, Download, MoreHorizontal, FileText, ArrowRight, Maximize2, X, Check } from 'lucide-react';
+import { Bookmark, Download, MoreHorizontal, FileText, ArrowRight, Maximize2, X, Check, PanelRightClose } from 'lucide-react';
 import { AUDIENCES, type AudienceId } from '../audienceData';
 import type { Screen } from '../App';
 import DataSourcesPopover from './DataSourcesPopover';
@@ -245,7 +245,7 @@ function SectionHead({ num, title, aside, reserveAsk }: { num: string; title: st
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, onOpenFullPage, isSaved = false, onSave }: { audienceId: AudienceId; screen?: Screen; onClose?: () => void; onAskInChat?: (ref: ModuleRef) => void; onOpenFullPage?: (id: AudienceId, name: string) => void; isSaved?: boolean; onSave?: (id: AudienceId) => void }) {
+export default function AudienceDetailPanel({ audienceId, onClose, onCollapse, onAskInChat, onOpenFullPage, isSaved = false, onSave }: { audienceId: AudienceId; screen?: Screen; onClose?: () => void; onCollapse?: () => void; onAskInChat?: (ref: ModuleRef) => void; onOpenFullPage?: (id: AudienceId, name: string) => void; isSaved?: boolean; onSave?: (id: AudienceId) => void }) {
   const [whoTab, setWhoTab] = useState('Demographics');
   const [howTab, setHowTab] = useState('Brief');
   const [showExport, setShowExport] = useState(false);
@@ -258,9 +258,19 @@ export default function AudienceDetailPanel({ audienceId, onClose, onAskInChat, 
 
       {/* ── Top tab bar ── */}
       <div className="flex-none flex items-center gap-1.5 px-4 py-2.5 border-b border-[#e5e5e2] bg-white">
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] bg-[#f1e9ff] text-[#6b3c72]">
-          <FileText className="w-3.5 h-3.5" />Preview
-        </div>
+        {onCollapse ? (
+          <button
+            onClick={onCollapse}
+            title="Hide this panel — the map takes the full stage"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] bg-[#f1e9ff] text-[#6b3c72] hover:bg-[#e7dbff] transition-colors"
+          >
+            <PanelRightClose className="w-3.5 h-3.5" />Hide
+          </button>
+        ) : (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-['Jua',sans-serif] text-[12px] bg-[#f1e9ff] text-[#6b3c72]">
+            <FileText className="w-3.5 h-3.5" />Preview
+          </div>
+        )}
         {onOpenFullPage && (
           <button
             onClick={() => onOpenFullPage(audienceId, audience.name)}

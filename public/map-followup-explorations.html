@@ -70,14 +70,14 @@
   .storemk{width:32px;height:32px;border-radius:50%;background:var(--plum);border:3px solid #fff;box-shadow:0 3px 12px rgba(74,42,110,.45);display:grid;place-items:center}
   .storemk svg{width:16px;height:16px}
   .storelab,.ringlab,.pill,.stopnum,.brandlab{font-family:var(--disp);white-space:nowrap;font-weight:800}
-  .storelab{font-size:11px;color:#fff;background:var(--plum);border-radius:8px;padding:3px 9px;transform:translate(-50%,-50%);box-shadow:0 2px 9px rgba(74,42,110,.4)}
-  .ringlab{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#fff;background:var(--deep);border-radius:99px;padding:3px 9px;transform:translate(-50%,-50%);box-shadow:0 0 0 1.6px rgba(255,255,255,.92),0 3px 10px rgba(33,26,46,.34)}
+  .storelab{width:max-content;font-size:11px;color:#fff;background:var(--plum);border-radius:8px;padding:3px 9px;transform:translate(-50%,-50%);box-shadow:0 2px 9px rgba(74,42,110,.4)}
+  .ringlab{width:max-content;display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#fff;background:var(--deep);border-radius:99px;padding:3px 9px;transform:translate(-50%,-50%);box-shadow:0 0 0 1.6px rgba(255,255,255,.92),0 3px 10px rgba(33,26,46,.34)}
   .ringlab.alt{background:#0E7490;}
-  .pill{font-size:11px;color:#fff;border-radius:99px;padding:3px 9px;box-shadow:0 0 0 2px #fff,0 3px 10px rgba(0,0,0,.25);transform:translate(-50%,-50%)}
+  .pill{width:max-content;font-size:11px;color:#fff;border-radius:99px;padding:3px 9px;box-shadow:0 0 0 2px #fff,0 3px 10px rgba(0,0,0,.25);transform:translate(-50%,-50%)}
   .stopnum{width:26px;height:26px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(225,29,116,.45)}
-  .stoplab{font-family:var(--disp);font-weight:700;font-size:10.5px;color:var(--deep);background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:7px;padding:2px 7px;white-space:nowrap;transform:translate(-50%,-50%);box-shadow:0 2px 7px rgba(33,26,46,.14)}
+  .stoplab{width:max-content;font-family:var(--disp);font-weight:700;font-size:10.5px;color:var(--deep);background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:7px;padding:2px 7px;white-space:nowrap;transform:translate(-50%,-50%);box-shadow:0 2px 7px rgba(33,26,46,.14)}
   .brandmk{border-radius:50%;border:2.5px solid #fff;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.3);color:#fff;font-family:var(--disp);font-weight:800}
-  .brandlab{font-size:10.5px;color:#fff;border-radius:7px;padding:2px 8px;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .brandlab{width:max-content;font-size:10.5px;color:#fff;border-radius:7px;padding:2px 8px;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,.25)}
   @keyframes dashflow{to{stroke-dashoffset:-140}}
   .flow{stroke-dasharray:9 11;animation:dashflow 2.4s linear infinite}
   .tip{background:#211A2E!important;color:#fff!important;border:none!important;border-radius:9px!important;font-family:var(--body)!important;font-size:12px!important;font-weight:700!important;padding:6px 10px!important}
@@ -313,7 +313,7 @@ function viewSwitch(){
     L.marker(cp.c,{interactive:false,zIndexOffset:700,icon:L.divIcon({className:'',iconSize:[cp.r,cp.r],iconAnchor:[cp.r/2,cp.r/2],
       html:`<div class="brandmk" style="width:${cp.r}px;height:${cp.r}px;background:${cp.col};font-size:${cp.r>22?11:9.5}px">${cp.share}</div>`})}).addTo(fx);
     L.marker(cp.c,{interactive:false,zIndexOffset:701,
-      icon:L.divIcon({html:`<div class="brandlab" style="background:${cp.col}">${cp.n}</div>`,className:'',iconSize:[1,1],iconAnchor:[0,-20]})}).addTo(fx);
+      icon:L.divIcon({html:`<div class="brandlab" style="background:${cp.col}">${cp.n}</div>`,className:'',iconSize:[1,1],iconAnchor:[0,-(cp.r/2+13)]})}).addTo(fx);
   });
   storePin();
   setBanner('Where the switching comes from — share today vs propensity to move');

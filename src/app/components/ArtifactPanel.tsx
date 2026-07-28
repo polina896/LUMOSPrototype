@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users, Bookmark, X, ArrowUp, Wand2 } from 'lucide-react';
+import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users, Bookmark, X, ArrowUp, Wand2, PanelRightOpen } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Screen } from '../App';
-import type { AudienceId } from '../audienceData';
+import { AUDIENCES, type AudienceId } from '../audienceData';
 import CustomizationPopover, { type StyleConfig } from './CustomizationPopover';
 import PostcodeEditModal from './PostcodeEditModal';
 import HeatmapView from './HeatmapView';
@@ -103,22 +103,17 @@ export default function ArtifactPanel({
   savedDocumentNames = [],
 }: ArtifactPanelProps) {
   const [previewMode, setPreviewMode] = useState<'preview' | 'data'>('preview');
+  // The audience panel can be tucked away so the map gets the full stage. It
+  // stays mounted as a slim rail so the way back is always in the same place.
+  const [detailCollapsed, setDetailCollapsed] = useState(false);
 
   if (screen === 'blank' || screen === 'planning' || screen === 'clarifying' || screen === 'insights') {
     return null;
   }
 
-  if (screen === 'profiles') {
-    if (!selectedAudienceId) return null;
-    return (
-      <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} isSaved={savedAudienceIds.includes(selectedAudienceId)} onSave={onSaveAudience} />
-      </div>
-    );
-  }
-
-  if (screen === 'deep-dive') {
+  if (screen === 'profiles' || screen === 'deep-dive') {
     if (!selectedAudienceId) {
+      if (screen === 'profiles') return null;
       return (
         <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col items-center justify-center gap-4 text-center p-10">
           <div className="w-14 h-14 rounded-full bg-[#f5eeff] flex items-center justify-center">
@@ -132,8 +127,17 @@ export default function ArtifactPanel({
       );
     }
     return (
-      <div className="w-[420px] bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-y-auto">
-        <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onOpenFullPage={onOpenFullPage} isSaved={savedAudienceIds.includes(selectedAudienceId)} onSave={onSaveAudience} />
+      <div className={`flex-shrink-0 bg-white border-l border-[#d3d3d0] flex flex-col min-h-0 overflow-hidden transition-[width] duration-300 ease-out ${detailCollapsed ? 'w-[46px]' : 'w-[420px]'}`}>
+        {detailCollapsed ? (
+          <CollapsedDetailRail
+            audienceName={AUDIENCES.find((a) => a.id === selectedAudienceId)?.name ?? 'Audience'}
+            onExpand={() => setDetailCollapsed(false)}
+          />
+        ) : (
+          <div className="w-[420px] flex-1 min-h-0 overflow-y-auto flex flex-col">
+            <AudienceDetailPanel audienceId={selectedAudienceId} screen={screen} onCollapse={() => setDetailCollapsed(true)} onOpenFullPage={onOpenFullPage} isSaved={savedAudienceIds.includes(selectedAudienceId)} onSave={onSaveAudience} />
+          </div>
+        )}
       </div>
     );
   }
@@ -161,6 +165,30 @@ export default function ArtifactPanel({
   }
 
   return null;
+}
+
+// The collapsed state of the audience detail panel: a slim rail carrying the
+// audience name sideways, so you can still see which one is open and get back
+// to it in one click.
+function CollapsedDetailRail({ audienceName, onExpand }: { audienceName: string; onExpand: () => void }) {
+  return (
+    <button
+      onClick={onExpand}
+      title={`Expand ${audienceName}`}
+      className="w-full h-full flex flex-col items-center gap-3 pt-3 pb-4 bg-white hover:bg-[#faf7ff] transition-colors group"
+    >
+      <span className="w-[30px] h-[30px] flex-none flex items-center justify-center border border-[#e5e5e2] rounded-lg group-hover:border-[#6b3c72] transition-colors">
+        <PanelRightOpen className="w-3.5 h-3.5 text-[#6b6b6b] group-hover:text-[#6b3c72] transition-colors" />
+      </span>
+      <span className="w-[6px] h-[6px] flex-none rounded-full bg-[#6b3c72]" />
+      <span
+        className="flex-1 min-h-0 overflow-hidden font-['Jua',sans-serif] text-[12px] text-[#6b6b6b] group-hover:text-[#6b3c72] transition-colors whitespace-nowrap"
+        style={{ writingMode: 'vertical-rl' }}
+      >
+        {audienceName}
+      </span>
+    </button>
+  );
 }
 
 export function PickerCard({
