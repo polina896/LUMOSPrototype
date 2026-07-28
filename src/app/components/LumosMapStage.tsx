@@ -35,6 +35,8 @@ interface LumosMapInstance {
   showAll: () => void;
   setLayerOn: (key: string, on: boolean) => void;
   setExplore: (kind: string | null) => void;
+  showHypothesis: (text?: string) => void;
+  hideHypothesis: () => void;
   clearFocus: () => void;
   destroy: () => void;
   readonly mode: string;
@@ -61,6 +63,8 @@ export default function LumosMapStage({
   onPickRegion,
   layerRequest,
   exploreRequest,
+  hypothesisPending = false,
+  onOpenHypothesis,
 }: {
   selectedAudienceId: AudienceId | null;
   onSelectAudience: (id: AudienceId | null) => void;
@@ -69,6 +73,9 @@ export default function LumosMapStage({
   layerRequest?: { key: string; n: number } | null;
   // a follow-up question asking the map to answer it: {kind, n} — n forces a re-run
   exploreRequest?: { kind: string; n: number } | null;
+  // the hypothesis notice, pinned out on the band it is about
+  hypothesisPending?: boolean;
+  onOpenHypothesis?: () => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const lmRef = useRef<LumosMapInstance | null>(null);
@@ -77,6 +84,8 @@ export default function LumosMapStage({
   onSelectRef.current = onSelectAudience;
   const onPickRef = useRef(onPickRegion);
   onPickRef.current = onPickRegion;
+  const onHypRef = useRef(onOpenHypothesis);
+  onHypRef.current = onOpenHypothesis;
 
   // Mount once. The map reveals + fits Greater Sydney on open().
   useEffect(() => {
@@ -88,6 +97,7 @@ export default function LumosMapStage({
         if (aud) onSelectRef.current(aud);
       },
       onShowAll: () => onSelectRef.current(null),
+      onHypothesis: () => onHypRef.current?.(),
       onRegion: (pick: RegionPick) => {
         onPickRef.current?.({ ...pick, audienceId: SEG_TO_AUD[pick.segment] ?? null });
       },
@@ -124,6 +134,16 @@ export default function LumosMapStage({
     if (!exploreRequest) return;
     try { lmRef.current?.setExplore(exploreRequest.kind); } catch { /* noop */ }
   }, [exploreRequest?.n]);
+
+  // The notice lives on the map for as long as it is waiting in the chat.
+  useEffect(() => {
+    const lm = lmRef.current;
+    if (!lm) return;
+    try {
+      if (hypothesisPending) lm.showHypothesis('Pattern spotted here');
+      else lm.hideHypothesis();
+    } catch { /* noop */ }
+  }, [hypothesisPending]);
 
   return <div ref={hostRef} className="w-full h-full" />;
 }

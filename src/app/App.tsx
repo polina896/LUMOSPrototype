@@ -88,7 +88,18 @@ export default function App() {
   const requestLayer = (key: string) => setLayerRequest((prev) => ({ key, n: (prev?.n ?? 0) + 1 }));
   // A follow-up question the map answers with its own view.
   const [exploreRequest, setExploreRequest] = useState<{ kind: string; n: number } | null>(null);
-  const requestExplore = (kind: string) => setExploreRequest((prev) => ({ kind, n: (prev?.n ?? 0) + 1 }));
+  // The hypothesis is drawn from the distance and origin answers, so it surfaces
+  // once the user has actually seen two of them — never on a timer alone.
+  const [hypothesis, setHypothesis] = useState<'idle' | 'pending' | 'open' | 'validated' | 'dismissed'>('idle');
+  const seenExplorations = useRef<Set<string>>(new Set());
+  const requestExplore = (kind: string) => {
+    setExploreRequest((prev) => ({ kind, n: (prev?.n ?? 0) + 1 }));
+    seenExplorations.current.add(kind);
+    // give it a beat, so it reads as a conclusion rather than a canned reply
+    if (seenExplorations.current.size === 2) {
+      window.setTimeout(() => setHypothesis((h) => (h === 'idle' ? 'pending' : h)), 2600);
+    }
+  };
 
   const addChatContext = (ref: ModuleRef) =>
     setChatContext((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
@@ -237,6 +248,10 @@ export default function App() {
               onStartCompare={startCompare}
               regionPicks={regionPicks}
               onExplore={requestExplore}
+              hypothesis={hypothesis === 'pending' || hypothesis === 'open' || hypothesis === 'validated' || hypothesis === 'dismissed' ? hypothesis : 'idle'}
+              onOpenHypothesis={() => setHypothesis('open')}
+              onDismissHypothesis={() => setHypothesis('dismissed')}
+              onValidateHypothesis={() => setHypothesis('validated')}
             />
           </div>
 
@@ -249,6 +264,8 @@ export default function App() {
                 onPickRegion={handlePickRegion}
                 layerRequest={layerRequest}
                 exploreRequest={exploreRequest}
+                hypothesisPending={hypothesis === 'pending'}
+                onOpenHypothesis={() => setHypothesis('open')}
               />
             </div>
           )}

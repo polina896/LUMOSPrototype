@@ -206,6 +206,10 @@ interface ChatPanelProps {
   onStartCompare?: (seed: never[], prompt: string) => void;
   regionPicks?: ChatRegionPick[];
   onExplore?: (kind: string) => void;
+  hypothesis?: 'idle' | 'pending' | 'open' | 'validated' | 'dismissed';
+  onOpenHypothesis?: () => void;
+  onDismissHypothesis?: () => void;
+  onValidateHypothesis?: () => void;
 }
 
 // A catchment the user clicked on the map. The chat answers it in a sentence
@@ -287,6 +291,10 @@ export default function ChatPanel({
   onStartCompare,
   regionPicks = [],
   onExplore,
+  hypothesis = 'idle',
+  onOpenHypothesis,
+  onDismissHypothesis,
+  onValidateHypothesis,
 }: ChatPanelProps) {
   const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -333,7 +341,7 @@ export default function ChatPanel({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length]);
+  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length, hypothesis]);
 
   // ── Effects per screen ──────────────────────────────────────────────────────
 
@@ -958,6 +966,20 @@ export default function ChatPanel({
                 <RegionSummary key={pick.key} pick={pick} onExplore={onExplore} />
               ))}
 
+              {/* Hypothesis — enters the thread only when the user opens it */}
+              {(hypothesis === 'open' || hypothesis === 'validated') && (
+                <HypothesisCard
+                  onValidate={() => onValidateHypothesis?.()}
+                  onNotNow={() => onDismissHypothesis?.()}
+                />
+              )}
+              {hypothesis === 'validated' && (
+                <>
+                  <UserMessage text="Yes — validate this" />
+                  <AIMessage text="Testing it now. I’ll compare trip length and dwell time against a like-for-like grocery baseline, and check whether the 20–30 km households behave like destination shoppers on frequency and basket too." />
+                </>
+              )}
+
               {/* Clarify widget — flows inline with the conversation it belongs to */}
               {screen === 'clarifying' && showClarifyCard && !clarifySubmitted && (
                 <div className="pt-1">
@@ -975,6 +997,12 @@ export default function ChatPanel({
           {/* Input bar */}
           <div className="px-8 py-5 border-t border-gray-200">
             <div className="max-w-[700px]">
+              {hypothesis === 'pending' && (
+                <HypothesisDock
+                  onOpen={() => onOpenHypothesis?.()}
+                  onDismiss={() => onDismissHypothesis?.()}
+                />
+              )}
               <InputBar
                 placeholder="Reply to Lumos"
                 contextRefs={chatContext}
@@ -1270,6 +1298,62 @@ const SEGMENT_COLOR: Record<string, string> = {
   value: '#2F8F63',
   bulk: '#C07A2E',
 };
+
+// ── Hypothesis ────────────────────────────────────────────────────────────────
+// The one thing Lumos says unprompted. It never enters the thread on its own:
+// it waits above the composer (and out on the map) until the user opens it.
+
+function HypothesisDock({ onOpen, onDismiss }: { onOpen: () => void; onDismiss: () => void }) {
+  return (
+    <div className="mb-3 flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-[#F0D9A8] bg-[#FEF6E7] lumos-reply-in">
+      <span className="w-6 h-6 rounded-lg bg-white border border-[#F0D9A8] grid place-items-center flex-shrink-0">
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="#B45309" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z" />
+        </svg>
+      </span>
+      <span className="min-w-0">
+        <span className="block font-['Jua',sans-serif] text-[13px] text-[#B45309] leading-tight">Lumos spotted a pattern</span>
+        <span className="block font-['Jua',sans-serif] text-[11px] text-[#8a6a3a] leading-tight mt-0.5">Destination shopping · 20–30 km</span>
+      </span>
+      <button
+        onClick={onOpen}
+        className="lumos-open-pulse ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#B45309] hover:bg-[#93400a] text-white font-['Jua',sans-serif] text-[12px] transition-colors flex-shrink-0"
+      >
+        Open
+        <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </button>
+      <button onClick={onDismiss} title="Dismiss" className="text-[#b99a6a] hover:text-[#8a6a3a] text-[16px] leading-none px-1 flex-shrink-0">×</button>
+    </div>
+  );
+}
+
+function HypothesisCard({ onValidate, onNotNow }: { onValidate: () => void; onNotNow: () => void }) {
+  return (
+    <div className="mb-6 rounded-2xl border border-[#F0D9A8] bg-[#FEF6E7] overflow-hidden lumos-reply-in">
+      <div className="flex items-center gap-2.5 px-4 pt-3.5 pb-2">
+        <span className="w-6 h-6 rounded-lg bg-white border border-[#F0D9A8] grid place-items-center flex-shrink-0">
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="#B45309" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z" />
+          </svg>
+        </span>
+        <span className="font-['Jua',sans-serif] text-[14px] text-[#B45309] leading-snug">I think we’ve identified an interesting pattern.</span>
+      </div>
+      <div className="px-4 pb-4">
+        <div className="bg-white border border-[#F0D9A8] rounded-xl px-4 py-3.5 mb-3">
+          <p className="font-['Jua',sans-serif] text-[9.5px] tracking-[0.11em] uppercase text-[#B45309] mb-1.5">Hypothesis</p>
+          <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] leading-relaxed">
+            Costco’s strongest customers aren’t concentrated around the store — they’re willing to travel 20–30 km because they exhibit <b>destination shopping behaviour</b>.
+          </p>
+        </div>
+        <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] mb-3">Would you like me to validate this?</p>
+        <div className="flex gap-2.5">
+          <button onClick={onValidate} className="px-4 py-2.5 rounded-xl bg-[#B45309] hover:bg-[#93400a] text-white font-['Jua',sans-serif] text-[13px] transition-colors">Validate this</button>
+          <button onClick={onNotNow} className="px-4 py-2.5 rounded-xl bg-white border border-[#F0D9A8] text-[#8a6a3a] font-['Jua',sans-serif] text-[13px] hover:bg-[#fdf6ea] transition-colors">Not now</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RegionSummary({ pick, onExplore }: { pick: ChatRegionPick; onExplore?: (kind: string) => void }) {
   // Land the reply the way a live answer arrives: the source chip first, a

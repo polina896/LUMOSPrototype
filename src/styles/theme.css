@@ -195,3 +195,13 @@
 }
 .lumos-reply-in { animation: lumos-reply-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .lumos-source-pulse { animation: lumos-source-pulse 1.6s ease-out 2; }
+
+/* The hypothesis is the one thing Lumos raises unprompted — its Open button
+   pulses until acted on, so a quiet notice still gets noticed. */
+@keyframes lumos-open-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.5); }
+  70%  { box-shadow: 0 0 0 11px rgba(180, 83, 9, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0); }
+}
+.lumos-open-pulse { animation: lumos-open-pulse 2s ease-out infinite; }
+.lumos-open-pulse:hover { animation: none; }
