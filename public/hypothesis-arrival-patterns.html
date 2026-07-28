@@ -77,6 +77,8 @@
   .hyp-yes{background:var(--amber);color:#fff}
   .hyp-yes:hover{background:#93400a}
   .hyp-no{background:#fff;border:1px solid var(--amberline)!important;color:#8a6a3a}
+  .hyp-edit{background:#fff;border:1px solid var(--amberline)!important;color:var(--amber)}
+  .hyp-edit:hover,.hyp-no:hover{background:#fdf6ea}
 
   /* pattern 1 helper: jump-to-new */
   .jump{position:absolute;left:50%;transform:translateX(-50%) translateY(8px);bottom:118px;z-index:40;display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;background:var(--amber);color:#fff;font-family:var(--disp);font-size:12px;font-weight:700;box-shadow:0 6px 20px rgba(180,83,9,.35);cursor:pointer;opacity:0;pointer-events:none;transition:.3s}
@@ -285,6 +287,7 @@ const HYP_HTML = (open) => `
       <div class="hyp-ask">Would you like me to validate this?</div>
       <div class="hyp-acts">
         <button class="hyp-yes">Validate this</button>
+        <button class="hyp-edit">Edit hypothesis</button>
         <button class="hyp-no">Not now</button>
       </div>
     </div></div>
@@ -300,6 +303,17 @@ function wireHyp(el){
     setTimeout(()=>{ thread.scrollTop=thread.scrollHeight; },400);
   };
   el.querySelector('.hyp-no').onclick=()=>{ card.classList.remove('open'); };
+  const edit=el.querySelector('.hyp-edit'), quote=el.querySelector('.hyp-quote p'), ask=el.querySelector('.hyp-ask');
+  edit.onclick=()=>{
+    const on=edit.textContent==='Edit hypothesis';
+    quote.contentEditable=on?'true':'false';
+    quote.style.outline=on?'1px solid var(--amberline)':'none';
+    quote.style.borderRadius='8px'; quote.style.padding=on?'8px 10px':'0';
+    quote.style.background=on?'#FFFDF8':'transparent';
+    edit.textContent=on?'Save hypothesis':'Edit hypothesis';
+    ask.textContent=on?'Add your own context, then save it back.':'Would you like me to validate this?';
+    if(on) quote.focus();
+  };
 }
 function dropIntoThread(open){
   const el=add(HYP_HTML(open),30); wireHyp(el);

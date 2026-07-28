@@ -1327,7 +1327,15 @@ function HypothesisDock({ onOpen, onDismiss }: { onOpen: () => void; onDismiss: 
   );
 }
 
+const HYPOTHESIS_TEXT =
+  'Costco’s strongest customers aren’t concentrated around the store — they’re willing to travel 20–30 km because they exhibit destination shopping behaviour.';
+
 function HypothesisCard({ onValidate, onNotNow }: { onValidate: () => void; onNotNow: () => void }) {
+  // Editing is deliberately minimal — the point is that the user can add their
+  // own context to Lumos's guess, not to build a full authoring surface here.
+  const [text, setText] = useState(HYPOTHESIS_TEXT);
+  const [editing, setEditing] = useState(false);
+
   return (
     <div className="mb-6 rounded-2xl border border-[#F0D9A8] bg-[#FEF6E7] overflow-hidden lumos-reply-in">
       <div className="flex items-center gap-2.5 px-4 pt-3.5 pb-2">
@@ -1341,14 +1349,31 @@ function HypothesisCard({ onValidate, onNotNow }: { onValidate: () => void; onNo
       <div className="px-4 pb-4">
         <div className="bg-white border border-[#F0D9A8] rounded-xl px-4 py-3.5 mb-3">
           <p className="font-['Jua',sans-serif] text-[9.5px] tracking-[0.11em] uppercase text-[#B45309] mb-1.5">Hypothesis</p>
-          <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] leading-relaxed">
-            Costco’s strongest customers aren’t concentrated around the store — they’re willing to travel 20–30 km because they exhibit <b>destination shopping behaviour</b>.
-          </p>
+          {editing ? (
+            <textarea
+              autoFocus
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={4}
+              className="w-full resize-none outline-none font-['Jua',sans-serif] text-[14px] text-[#3a2a12] leading-relaxed bg-[#FFFDF8] border border-[#F0D9A8] rounded-lg px-3 py-2"
+            />
+          ) : (
+            <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] leading-relaxed">{text}</p>
+          )}
         </div>
-        <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] mb-3">Would you like me to validate this?</p>
-        <div className="flex gap-2.5">
-          <button onClick={onValidate} className="px-4 py-2.5 rounded-xl bg-[#B45309] hover:bg-[#93400a] text-white font-['Jua',sans-serif] text-[13px] transition-colors">Validate this</button>
-          <button onClick={onNotNow} className="px-4 py-2.5 rounded-xl bg-white border border-[#F0D9A8] text-[#8a6a3a] font-['Jua',sans-serif] text-[13px] hover:bg-[#fdf6ea] transition-colors">Not now</button>
+        <p className="font-['Jua',sans-serif] text-[14px] text-[#3a2a12] mb-3">
+          {editing ? 'Add your own context, then save it back.' : 'Would you like me to validate this?'}
+        </p>
+        {/* the rail is narrow — keep all three on one line, with the dismissal quietest */}
+        <div className="flex items-center gap-2">
+          <button onClick={onValidate} className="px-3.5 py-2.5 rounded-xl bg-[#B45309] hover:bg-[#93400a] text-white font-['Jua',sans-serif] text-[12.5px] whitespace-nowrap transition-colors">Validate this</button>
+          <button
+            onClick={() => setEditing((v) => !v)}
+            className="px-3.5 py-2.5 rounded-xl bg-white border border-[#F0D9A8] text-[#B45309] font-['Jua',sans-serif] text-[12.5px] whitespace-nowrap hover:bg-[#fdf6ea] transition-colors"
+          >
+            {editing ? 'Save hypothesis' : 'Edit hypothesis'}
+          </button>
+          <button onClick={onNotNow} className="px-2 py-2.5 text-[#8a6a3a] font-['Jua',sans-serif] text-[12.5px] whitespace-nowrap hover:text-[#5f4823] transition-colors">Not now</button>
         </div>
       </div>
     </div>
