@@ -616,7 +616,69 @@
     try{ map.flyTo(anchor,11,{duration:.7}); }catch(e){}
   }
 
-  var XVIEWS={far:xFar,from:xFrom,before:xBefore,switch:xSwitch};
+  // ── evidence views ────────────────────────────────────────────────────────
+  // Each validation chart can put its own filter on the geography.
+  var BRANDS={
+    ikea:{col:'#0058A3',label:'IKEA',at:[[-33.7020,150.8390],[-33.8300,151.0870]]},
+    bunnings:{col:'#0D5257',label:'Bunnings',at:[[-33.6900,150.9160],[-33.7480,150.7000],[-33.7680,150.9000],[-33.6180,150.8250]]}
+  };
+  // reweight the audience field, then say what the weighting means
+  function xWeighted(rg,keep,key,rows,note){
+    var cm=catchOf(rg), anchor=cm.anchor, d=distanceData(rg);
+    (d.origins||[]).forEach(function(o){
+      var w=keep(o); if(w<=0) return;
+      var rr=rng(o.n.length*37+7), n=Math.round(o.pct*w*1.6);
+      for(var k=0;k<n;k++){
+        var a=rr()*Math.PI*2, dd=Math.sqrt(rr())*0.016;
+        L.circleMarker([o.c[0]+Math.sin(a)*dd*0.82,o.c[1]+Math.cos(a)*dd],
+          {radius:3.2,stroke:false,fillColor:'#6B3C72',fillOpacity:.55,interactive:false}).addTo(xLayer);
+      }
+      if(w>=1.4) L.marker(o.c,{interactive:false,zIndexOffset:600,
+        icon:L.divIcon({html:'<div class="xpill">'+o.n+'</div>',className:'',iconSize:[1,1]})}).addTo(xLayer);
+    });
+    L.circleMarker(anchor,{radius:8,color:'#fff',weight:3,fillColor:'#4A2A6E',fillOpacity:1,interactive:false}).addTo(xLayer);
+    xpanel('<div class="xh">'+key+'</div>'+rows+(note?'<div class="xfoot">'+note+'</div>':''));
+    try{ map.flyTo(anchor,10.3,{duration:.6}); }catch(e){}
+  }
+  function xWhen(rg){
+    var anchor=catchOf(rg).anchor, d=distanceData(rg);
+    (d.origins||[]).filter(function(o){ return o.km>=8; }).forEach(function(o){
+      L.polyline(curve(o.c,anchor,0.12,26),{color:'#6B3C72',weight:1+o.pct*0.14,opacity:.75,className:'lm-inflow'})
+        .bindTooltip(tip(o.n,'Weekend trip · '+o.pct+'% of visits'),{className:'aud-tip',sticky:true}).addTo(xLayer);
+    });
+    xWeighted(rg,function(o){ return o.km>=8?1.5:0.45; },'Weekend only',
+      xrow('Saturday','','33%')+xrow('Sunday','','24%')+xrow('Whole week','','43%'),
+      'Trips shown are <b>Sat–Sun</b> arrivals');
+  }
+  function xRepeat(rg){
+    xWeighted(rg,function(o){ return o.km>=10?1.7:0.5; },'Repeat households',
+      xrow('Return within 60 days','','68%')+xrow('Category norm','','36%'),
+      'Weighted to households returning <b>2+ times</b>');
+  }
+  function xHousehold(rg){
+    xWeighted(rg,function(o){ return o.pct>=10?1.8:0.45; },'Households of 4+',
+      xrow('4 people','','38%')+xrow('5 or more','','28%')+xrow('Metro 4+','','29%'),
+      'Showing <b>4+ person</b> households only');
+  }
+  function xBrand(rg,kind){
+    var b=BRANDS[kind], anchor=catchOf(rg).anchor;
+    b.at.forEach(function(c){
+      L.polyline(curve(c,anchor,0.14,24),{color:b.col,weight:2.4,opacity:.8,className:'lm-inflow'}).addTo(xLayer);
+      L.circleMarker(c,{radius:7,color:'#fff',weight:2.5,fillColor:b.col,fillOpacity:1})
+        .bindTooltip(tip(b.label,'Visited by this audience'),{className:'aud-tip',direction:'top'}).addTo(xLayer);
+      L.marker(c,{interactive:false,zIndexOffset:700,
+        icon:L.divIcon({html:'<div class="xbrandlab" style="background:'+b.col+'">'+b.label+'</div>',className:'',iconSize:[1,1],iconAnchor:[0,-18]})}).addTo(xLayer);
+    });
+    L.circleMarker(anchor,{radius:8,color:'#fff',weight:3,fillColor:'#4A2A6E',fillOpacity:1,interactive:false}).addTo(xLayer);
+    xpanel('<div class="xh">'+b.label+' overlap</div>'
+      + xrow('<span class="xdot" style="background:'+b.col+'"></span>This audience', bar(kind==='ikea'?68:93,b.col), kind==='ikea'?'41%':'56%')
+      + xrow('<span class="xdot" style="background:#8A8494"></span>Metro average', bar(kind==='ikea'?20:32,'#8A8494'), kind==='ikea'?'12%':'19%')
+      + '<div class="xfoot">Co-visitation with <b>'+b.label+'</b> in the last 90 days</div>');
+    try{ map.flyTo([anchor[0]-0.03,anchor[1]+0.05],10,{duration:.6}); }catch(e){}
+  }
+  var XVIEWS={far:xFar,from:xFrom,before:xBefore,switch:xSwitch,
+    when:xWhen, repeat:xRepeat, household:xHousehold,
+    ikea:function(rg){ xBrand(rg,'ikea'); }, bunnings:function(rg){ xBrand(rg,'bunnings'); }};
   function renderExplore(){
     if(xLayer){ try{ map.removeLayer(xLayer); }catch(e){} xLayer=null; }
     var host=document.querySelector('.leg'); if(host) host.style.display=state.explore?'none':'';
@@ -866,6 +928,7 @@
         showAll: function(){ suppressCb=true; setAudUI(AUD_IDS.slice()); applyAudience(true); suppressCb=false; },
         setLens: function(signal, when){ if(signal){ var mp={residential:'Residential',daytime:'Daytime',transaction:'Transaction'}; var s=mp[String(signal).toLowerCase()]||signal; try{ setHour(phaseHour(s)); }catch(e){} } },
         destroy: function(){ try{ if(map) map.remove(); }catch(e){} host.innerHTML=''; host.classList.remove('lm-root','lm-open'); },
+        invalidateSize: function(){ try{ if(map) map.invalidateSize(); }catch(e){} },
         setExplore: function(kind){ setExplore(kind); },
         showHypothesis: function(text){ showHypothesis(text); },
         hideHypothesis: function(){ hideHypothesis(); },

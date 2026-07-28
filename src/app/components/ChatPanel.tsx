@@ -15,6 +15,7 @@ import type { Screen } from '../App';
 import { AUDIENCES } from '../audienceData';
 import type { AudienceId } from '../audienceData';
 import AudienceListCard from './AudienceListCard';
+import { EvidenceGrid, KeyFindings, NEXT_TURNS } from './EvidenceCharts';
 
 // ─── Audience library ─────────────────────────────────────────────────────────
 
@@ -210,6 +211,8 @@ interface ChatPanelProps {
   onOpenHypothesis?: () => void;
   onDismissHypothesis?: () => void;
   onValidateHypothesis?: () => void;
+  evidenceOnMap?: string | null;
+  onEvidenceShowOnMap?: (id: string) => void;
 }
 
 // A catchment the user clicked on the map. The chat answers it in a sentence
@@ -295,7 +298,11 @@ export default function ChatPanel({
   onOpenHypothesis,
   onDismissHypothesis,
   onValidateHypothesis,
+  evidenceOnMap = null,
+  onEvidenceShowOnMap,
 }: ChatPanelProps) {
+  // which next step the reader picked once the evidence is in
+  const [nextTurn, setNextTurn] = useState<string | null>(null);
   const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
@@ -341,7 +348,7 @@ export default function ChatPanel({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length, hypothesis]);
+  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length, hypothesis, evidenceOnMap, nextTurn]);
 
   // ── Effects per screen ──────────────────────────────────────────────────────
 
@@ -650,7 +657,7 @@ export default function ChatPanel({
       {screen !== 'blank' && (
         <div className="flex-1 flex flex-col min-h-0">
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 flex flex-col">
-            <div className="w-full max-w-[700px] my-auto pb-8 space-y-0">
+            <div className={`w-full my-auto pb-8 space-y-0 ${hypothesis === 'validated' ? 'max-w-none' : 'max-w-[700px]'}`}>
 
               {/* ── Brief user message ── */}
               {entryMode === 'brief' && (
@@ -976,7 +983,33 @@ export default function ChatPanel({
               {hypothesis === 'validated' && (
                 <>
                   <UserMessage text="Yes — validate this" />
-                  <AIMessage text="Testing it now. I’ll compare trip length and dwell time against a like-for-like grocery baseline, and check whether the 20–30 km households behave like destination shoppers on frequency and basket too." />
+                  <AIMessage text="Testing it now. I’ll compare six signals against a like-for-like grocery baseline — if this is destination shopping, the trip should be long, planned, repeated and chained to other big-box retail." />
+                  <AIMessage text="Here’s the evidence. Each one can drive the map — Show on map puts that filter on the geography." />
+                  <EvidenceGrid active={evidenceOnMap} onShowOnMap={(id) => onEvidenceShowOnMap?.(id)} />
+                  <KeyFindings />
+                  <AIMessage text="Would you like me to:" />
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5 mb-5">
+                    {NEXT_TURNS.map((n) => (
+                      <button
+                        key={n.id}
+                        onClick={() => setNextTurn(n.id)}
+                        className={`flex items-center gap-2.5 rounded-xl border p-3 text-left font-['Jua',sans-serif] text-[14px] leading-snug text-[#1a1a1a] transition-colors ${
+                          nextTurn === n.id ? 'bg-[#efe8f8] border-[#732d93]' : 'bg-[#f8f8f8] border-transparent hover:bg-[#f5f0fb] hover:border-[#d9cdf0]'
+                        }`}
+                      >
+                        <span className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-[7px] border border-[#e1d9ec] bg-white">
+                          <svg viewBox="0 0 24 24" className="h-3 w-3 text-[#6b3c72]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">{n.icon}</svg>
+                        </span>
+                        {n.t}
+                      </button>
+                    ))}
+                  </div>
+                  {nextTurn && (
+                    <div className="lumos-reply-in">
+                      <UserMessage text={NEXT_TURNS.find((n) => n.id === nextTurn)!.t.replace(/\?$/, '')} />
+                      <AIMessage text={NEXT_TURNS.find((n) => n.id === nextTurn)!.ack} />
+                    </div>
+                  )}
                 </>
               )}
 
@@ -996,7 +1029,7 @@ export default function ChatPanel({
 
           {/* Input bar */}
           <div className="px-8 py-5 border-t border-gray-200">
-            <div className="max-w-[700px]">
+            <div className={hypothesis === 'validated' ? '' : 'max-w-[700px]'}>
               {hypothesis === 'pending' && (
                 <HypothesisDock
                   onOpen={() => onOpenHypothesis?.()}

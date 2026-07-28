@@ -35,6 +35,7 @@ interface LumosMapInstance {
   showAll: () => void;
   setLayerOn: (key: string, on: boolean) => void;
   setExplore: (kind: string | null) => void;
+  invalidateSize: () => void;
   showHypothesis: (text?: string) => void;
   hideHypothesis: () => void;
   clearFocus: () => void;
@@ -134,6 +135,16 @@ export default function LumosMapStage({
     if (!exploreRequest) return;
     try { lmRef.current?.setExplore(exploreRequest.kind); } catch { /* noop */ }
   }, [exploreRequest?.n]);
+
+  // The chat can take two thirds of the screen when the evidence lands, and
+  // Leaflet does not notice its container resizing — tell it.
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const ro = new ResizeObserver(() => { try { lmRef.current?.invalidateSize(); } catch { /* noop */ } });
+    ro.observe(host);
+    return () => ro.disconnect();
+  }, []);
 
   // The notice lives on the map for as long as it is waiting in the chat.
   useEffect(() => {

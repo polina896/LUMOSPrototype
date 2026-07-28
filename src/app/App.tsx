@@ -88,6 +88,8 @@ export default function App() {
   const requestLayer = (key: string) => setLayerRequest((prev) => ({ key, n: (prev?.n ?? 0) + 1 }));
   // A follow-up question the map answers with its own view.
   const [exploreRequest, setExploreRequest] = useState<{ kind: string; n: number } | null>(null);
+  // which validation chart is currently on the map
+  const [evidenceOnMap, setEvidenceOnMap] = useState<string | null>(null);
   // The hypothesis is drawn from the distance and origin answers, so it surfaces
   // once the user has actually seen two of them — never on a timer alone.
   const [hypothesis, setHypothesis] = useState<'idle' | 'pending' | 'open' | 'validated' | 'dismissed'>('idle');
@@ -176,6 +178,9 @@ export default function App() {
   // slim left rail and the LumosMap opens as the center stage (the geographic map
   // no longer lives inside the audience detail panel).
   const segmentsIdentified = screen === 'profiles' || screen === 'deep-dive';
+  // Six charts do not fit a 380px rail — once the evidence lands the chat takes
+  // the room and the map drops to roughly a third, still driven from the charts.
+  const evidenceOpen = hypothesis === 'validated';
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
@@ -230,7 +235,9 @@ export default function App() {
       ) : (
         <>
           {/* Chat — full width until segments are identified, then a slim left rail */}
-          <div className={`flex min-h-0 transition-[width] duration-300 ease-out ${segmentsIdentified ? 'w-[380px] flex-shrink-0' : 'flex-1'}`}>
+          <div className={`flex min-h-0 transition-[width] duration-500 ease-out ${
+            segmentsIdentified ? (evidenceOpen ? 'flex-1 min-w-0' : 'w-[380px] flex-shrink-0') : 'flex-1'
+          }`}>
             <ChatPanel
               screen={screen}
               setScreen={setScreen}
@@ -252,12 +259,16 @@ export default function App() {
               onOpenHypothesis={() => setHypothesis('open')}
               onDismissHypothesis={() => setHypothesis('dismissed')}
               onValidateHypothesis={() => setHypothesis('validated')}
+              evidenceOnMap={evidenceOnMap}
+              onEvidenceShowOnMap={(id) => { setEvidenceOnMap(id); requestExplore(id); }}
             />
           </div>
 
           {/* LumosMap center stage — appears once segments resolve */}
           {segmentsIdentified && !showDataExplorer && (
-            <div className="flex-1 min-w-0 border-l border-[#d3d3d0] bg-[#EDEBF2]">
+            <div className={`min-w-0 border-l border-[#d3d3d0] bg-[#EDEBF2] transition-[width] duration-500 ease-out ${
+              evidenceOpen ? 'w-[40%] flex-shrink-0' : 'flex-1'
+            }`}>
               <LumosMapStage
                 selectedAudienceId={selectedAudienceId}
                 onSelectAudience={setSelectedAudienceId}
