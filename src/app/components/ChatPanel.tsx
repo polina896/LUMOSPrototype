@@ -205,7 +205,7 @@ interface ChatPanelProps {
   onClearChatContext?: () => void;
   onStartCompare?: (seed: never[], prompt: string) => void;
   regionPicks?: ChatRegionPick[];
-  onRequestLayer?: (key: string) => void;
+  onExplore?: (kind: string) => void;
 }
 
 // A catchment the user clicked on the map. The chat answers it in a sentence
@@ -286,7 +286,7 @@ export default function ChatPanel({
   onClearChatContext,
   onStartCompare,
   regionPicks = [],
-  onRequestLayer,
+  onExplore,
 }: ChatPanelProps) {
   const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -955,7 +955,7 @@ export default function ChatPanel({
 
               {/* Catchment picks — the map click, answered in the chat */}
               {regionPicks.map((pick) => (
-                <RegionSummary key={pick.key} pick={pick} onRequestLayer={onRequestLayer} />
+                <RegionSummary key={pick.key} pick={pick} onExplore={onExplore} />
               ))}
 
               {/* Clarify widget — flows inline with the conversation it belongs to */}
@@ -1215,6 +1215,54 @@ function FloatingClarifyWidget({
   );
 }
 
+// The four ways into the twin, once a catchment is open. Each drives a map state.
+const EXPLORATIONS = [
+  {
+    id: 'far',
+    q: 'How far do they travel?',
+    icon: <path d="M12 21V3M5 10l7-7 7 7" />,
+    a: 'A median of 14 km each way — 1.7× the Greater Sydney average of 8.4 km. Two thirds of trips come from beyond 10 km, which is why roadside media works so much harder than letterbox here.',
+  },
+  {
+    id: 'from',
+    q: 'Which suburbs are they coming from?',
+    icon: <><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z" /><circle cx="12" cy="10" r="2.6" /></>,
+    a: 'Concentrated, but not where you would guess. Penrith, Richmond and Castle Hill alone send just over half the trips — three outer centres with no warehouse club of their own.',
+  },
+  {
+    id: 'before',
+    q: 'What do they do before visiting Costco?',
+    icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    a: 'It is a chained Saturday morning. 38% run school drop-off → café → Bunnings → Costco, arriving around 11am. The trip is decided the night before and the route barely varies.',
+  },
+  {
+    id: 'switch',
+    q: 'Which competitor are they switching from?',
+    icon: <><path d="M7 16l-4-4 4-4" /><path d="M3 12h12" /><path d="M17 8l4 4-4 4" /><path d="M21 12H9" /></>,
+    a: 'Mostly ALDI and Woolworths. ALDI holds a smaller share of basket but a far higher switching rate — these households already buy on unit price, so the argument is already won.',
+  },
+] as const;
+
+type ExploreId = typeof EXPLORATIONS[number]['id'];
+
+function ExploreButton({ item, active, onPick }: {
+  item: typeof EXPLORATIONS[number]; active: boolean; onPick: () => void;
+}) {
+  return (
+    <button
+      onClick={onPick}
+      className={`flex items-start gap-2.5 w-full text-left p-3 rounded-lg border transition-colors ${
+        active ? 'bg-[#f1e9ff] border-[#732d93]' : 'bg-[#f8f8f8] border-transparent hover:bg-[#f1ecfb] hover:border-[#d9cdf0]'
+      }`}
+    >
+      <span className="w-[22px] h-[22px] rounded-[7px] bg-white border border-[#e1d9ec] grid place-items-center flex-shrink-0 mt-px">
+        <svg viewBox="0 0 24 24" className="w-3 h-3 text-[#6b3c72]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">{item.icon}</svg>
+      </span>
+      <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">{item.q}</span>
+    </button>
+  );
+}
+
 // Colours match the map's own segment palette, so the chip that lands in the
 // chat is visibly the thing that was just clicked on the map.
 const SEGMENT_COLOR: Record<string, string> = {
@@ -1223,13 +1271,16 @@ const SEGMENT_COLOR: Record<string, string> = {
   bulk: '#C07A2E',
 };
 
-function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onRequestLayer?: (key: string) => void }) {
+function RegionSummary({ pick, onExplore }: { pick: ChatRegionPick; onExplore?: (kind: string) => void }) {
   // Land the reply the way a live answer arrives: the source chip first, a
   // beat of thinking, then the words.
   const [thinking, setThinking] = useState(true);
+  const [explored, setExplored] = useState<ExploreId[]>([]);
+  const [answered, setAnswered] = useState<ExploreId | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setThinking(true);
+    setExplored([]); setAnswered(null);
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     const t = window.setTimeout(() => {
       setThinking(false);
@@ -1285,24 +1336,26 @@ function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onReque
             <AIMessage text={`Their biggest single source of trips is ${top.name} at ${top.pct}% of visits. I’ve drawn the drive-time catchment and the trips running into it on the map.`} />
           )}
           <div className="space-y-2">
-            <button
-              onClick={() => onRequestLayer?.('poi')}
-              className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
-            >
-              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Where else do they go?</span>
-            </button>
-            <button
-              onClick={() => onRequestLayer?.('media')}
-              className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
-            >
-              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Which billboards reach them?</span>
-            </button>
-            <button className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors">
-              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Compare to {compareTo}</span>
-            </button>
+            <AIMessage text="Interesting. These customers travel significantly further than average." />
+            <p className="font-['Jua',sans-serif] text-[15px] text-[#140934] leading-relaxed pb-1">Would you like to understand:</p>
+            {EXPLORATIONS.map((item) => (
+              <ExploreButton
+                key={item.id}
+                item={item}
+                active={explored.includes(item.id)}
+                onPick={() => {
+                  if (!explored.includes(item.id)) setExplored((prev) => [...prev, item.id]);
+                  setAnswered(item.id);
+                  onExplore?.(item.id);
+                }}
+              />
+            ))}
+            {answered && (
+              <div className="pt-3 lumos-reply-in">
+                <UserMessage text={EXPLORATIONS.find((e) => e.id === answered)!.q} />
+                <AIMessage text={EXPLORATIONS.find((e) => e.id === answered)!.a} />
+              </div>
+            )}
           </div>
         </div>
       )}

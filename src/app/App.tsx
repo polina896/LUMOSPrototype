@@ -86,6 +86,9 @@ export default function App() {
   // A chat follow-up asking the map to bring a layer up.
   const [layerRequest, setLayerRequest] = useState<{ key: string; n: number } | null>(null);
   const requestLayer = (key: string) => setLayerRequest((prev) => ({ key, n: (prev?.n ?? 0) + 1 }));
+  // A follow-up question the map answers with its own view.
+  const [exploreRequest, setExploreRequest] = useState<{ kind: string; n: number } | null>(null);
+  const requestExplore = (kind: string) => setExploreRequest((prev) => ({ kind, n: (prev?.n ?? 0) + 1 }));
 
   const addChatContext = (ref: ModuleRef) =>
     setChatContext((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
@@ -233,7 +236,7 @@ export default function App() {
               onClearChatContext={() => setChatContext([])}
               onStartCompare={startCompare}
               regionPicks={regionPicks}
-              onRequestLayer={requestLayer}
+              onExplore={requestExplore}
             />
           </div>
 
@@ -245,6 +248,7 @@ export default function App() {
                 onSelectAudience={setSelectedAudienceId}
                 onPickRegion={handlePickRegion}
                 layerRequest={layerRequest}
+                exploreRequest={exploreRequest}
               />
             </div>
           )}

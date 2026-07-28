@@ -34,6 +34,7 @@ interface LumosMapInstance {
   select: (id: string) => void;
   showAll: () => void;
   setLayerOn: (key: string, on: boolean) => void;
+  setExplore: (kind: string | null) => void;
   clearFocus: () => void;
   destroy: () => void;
   readonly mode: string;
@@ -59,12 +60,15 @@ export default function LumosMapStage({
   onSelectAudience,
   onPickRegion,
   layerRequest,
+  exploreRequest,
 }: {
   selectedAudienceId: AudienceId | null;
   onSelectAudience: (id: AudienceId | null) => void;
   onPickRegion?: (pick: RegionPick & { audienceId: AudienceId | null }) => void;
   // a chat follow-up asking the map to bring a layer up: {key, n} — n forces a re-run
   layerRequest?: { key: string; n: number } | null;
+  // a follow-up question asking the map to answer it: {kind, n} — n forces a re-run
+  exploreRequest?: { kind: string; n: number } | null;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const lmRef = useRef<LumosMapInstance | null>(null);
@@ -114,6 +118,12 @@ export default function LumosMapStage({
     if (!layerRequest) return;
     try { lmRef.current?.setLayerOn(layerRequest.key, true); } catch { /* noop */ }
   }, [layerRequest?.n]);
+
+  // A follow-up question ("how far do they travel?") the map answers itself.
+  useEffect(() => {
+    if (!exploreRequest) return;
+    try { lmRef.current?.setExplore(exploreRequest.kind); } catch { /* noop */ }
+  }, [exploreRequest?.n]);
 
   return <div ref={hostRef} className="w-full h-full" />;
 }
