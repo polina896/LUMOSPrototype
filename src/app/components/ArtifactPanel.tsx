@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users, Bookmark } from 'lucide-react';
+import { ChevronDown, Check, Sparkles, Plus, PaintBucket, FileText, Database, GripVertical, Edit2, MoreVertical, Lightbulb, Download, Users, Bookmark, X, ArrowUp, Wand2 } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Screen } from '../App';
@@ -11,6 +11,69 @@ import AudienceDetailPanel from './AudienceDetailPanel';
 import DataExplorerPanel from './DataExplorerPanel';
 
 const ItemType = 'BLOCK';
+
+// ────────────────────────────────────────────────────────────────
+// Doc editing: scope a block into Ask Lumos → preview a proposed
+// change inline → Accept / Discard. Shared across every block via
+// context so the DraggableWrapper owns the whole flow in one place.
+// ────────────────────────────────────────────────────────────────
+interface Proposal {
+  loading: boolean;
+  before?: string;
+  after?: string;
+  summary?: string;
+  note?: string;
+}
+
+interface BlockEditApi {
+  askOpenId: string | null;
+  openAsk: (id: string) => void;
+  closeAsk: () => void;
+  proposals: Record<string, Proposal>;
+  heroNotes: Record<string, string>;
+  submitAsk: (id: string, instruction: string, before: string) => void;
+  acceptProposal: (id: string) => void;
+  discardProposal: (id: string) => void;
+  clearHero: (id: string) => void;
+  duplicateBlock: (id: string) => void;
+  deleteBlock: (id: string) => void;
+}
+
+const BlockEditContext = React.createContext<BlockEditApi | null>(null);
+
+// Canned-but-intent-aware rewrite (mirrors the doc-editing wireframe).
+function proposeRewrite(prompt: string, before: string): { after: string; summary: string; note: string } {
+  const p = (prompt || '').toLowerCase();
+  if (/short|concise|tighten|punch|snappy|brief|trim/.test(p))
+    return {
+      after: 'Three audiences own 71% of premium-auto intent — and they’re only in-corridor a few hours a week. Concentration is the whole opportunity.',
+      summary: 'shortened to one punchy line',
+      note: 'Tightened to a single sentence and led with the headline stat.',
+    };
+  if (/number|stat|data|quantif|metric|figure/.test(p))
+    return {
+      after: 'Just three audiences hold 71% of qualified intent (218K intenders, ▲9% QoQ), clustering in 3 corridors for ~6 hours a week — a S$4.9B addressable window.',
+      summary: 'added quantification',
+      note: 'Folded in the intender count, growth and spend figures.',
+    };
+  if (/formal|exec|profession|stakeholder/.test(p))
+    return {
+      after: 'Qualified premium-auto intent is highly concentrated: three audiences account for 71% of demand, consistently present in three key corridors during a narrow weekly window — a targetable efficiency the launch should exploit.',
+      summary: 'more formal tone',
+      note: 'Rewrote in a more executive register.',
+    };
+  if (/warm|human|friendly|approachable/.test(p))
+    return {
+      after: 'Here’s the good news: most of the people Meridian wants are already showing up in the same few places each week. Meet them there and the launch does the heavy lifting for you.',
+      summary: 'warmer, more human tone',
+      note: 'Softened the register while keeping the core insight.',
+    };
+  return {
+    after: `${before.replace(/\s+$/, '')} And crucially, this is reachable — predictable corridors during a narrow weekly window make timing and place the real unlock.`,
+    summary: 'sharper emphasis on reachability',
+    note: 'Kept your facts and sharpened the “why it matters”.',
+  };
+}
 
 interface ArtifactPanelProps {
   screen: Screen;
@@ -351,6 +414,86 @@ function ResultPanel({
   const [isPostcodeEditOpen, setIsPostcodeEditOpen] = useState(false);
   const [postcodeView, setPostcodeView] = useState<'ranking' | 'heatmap'>('ranking');
 
+  // ── Block editing (scoped Ask → proposal → Accept/Discard) ──
+  const [askOpenId, setAskOpenId] = useState<string | null>(null);
+  const [proposals, setProposals] = useState<Record<string, Proposal>>({});
+  const [heroNotes, setHeroNotes] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast((t) => (t === msg ? null : t)), 1800);
+  };
+
+  const blockEditApi: BlockEditApi = {
+    askOpenId,
+    openAsk: (id) => {
+      setAskOpenId(id);
+      setProposals((p) => {
+        if (!p[id]) return p;
+        const next = { ...p };
+        delete next[id];
+        return next;
+      });
+    },
+    closeAsk: () => setAskOpenId(null),
+    proposals,
+    heroNotes,
+    submitAsk: (id, instruction, before) => {
+      setAskOpenId(null);
+      setProposals((p) => ({ ...p, [id]: { loading: true } }));
+      window.setTimeout(() => {
+        const { after, summary, note } = proposeRewrite(instruction, before);
+        setProposals((p) => ({ ...p, [id]: { loading: false, before, after, summary, note } }));
+      }, 1200);
+    },
+    acceptProposal: (id) => {
+      setProposals((p) => {
+        const prop = p[id];
+        if (prop?.after) setHeroNotes((h) => ({ ...h, [id]: prop.after! }));
+        const next = { ...p };
+        delete next[id];
+        return next;
+      });
+      showToast('Change applied');
+    },
+    discardProposal: (id) => {
+      setProposals((p) => {
+        const next = { ...p };
+        delete next[id];
+        return next;
+      });
+      showToast('Change discarded');
+    },
+    clearHero: (id) => {
+      setHeroNotes((h) => {
+        const next = { ...h };
+        delete next[id];
+        return next;
+      });
+      showToast('Note removed');
+    },
+    duplicateBlock: (id) => {
+      setBlocks((bs) => {
+        const i = bs.findIndex((b) => b.id === id);
+        if (i === -1) return bs;
+        const copy: BlockData = { ...bs[i], id: `${bs[i].type}-${Date.now()}` };
+        const next = [...bs];
+        next.splice(i + 1, 0, copy);
+        return next;
+      });
+      showToast('Block duplicated');
+    },
+    deleteBlock: (id) => {
+      setBlocks((bs) => bs.filter((b) => b.id !== id));
+      setProposals((p) => {
+        const next = { ...p };
+        delete next[id];
+        return next;
+      });
+      showToast('Block deleted');
+    },
+  };
+
   const moveBlock = (dragIndex: number, hoverIndex: number) => {
     const newBlocks = [...blocks];
     const [removed] = newBlocks.splice(dragIndex, 1);
@@ -375,8 +518,21 @@ function ResultPanel({
     setOnAddTextBlock(() => addTextBlock);
   }, [setOnAddTextBlock]);
 
+  // Seed takeaway each data block's Ask edit starts from.
+  const HERO_SEED: Record<BlockData['type'], string> = {
+    insight: '',
+    text: '',
+    'geo-map': 'Three corridors — Central/East, North/West and the HDB towns — hold the large majority of qualified reach, so a tightly geo-fenced launch beats island-wide spend.',
+    audiences: 'These three segments carry the bulk of qualified intent; lead with Premium Sedan Intenders for challenger impact.',
+    growth: 'Too small to lead with, but the fastest climbers — worth seeding now ahead of the Q1 launch surge.',
+    postcodes: 'Six districts index well above baseline, with Orchard / River Valley the clear anchor for OOH-to-showroom seeding.',
+    'campaign-recs': 'Sequence the launch by segment: a broad-reach hero for sedans, always-on consideration for EV, and retargeting for SUV upgraders.',
+    messaging: 'Each segment needs its own value prop and hook — one message won’t carry all three.',
+    narrative: 'These three segments aren’t just the biggest — they’re the most reachable, which is what makes them the right place to start.',
+  };
+
   return (
-    <>
+    <BlockEditContext.Provider value={blockEditApi}>
     <DndProvider backend={HTML5Backend}>
     <div className="flex flex-col h-full">
       {/* Header Row */}
@@ -528,9 +684,9 @@ function ResultPanel({
             : "Meridian Motors' Singapore launch opportunity sits across three audience segments with distinct consideration behaviours and purchase signals. Lead with Premium Sedan Intenders for brand challenger impact, activate EV Upgrade Shoppers for category leadership, and target Family SUV Upgraders for sustained new-model consideration.";
 
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel="AI Summary" defaultHero={summaryText} heroInline>
               <AISummaryBlock
-                text={summaryText}
+                text={heroNotes[block.id] ?? summaryText}
                 styleConfig={styleConfig}
               />
             </DraggableWrapper>
@@ -550,7 +706,7 @@ function ResultPanel({
               ];
 
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]}>
               <DraggableBlock title={block.title!} styleConfig={styleConfig}>
                 <div className="space-y-2.5">
                   {audienceData.map((audience) => (
@@ -572,32 +728,31 @@ function ResultPanel({
         }
         if (block.type === 'narrative') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel="Why these segments" defaultHero={HERO_SEED[block.type]}>
               <NarrativeBlock styleConfig={styleConfig} entryMode={entryMode} />
             </DraggableWrapper>
           );
         }
         if (block.type === 'growth') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]}>
               <GrowthAudiencesBlock title={block.title!} styleConfig={styleConfig} entryMode={entryMode} />
             </DraggableWrapper>
           );
         }
         if (block.type === 'geo-map') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]}>
               <GeoMapBlock title={block.title!} styleConfig={styleConfig} />
             </DraggableWrapper>
           );
         }
         if (block.type === 'postcodes') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]} onStructuredEdit={() => setIsPostcodeEditOpen(true)}>
               <DraggableBlock
                 title={block.title!}
                 styleConfig={styleConfig}
-                onEdit={() => setIsPostcodeEditOpen(true)}
               >
                 {postcodeView === 'ranking' ? (
                   <div className="space-y-3">
@@ -617,22 +772,22 @@ function ResultPanel({
         }
         if (block.type === 'campaign-recs') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]}>
               <CampaignRecommendationsBlock title={block.title!} styleConfig={styleConfig} entryMode={entryMode} />
             </DraggableWrapper>
           );
         }
         if (block.type === 'messaging') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={HERO_SEED[block.type]}>
               <MessagingBlock title={block.title!} styleConfig={styleConfig} entryMode={entryMode} />
             </DraggableWrapper>
           );
         }
         if (block.type === 'text') {
           return (
-            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock}>
-              <TextBlock title={block.title!} content={block.content!} styleConfig={styleConfig} />
+            <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel={block.title} defaultHero={block.content} heroInline>
+              <TextBlock title={block.title!} content={heroNotes[block.id] ?? block.content!} styleConfig={styleConfig} />
             </DraggableWrapper>
           );
         }
@@ -677,7 +832,15 @@ function ResultPanel({
       onViewChange={setPostcodeView}
       styleConfig={styleConfig}
     />
-    </>
+
+    {/* Toast */}
+    {toast && (
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-[#1a1a1a] text-white rounded-full shadow-lg font-['Geist',sans-serif] text-[12.5px] flex items-center gap-2 animate-[fadeIn_.15s_ease]">
+        <Check className="w-3.5 h-3.5 text-[#5bd39a]" />
+        {toast}
+      </div>
+    )}
+    </BlockEditContext.Provider>
   );
 }
 
@@ -715,10 +878,34 @@ interface DraggableWrapperProps {
   index: number;
   moveBlock: (dragIndex: number, hoverIndex: number) => void;
   children: React.ReactNode;
+  /** Label shown in the Ask scope-chip (usually the section title). */
+  blockLabel?: string;
+  /** Text the proposal starts from — the block's body for prose, or a seed takeaway for data blocks. */
+  defaultHero?: string;
+  /** When true the accepted change is reflected in the block body itself (no separate callout). */
+  heroInline?: boolean;
+  /** Optional structured editor (e.g. postcode modal) surfaced as a pencil. */
+  onStructuredEdit?: () => void;
 }
 
-function DraggableWrapper({ id, index, moveBlock, children }: DraggableWrapperProps) {
+function DraggableWrapper({ id, index, moveBlock, children, blockLabel, defaultHero = '', heroInline, onStructuredEdit }: DraggableWrapperProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const edit = React.useContext(BlockEditContext);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [askText, setAskText] = useState('');
+
+  const askOpen = edit?.askOpenId === id;
+  const proposal = edit?.proposals[id];
+  const heroNote = edit?.heroNotes[id];
+  const beforeText = heroNote ?? defaultHero;
+
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  const submit = () => {
+    const t = askText.trim();
+    if (!t || !edit) return;
+    edit.submitAsk(id, t, beforeText);
+    setAskText('');
+  };
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemType,
@@ -763,14 +950,215 @@ function DraggableWrapper({ id, index, moveBlock, children }: DraggableWrapperPr
 
   drag(drop(ref));
 
+  const isBusy = askOpen || !!proposal;
+
   return (
     <div
       ref={ref}
-      className={`transition-opacity ${isDragging ? 'opacity-40' : 'opacity-100'} ${
+      className={`group relative transition-all ${isDragging ? 'opacity-40' : 'opacity-100'} ${
         isOver ? 'scale-[1.02]' : 'scale-100'
-      }`}
+      } ${isBusy ? 'rounded-xl ring-1 ring-[#e7d9ee]' : ''}`}
     >
+      {/* Centralized block toolbar (Ask · edit · more) */}
+      <div
+        onMouseDown={stop}
+        className={`absolute right-3 top-3 z-30 flex items-center gap-1 transition-opacity ${
+          askOpen || moreOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        }`}
+      >
+        <button
+          onClick={(e) => {
+            stop(e);
+            if (askOpen) edit?.closeAsk();
+            else edit?.openAsk(id);
+          }}
+          className="flex items-center gap-1 h-[26px] pl-2 pr-2.5 bg-white border border-[#e3d3ea] text-[#6b3c72] rounded-md text-[11.5px] font-['Geist',sans-serif] hover:bg-[#faf5fc] shadow-sm transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          Ask
+        </button>
+        {onStructuredEdit && (
+          <button
+            onClick={(e) => {
+              stop(e);
+              onStructuredEdit();
+            }}
+            title="Edit data"
+            className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 shadow-sm transition-colors"
+          >
+            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
+          </button>
+        )}
+        <div className="relative">
+          <button
+            onClick={(e) => {
+              stop(e);
+              setMoreOpen((v) => !v);
+            }}
+            className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 shadow-sm transition-colors"
+          >
+            <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
+          </button>
+          {moreOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+              <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
+                {[
+                  { label: 'Export as PDF', fn: () => {} },
+                  { label: 'Export as PNG', fn: () => {} },
+                ].map((it) => (
+                  <button
+                    key={it.label}
+                    onClick={() => setMoreOpen(false)}
+                    className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors"
+                  >
+                    {it.label}
+                  </button>
+                ))}
+                <div className="my-1 border-t border-[#e5e5e2]" />
+                <button
+                  onClick={() => {
+                    setMoreOpen(false);
+                    edit?.duplicateBlock(id);
+                  }}
+                  className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors"
+                >
+                  Duplicate
+                </button>
+                <button
+                  onClick={() => {
+                    setMoreOpen(false);
+                    edit?.deleteBlock(id);
+                  }}
+                  className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
       {children}
+
+      {/* Accepted takeaway note (data blocks — prose blocks reflect the change in-body) */}
+      {!heroInline && heroNote && !proposal && (
+        <div onMouseDown={stop} className="ml-[38px] mr-2 -mt-4 mb-8 group/note relative">
+          <div className="flex items-start gap-2.5 bg-gradient-to-b from-[#faf7fc] to-[#f6f1f8] border border-[#ece2f0] border-l-[3px] border-l-[#6b3c72] rounded-lg px-3.5 py-2.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#6b3c72] mt-0.5 flex-none" />
+            <p className="font-['Geist',sans-serif] text-[13px] text-[#40304a] leading-[20px]">{heroNote}</p>
+            <div className="flex-none flex gap-1 opacity-0 group-hover/note:opacity-100 transition-opacity">
+              <button onClick={() => edit?.openAsk(id)} title="Revise" className="w-6 h-6 rounded-md hover:bg-white/70 flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-[#6b3c72]" />
+              </button>
+              <button onClick={() => edit?.clearHero(id)} title="Remove" className="w-6 h-6 rounded-md hover:bg-white/70 flex items-center justify-center">
+                <X className="w-3.5 h-3.5 text-[#9a8aa2]" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inline Ask composer, scoped to this block */}
+      {askOpen && (
+        <div onMouseDown={stop} className="ml-[38px] mr-2 -mt-4 mb-8">
+          <div className="border border-[#e3d3ea] bg-[#fbf7fd] rounded-xl p-2.5">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full bg-[#f1e9ff] border border-[#e3d3ea] text-[11px] text-[#6b3c72] font-['Geist',sans-serif]">
+                <Wand2 className="w-3 h-3" />
+                <span className="max-w-[220px] truncate">{blockLabel || 'This section'}</span>
+                <button onClick={() => edit?.closeAsk()} className="w-4 h-4 rounded-full bg-[#6b3c72]/15 hover:bg-[#6b3c72]/30 flex items-center justify-center">
+                  <X className="w-2.5 h-2.5 text-[#6b3c72]" />
+                </button>
+              </span>
+            </div>
+            <div className="flex items-end gap-2">
+              <textarea
+                autoFocus
+                rows={1}
+                value={askText}
+                onChange={(e) => setAskText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                  }
+                  if (e.key === 'Escape') edit?.closeAsk();
+                }}
+                placeholder={`Tell Lumos how to change “${blockLabel || 'this section'}”…`}
+                className="flex-1 resize-none bg-white border border-[#e5e5e2] rounded-lg px-3 py-2 font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] outline-none focus:border-[#6b3c72] leading-[19px] max-h-28"
+              />
+              <button
+                onClick={submit}
+                disabled={!askText.trim()}
+                className="w-[34px] h-[34px] rounded-full bg-[#6b3c72] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[#5a3060] transition-colors"
+              >
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {['Make it shorter', 'More formal', 'Add the numbers', 'Warmer tone'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    if (!edit) return;
+                    edit.submitAsk(id, s, beforeText);
+                    setAskText('');
+                  }}
+                  className="px-2.5 py-1 rounded-full bg-white border border-[#e5e5e2] text-[11px] text-[#6b6b6b] font-['Geist',sans-serif] hover:border-[#6b3c72] hover:text-[#6b3c72] transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Proposal — loading shimmer, then before → after with Accept / Discard */}
+      {proposal && (
+        <div onMouseDown={stop} className="ml-[38px] mr-2 -mt-4 mb-8">
+          {proposal.loading ? (
+            <div className="border border-[#e3d3ea] bg-[#fbf5fd] rounded-xl px-3.5 py-3 flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-[#6b3c72] animate-pulse" />
+              <span className="font-['Geist',sans-serif] text-[12.5px] text-[#6b3c72]">Lumos is revising “{blockLabel || 'this section'}”…</span>
+            </div>
+          ) : (
+            <div className="border border-[#e3d3ea] bg-[#fbf5fd] rounded-xl overflow-hidden">
+              <div className="px-3.5 pt-3 pb-2.5 space-y-2">
+                {beforeText && (
+                  <div className="flex gap-2">
+                    <span className="flex-none mt-0.5 text-[10px] font-['Geist',sans-serif] font-semibold uppercase tracking-wide text-[#b7a4bf]">Before</span>
+                    <p className="font-['Geist',sans-serif] text-[12.5px] text-[#9a8aa2] line-through leading-[19px]">{beforeText}</p>
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <span className="flex-none mt-0.5 text-[10px] font-['Geist',sans-serif] font-semibold uppercase tracking-wide text-[#6b3c72]">After</span>
+                  <p className="font-['Geist',sans-serif] text-[13px] text-[#2a1f30] leading-[20px]">{proposal.after}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 px-3.5 py-2 border-t border-[#eaddf0] bg-white/50">
+                <span className="font-['Geist',sans-serif] text-[11.5px] text-[#8a7a92]">✦ {proposal.summary}</span>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => edit?.discardProposal(id)}
+                    className="px-3 py-1.5 rounded-lg border border-[#e5e5e2] bg-white text-[12px] text-[#6b6b6b] font-['Geist',sans-serif] hover:bg-gray-50 transition-colors"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    onClick={() => edit?.acceptProposal(id)}
+                    className="px-3 py-1.5 rounded-lg bg-[#6b3c72] text-white text-[12px] font-['Geist',sans-serif] hover:bg-[#5a3060] transition-colors"
+                  >
+                    Accept
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -839,9 +1227,8 @@ function AISummaryBlock({ text, styleConfig }: { text: string; styleConfig: Styl
   );
 }
 
-function DraggableBlock({ title, children, styleConfig, onEdit }: { title: string; children: React.ReactNode; styleConfig: StyleConfig; onEdit?: () => void }) {
+function DraggableBlock({ title, children, styleConfig }: { title: string; children: React.ReactNode; styleConfig: StyleConfig }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   return (
     <div
@@ -871,56 +1258,6 @@ function DraggableBlock({ title, children, styleConfig, onEdit }: { title: strin
 
       {/* Content */}
       <div className="pt-5 pb-3">
-        {/* Edit and More Buttons */}
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onEdit) onEdit();
-            }}
-            className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
         <h2
           style={{
             fontFamily: `'${styleConfig.headingFont}',sans-serif`,
@@ -938,7 +1275,6 @@ function DraggableBlock({ title, children, styleConfig, onEdit }: { title: strin
 
 function TextBlock({ title, content, styleConfig }: { title: string; content: string; styleConfig: StyleConfig }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   return (
     <div
@@ -968,49 +1304,6 @@ function TextBlock({ title, content, styleConfig }: { title: string; content: st
 
       {/* Content */}
       <div className="pt-5 pb-3">
-        {/* Edit and More Buttons */}
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <h3
           style={{
@@ -1037,7 +1330,6 @@ function TextBlock({ title, content, styleConfig }: { title: string; content: st
 
 function MessagingBlock({ title, styleConfig, entryMode }: { title: string; styleConfig: StyleConfig; entryMode?: 'brief' | 'upload' | null }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const audiences = entryMode === 'upload'
     ? [
@@ -1146,49 +1438,6 @@ function MessagingBlock({ title, styleConfig, entryMode }: { title: string; styl
 
       {/* Content */}
       <div className="pt-5 pb-3">
-        {/* Edit and More Buttons */}
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <h3
           style={{
@@ -1411,7 +1660,6 @@ function NarrativeBlock({ styleConfig, entryMode }: { styleConfig: StyleConfig; 
 
 function GrowthAudiencesBlock({ title, styleConfig, entryMode }: { title: string; styleConfig: StyleConfig; entryMode?: 'brief' | 'upload' | null }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const growthAudiences = entryMode === 'upload'
     ? [
@@ -1468,48 +1716,6 @@ function GrowthAudiencesBlock({ title, styleConfig, entryMode }: { title: string
       </div>
 
       <div className="pt-5 pb-3">
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <h2
           style={{
@@ -1585,7 +1791,6 @@ function GrowthAudiencesBlock({ title, styleConfig, entryMode }: { title: string
 
 function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: StyleConfig }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   return (
     <div
@@ -1612,48 +1817,6 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
       </div>
 
       <div className="pt-5 pb-3">
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <h2
           style={{
@@ -1914,7 +2077,6 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
 
 function CampaignRecommendationsBlock({ title, styleConfig, entryMode }: { title: string; styleConfig: StyleConfig; entryMode?: 'brief' | 'upload' | null }) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const campaigns = entryMode === 'upload'
     ? [
@@ -2021,48 +2183,6 @@ function CampaignRecommendationsBlock({ title, styleConfig, entryMode }: { title
       </div>
 
       <div className="pt-5 pb-3">
-        <div className={`absolute right-2 top-6 flex gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
-          </button>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMoreMenuOpen(!isMoreMenuOpen);
-              }}
-              className="w-[26px] h-[26px] bg-white border border-[#e5e5e2] rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <MoreVertical className="w-3.5 h-3.5 text-[#6b6b6b]" />
-            </button>
-            {isMoreMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setIsMoreMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-[30px] z-20 w-44 bg-white border border-[#e5e5e2] rounded-lg shadow-lg py-1">
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PDF
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as CSV
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Export as PNG
-                  </button>
-                  <div className="my-1 border-t border-[#e5e5e2]" />
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#1a1a1a] hover:bg-gray-50 transition-colors">
-                    Duplicate
-                  </button>
-                  <button className="w-full px-4 py-2 text-left font-['Geist',sans-serif] text-[13px] text-[#dc2626] hover:bg-red-50 transition-colors">
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <h2
           style={{
