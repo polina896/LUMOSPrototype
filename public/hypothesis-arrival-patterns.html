@@ -118,6 +118,22 @@
   .note .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--plum2);margin-bottom:7px}
   .note p{font-size:12px;color:var(--ink2);line-height:1.55}
   .note b{color:var(--plum)}
+  /* ── "what just happened" spotlight ─────────────────────────────────────── */
+  .spot{position:fixed;z-index:900;border:2px dashed var(--amber);border-radius:14px;pointer-events:none;
+    box-shadow:0 0 0 9999px rgba(26,16,48,.13);opacity:0;transition:.4s cubic-bezier(.22,1,.36,1)}
+  .spot.show{opacity:1}
+  .spot-lab{position:fixed;z-index:901;display:flex;align-items:center;gap:8px;padding:8px 13px 8px 9px;border-radius:99px;
+    background:var(--amber);color:#fff;font-family:var(--disp);font-size:12px;font-weight:800;white-space:nowrap;
+    box-shadow:0 6px 22px rgba(180,83,9,.4);opacity:0;transform:translateY(6px);transition:.4s cubic-bezier(.22,1,.36,1);pointer-events:none}
+  .spot-lab.show{opacity:1;transform:none}
+  .spot-lab .n{width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:10.5px}
+  .diff{margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .diff .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+  .drow{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink2);font-weight:600;margin-bottom:6px}
+  .drow:last-child{margin-bottom:0}
+  .drow .v{margin-left:auto;font-family:var(--disp);font-weight:800;font-size:11px}
+  .drow .v.no{color:#2F8F63}
+  .drow .v.yes{color:var(--amber)}
 </style>
 
 <div class="wrap">
@@ -169,6 +185,7 @@
       <div class="note">
         <div class="k">What this pattern does</div>
         <p id="noteText"></p>
+        <div class="diff" id="diffBox" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -196,6 +213,33 @@ L.circleMarker(STORE,{radius:9,color:'#fff',weight:3,fillColor:'#4A2A6E',fillOpa
 // pattern 4's badge sits on the band it is talking about
 const badgeMk=L.marker([-33.688,150.700],{interactive:true,icon:L.divIcon({className:'',iconSize:[1,1],
   html:`<div class="mbadge" id="mbadge"><span class="b-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z"/></svg></span><span class="b-t">Pattern spotted here</span></div>`})}).addTo(map);
+
+/* ── make the difference between the four legible, not just felt ─────────── */
+const spot=document.createElement('div'); spot.className='spot'; document.body.appendChild(spot);
+const spotLab=document.createElement('div'); spotLab.className='spot-lab'; document.body.appendChild(spotLab);
+let spotTimer=null;
+function spotlight(el,num,label){
+  if(!el) return;
+  clearTimeout(spotTimer);
+  const r=el.getBoundingClientRect(), pad=7;
+  spot.style.left=(r.left-pad)+'px'; spot.style.top=(r.top-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
+  spotLab.innerHTML=`<span class="n">${num}</span>${label}`;
+  spotLab.style.left=Math.max(12,r.left-pad)+'px';
+  spotLab.style.top=Math.max(12,r.top-pad-40)+'px';
+  requestAnimationFrame(()=>{ spot.classList.add('show'); spotLab.classList.add('show'); });
+  spotTimer=setTimeout(clearSpot,5200);
+}
+function clearSpot(){ spot.classList.remove('show'); spotLab.classList.remove('show'); }
+document.addEventListener('click',(e)=>{ if(!e.target.closest('.ctrl')) clearSpot(); },true);
+
+// a measured read of what the arrival actually cost the user
+function diffPanel(rows){
+  const el=document.getElementById('diffBox'); if(!el) return;
+  el.innerHTML='<div class="k">What just happened</div>'+rows.map(r=>
+    `<div class="drow"><span>${r[0]}</span><span class="v ${r[2]}">${r[1]}</span></div>`).join('');
+  el.style.display='block';
+}
 
 /* ── patterns ────────────────────────────────────────────────────────────── */
 const PATTERNS={
@@ -258,15 +302,28 @@ function dropIntoThread(open){
 /* ── the arrival ─────────────────────────────────────────────────────────── */
 function fire(){
   clear(false);
+  const wasTop=thread.scrollTop, wasFocus=document.activeElement===input;
   if(pattern==='inline'){
     const el=add(HYP_HTML(false),30); wireHyp(el);
-    // only take the scroll if the user is actually at the bottom and idle
-    if(atBottom() && !busy()) requestAnimationFrame(()=>thread.scrollTo({top:thread.scrollHeight,behavior:'smooth'}));
+    const take=atBottom() && !busy();
+    if(take) requestAnimationFrame(()=>thread.scrollTo({top:thread.scrollHeight,behavior:'smooth'}));
     else jump.classList.add('show');
+    setTimeout(()=>{
+      spotlight(take?el.querySelector('.hyp'):jump, 1, take?'Arrived inside the thread':'Thread untouched — pill offered instead');
+      diffPanel([['Appeared in the thread','Yes','yes'],['Thread scrolled','+'+Math.round(thread.scrollTop-wasTop)+'px',take?'yes':'no'],
+                 ['Typing interrupted',wasFocus&&document.activeElement!==input?'Yes':'No',wasFocus&&document.activeElement!==input?'yes':'no'],
+                 ['Costs attention','Medium','yes']]);
+    },520);
   }
-  if(pattern==='dock')  dock.classList.add('show');
-  if(pattern==='status'){ status.classList.add('show','ready'); statusText.textContent='1 pattern found'; }
-  if(pattern==='map')   document.getElementById('mbadge').classList.add('show');
+  if(pattern==='dock'){ dock.classList.add('show');
+    setTimeout(()=>{ spotlight(dock,2,'Docked above the composer'); diffPanel([['Appeared in the thread','No','no'],
+      ['Thread scrolled','0px','no'],['Typing interrupted','No','no'],['Costs attention','Low','no']]); },420); }
+  if(pattern==='status'){ status.classList.add('show','ready'); statusText.textContent='1 pattern found';
+    setTimeout(()=>{ spotlight(status,3,'Header status only — nothing moved'); diffPanel([['Appeared in the thread','No','no'],
+      ['Thread scrolled','0px','no'],['Typing interrupted','No','no'],['Costs attention','Very low — missable','no']]); },420); }
+  if(pattern==='map'){ const mb=document.getElementById('mbadge'); mb.classList.add('show');
+    setTimeout(()=>{ spotlight(mb,4,'Announced on the map, 22 km out'); diffPanel([['Appeared in the thread','No','no'],
+      ['Thread scrolled','0px','no'],['Typing interrupted','No','no'],['Costs attention','Low — but off in the map','no']]); },420); }
 }
 jump.onclick=()=>{ jump.classList.remove('show'); thread.scrollTo({top:thread.scrollHeight,behavior:'smooth'}); const c=thread.querySelector('.hyp'); if(c) c.classList.add('open'); };
 dock.onclick=(e)=>{ if(e.target.id==='dockX'){ dock.classList.remove('show'); return; } dock.classList.remove('show'); dropIntoThread(true); };
@@ -278,6 +335,7 @@ function clear(seed){
   jump.classList.remove('show'); dock.classList.remove('show');
   status.classList.remove('ready'); statusText.textContent='Looking for patterns…';
   const mb=document.getElementById('mbadge'); if(mb) mb.classList.remove('show');
+  clearSpot(); const db=document.getElementById('diffBox'); if(db) db.style.display='none';
   if(seed!==false){
     thread.innerHTML='';
     add(`<span class="chip"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.6"/></svg></i>Selected on map · Marsden Park · Riverstone</span>
