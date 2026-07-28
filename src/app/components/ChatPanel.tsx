@@ -1213,41 +1213,97 @@ function FloatingClarifyWidget({
   );
 }
 
+// Colours match the map's own segment palette, so the chip that lands in the
+// chat is visibly the thing that was just clicked on the map.
+const SEGMENT_COLOR: Record<string, string> = {
+  stockup: '#7A4C82',
+  value: '#2F8F63',
+  bulk: '#C07A2E',
+};
+
 function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onRequestLayer?: (key: string) => void }) {
+  // Land the reply the way a live answer arrives: the source chip first, a
+  // beat of thinking, then the words.
+  const [thinking, setThinking] = useState(true);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setThinking(true);
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const t = window.setTimeout(() => {
+      setThinking(false);
+      // the answer is taller than the thinking beat — follow it down
+      window.setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+    }, 850);
+    return () => window.clearTimeout(t);
+  }, [pick.key]);
+
   const read = REGION_READS[pick.name];
   const lead = read?.lead
     ?? `This catchment indexes ${pick.index} — #${pick.rank} of ${pick.of} across Greater Sydney, with about ${(pick.households / 1000).toFixed(0)}k households of your audience living here.`;
   const top = pick.corridors[0];
   const compareTo = pick.name.startsWith('Parramatta') ? 'Marsden Park Stock-Ups' : 'Parramatta Value Families';
+  const colour = SEGMENT_COLOR[pick.segment] ?? '#732d93';
+  const short = pick.name.split(' · ')[0];
 
   return (
-    <div className="mb-6">
-      <UserMessage text={`Tell me about ${pick.name.split(' · ')[0]}`} />
-      <AIMessage text={lead} />
-      {read?.also && <AIMessage text={read.also} />}
-      {!read?.also && top && (
-        <AIMessage text={`Their strongest corridor — ${top.name} — carries ${top.pct}% of the cluster’s weekday movement. I’ve drawn the catchment and its corridors on the map.`} />
-      )}
-      <div className="space-y-2">
-        <button
-          onClick={() => onRequestLayer?.('poi')}
-          className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
+    <div ref={ref} className="mb-6 lumos-reply-in">
+      {/* Where this reply came from — the chip the map click puts in the thread */}
+      <div className="flex justify-end mb-2">
+        <span
+          className="lumos-source-pulse inline-flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border"
+          style={{ borderColor: `${colour}44`, background: `${colour}12` }}
         >
-          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Where else do they go?</span>
-        </button>
-        <button
-          onClick={() => onRequestLayer?.('media')}
-          className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
-        >
-          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Which billboards reach them?</span>
-        </button>
-        <button className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors">
-          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
-          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Compare to {compareTo}</span>
-        </button>
+          <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colour }}>
+            <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z" /><circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <span className="font-['Jua',sans-serif] text-[11px] leading-none" style={{ color: colour }}>
+            Selected on map · {pick.name}
+          </span>
+        </span>
       </div>
+
+      <UserMessage text={`Tell me about ${short}`} />
+
+      {thinking ? (
+        <div className="mb-5 flex items-center gap-2">
+          <div className="flex gap-1">
+            {[0, 150, 300].map((d) => (
+              <div key={d} className="w-2 h-2 bg-[#7c6bf0] rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+            ))}
+          </div>
+          <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Reading the {short} catchment — households, basket, travel…</span>
+        </div>
+      ) : (
+        <div className="lumos-reply-in">
+          <AIMessage text={lead} />
+          {read?.also && <AIMessage text={read.also} />}
+          {!read?.also && top && (
+            <AIMessage text={`Their strongest corridor — ${top.name} — carries ${top.pct}% of the cluster’s weekday movement. I’ve drawn the catchment and its corridors on the map.`} />
+          )}
+          <div className="space-y-2">
+            <button
+              onClick={() => onRequestLayer?.('poi')}
+              className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
+            >
+              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Where else do they go?</span>
+            </button>
+            <button
+              onClick={() => onRequestLayer?.('media')}
+              className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
+            >
+              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Which billboards reach them?</span>
+            </button>
+            <button className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors">
+              <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+              <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Compare to {compareTo}</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
