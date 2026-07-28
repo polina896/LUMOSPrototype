@@ -43,6 +43,8 @@ interface LumosMapInstance {
 // into a plain-language summary rather than dumping the numbers on screen.
 export interface RegionPick {
   name: string;
+  store?: string | null;
+  trips?: { name: string; pct: number }[];
   index: number;
   households: number;
   share: number;

@@ -213,6 +213,8 @@ interface ChatPanelProps {
 export interface ChatRegionPick {
   key: number;
   name: string;
+  store?: string | null;
+  trips?: { name: string; pct: number }[];
   index: number;
   households: number;
   share: number;
@@ -226,11 +228,11 @@ export interface ChatRegionPick {
 const REGION_READS: Record<string, { lead: string; also: string }> = {
   'Marsden Park · Riverstone': {
     lead: 'This audience is 2.3× more likely to be affluent families with larger households. They frequently visit Bunnings, IKEA and Costco Auburn on weekends — big-basket trips, made by car.',
-    also: 'Their corridor into Norwest carries 31% of the cluster’s weekday movement, so the M7 and Richmond Road see them twice a day before they ever see a catalogue.',
+    also: 'Almost a quarter of the trips into the site come from Schofields alone, and thirty minutes of drive time covers three quarters of the cluster — so the M7 and Richmond Road see them on the way in, every time.',
   },
   'Schofields · Box Hill': {
     lead: 'Newer estates, same habit — 2.1× more likely to be young families in their first home, still forming where they shop.',
-    also: 'The weekend run chains hardware, groceries and a food-court stop into one trip. Reach them in the first six months after they move and the habit sticks.',
+    also: 'Their trips come almost entirely from inside twenty minutes — Schofields, Riverstone and Rouse Hill. Reach them in the first six months after they move and the habit sticks.',
   },
   'Rouse Hill · Kellyville': {
     lead: 'A crossover pocket — Stock-Ups and Bulk Buyers overlap here. They’re 1.9× more likely to already hold a warehouse-club membership.',
@@ -1240,7 +1242,7 @@ function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onReque
   const read = REGION_READS[pick.name];
   const lead = read?.lead
     ?? `This catchment indexes ${pick.index} — #${pick.rank} of ${pick.of} across Greater Sydney, with about ${(pick.households / 1000).toFixed(0)}k households of your audience living here.`;
-  const top = pick.corridors[0];
+  const top = pick.trips?.[0] ?? pick.corridors[0];
   const compareTo = pick.name.startsWith('Parramatta') ? 'Marsden Park Stock-Ups' : 'Parramatta Value Families';
   const colour = SEGMENT_COLOR[pick.segment] ?? '#732d93';
   const short = pick.name.split(' · ')[0];
@@ -1280,7 +1282,7 @@ function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onReque
           <AIMessage text={lead} />
           {read?.also && <AIMessage text={read.also} />}
           {!read?.also && top && (
-            <AIMessage text={`Their strongest corridor — ${top.name} — carries ${top.pct}% of the cluster’s weekday movement. I’ve drawn the catchment and its corridors on the map.`} />
+            <AIMessage text={`Their biggest single source of trips is ${top.name} at ${top.pct}% of visits. I’ve drawn the drive-time catchment and the trips running into it on the map.`} />
           )}
           <div className="space-y-2">
             <button
