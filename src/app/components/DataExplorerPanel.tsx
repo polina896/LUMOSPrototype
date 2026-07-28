@@ -232,7 +232,7 @@ export default function DataExplorerPanel({ screen, selectedAudienceId, onSelect
           {hasDocument ? (
             <>
               <DocumentCard
-                title="Singapore Launch Audiences — Strategy Doc"
+                title="Western Sydney Launch Audiences — Strategy Doc"
                 meta="3 audience segments · Campaign recommendations"
                 isStrategy
               />
@@ -291,7 +291,7 @@ export default function DataExplorerPanel({ screen, selectedAudienceId, onSelect
               ))}
               {hasAudiences && (
                 <InsightItemCard
-                  title="Geographic Concentration — Singapore Districts"
+                  title="Geographic Concentration — Greater Sydney Regions"
                   subtype="Heatmap · District level"
                 />
               )}

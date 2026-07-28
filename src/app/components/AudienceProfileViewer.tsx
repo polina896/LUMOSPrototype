@@ -123,7 +123,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
     return { blockMap: bm, sourceOf: src, catalog: cat };
   }, [decks]);
 
-  // Short name for the panel's answer scope (strip the " — Singapore" suffix).
+  // Short name for the panel's answer scope (strip the " — Western Sydney" suffix).
   const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
 
   // Which deck a block id lives in (scope only ever targets the active tab today).
@@ -369,7 +369,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
       {/* ── Persistent header: audience name + action buttons ── */}
       <div className="flex-none flex items-center justify-between gap-3 px-5 pt-4 pb-0 bg-[#fafaf8]">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="font-['Jua',sans-serif] text-[18px] text-[#1a1a1a] leading-[27px] truncate">Urban Upgrade Drivers — Singapore</span>
+          <span className="font-['Jua',sans-serif] text-[18px] text-[#1a1a1a] leading-[27px] truncate">Marsden Park Stock-Ups — Western Sydney</span>
           <span className="font-['Inter',sans-serif] text-[11px] text-[#9a9a9a] whitespace-nowrap shrink-0">· updated 2d ago</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -437,7 +437,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
                   { label: 'Filters:', value: ' In-market auto intenders · showroom & dealer dwell' },
                   { label: 'Sources:', value: ' LUMOS panels · GWI · Telco · Card & loyalty' },
                   { label: 'Window:', value: ' Mar–May 2026 · rolling 90d' },
-                  { label: 'Geo:', value: ' Singapore' },
+                  { label: 'Geo:', value: ' Greater Sydney' },
                   { label: 'Confidence:', value: ' ±2.1% @ 95% CI' },
                 ].map((c) => (
                   <span

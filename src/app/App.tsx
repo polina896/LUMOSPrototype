@@ -26,11 +26,11 @@ export interface SavedDocument {
 // Audience size map for the named audiences in the Audience Library
 const AUDIENCE_SIZE_MAP: Record<string, string> = {
   'a1': '387k',
-  'a2': '284k',
-  'a3': '218k',
-  'a4': '462k',
+  'a2': '186k',
+  'a3': '248k',
+  'a4': '132k',
   'a5': '195k',
-  'a6': '148k',
+  'a6': '278k',
   'a7': '312k',
   'a8': '394k',
 };

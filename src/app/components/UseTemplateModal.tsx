@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Plus, Mic, ArrowRight, ChevronDown } from 'lucide-react';
 
 const AUDIENCES = [
-  'Urban Upgrade Drivers — Singapore',
-  'Premium Sedan Intenders — Singapore',
-  'EV Early Adopters — Singapore',
-  'Family SUV Shoppers — Singapore',
-  'Expat High Earners — Singapore',
+  'Marsden Park Stock-Ups — Western Sydney',
+  'Parramatta Value Families — Western Sydney',
+  'Castle Hill Bulk Buyers — Western Sydney',
+  'Large Family Shoppers — Greater Sydney',
+  'Premium & Entertaining Buyers — Greater Sydney',
   'Fleet & Corporate Drivers',
   'Upgrade-Ready Owners',
-  'Young Aspirationals — Singapore',
+  'New-Build Movers — Greater Sydney',
 ];
 
 interface UseTemplateModalProps {

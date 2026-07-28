@@ -33,12 +33,12 @@
     weekend: { nbeach:1.5, east:1.3, insouth:1.25, west:1.12, inwest:1.05, unorth:1.0, lnorth:.9, city:.78 }
   };
   const DEFAULT_SEGMENTS = [
-    { id:'sedan', short:'Premium Sedan', color:'#6D28D9', soft:'#EDE4FB', count:284000, index:245,
-      density:{east:.92,lnorth:.86,unorth:.72,city:.52,nbeach:.4,inwest:.3,insouth:.2,west:.16} },
-    { id:'ev', short:'EV Upgrade', color:'#0E9384', soft:'#DBF4F0', count:218000, index:212,
-      density:{inwest:.92,city:.86,lnorth:.7,east:.55,unorth:.4,nbeach:.34,insouth:.26,west:.2} },
-    { id:'suv', short:'Family SUV', color:'#E07B1B', soft:'#FCEBD6', count:462000, index:188,
-      density:{west:.9,insouth:.86,nbeach:.8,unorth:.6,inwest:.4,east:.25,lnorth:.3,city:.15} }
+    { id:'stockup', short:'Marsden Park Stock-Ups', color:'#6D28D9', soft:'#EDE4FB', count:186000, index:264,
+      density:{west:.95,inwest:.46,unorth:.34,insouth:.28,nbeach:.14,lnorth:.12,city:.1,east:.08} },
+    { id:'value', short:'Parramatta Value Families', color:'#0E9384', soft:'#DBF4F0', count:248000, index:218,
+      density:{west:.88,inwest:.82,insouth:.5,city:.32,unorth:.28,lnorth:.2,east:.16,nbeach:.12} },
+    { id:'bulk', short:'Castle Hill Bulk Buyers', color:'#E07B1B', soft:'#FCEBD6', count:132000, index:186,
+      density:{unorth:.9,west:.68,lnorth:.55,nbeach:.44,inwest:.34,insouth:.28,east:.24,city:.14} }
   ];
 
   const SIGNAL_LABEL = { residential:'Residential', daytime:'Daytime', transaction:'Transaction' };

@@ -23,7 +23,7 @@ function AudienceStrategyPreview() {
       <div>
         <p className="font-['Jua',sans-serif] text-[9px] uppercase tracking-[0.8px] text-[#9a9a9a] mb-1.5">AI Summary</p>
         <p className="font-['Jua',sans-serif] text-[11px] text-[#333] leading-[16px] bg-[#fafaf9] border border-[#e5e5e2] rounded-lg p-3">
-          The Singapore premium auto market splits across three high-value conquest segments. Lead with Affluent Professionals for launch volume in Districts 9–11, build pipeline with Tech-savvy Families ahead of the EV release.
+          The Western Sydney bulk-grocery market splits across three high-value household clusters. Lead with Marsden Park Stock-Ups for launch volume across the North-West corridor, then build frequency with Parramatta Value Families.
         </p>
       </div>
 
@@ -81,7 +81,7 @@ function AudienceStrategyPreview() {
 function MessagingMatrixPreview() {
   const rows = [
     { segment: 'Affluent Professionals', angle: 'Engineering meets legacy', proof: 'Award-winning performance credentials', tone: 'Authoritative, aspirational' },
-    { segment: 'EV Upgrade Shoppers',    angle: 'Precision for the planet',  proof: 'Singapore Green Plan alignment',      tone: 'Progressive, confident' },
+    { segment: 'Parramatta Value Families', angle: 'Better by the unit',     proof: 'Unit-price comparison vs. rivals',    tone: 'Direct, practical' },
     { segment: 'Family SUV Upgraders',   angle: 'Every journey, considered', proof: '5-star safety, 7-seat versatility',   tone: 'Warm, reassuring' },
   ];
   return (

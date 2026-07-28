@@ -26,7 +26,7 @@ export function GlobalFilterBar() {
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <FilterPill label="Date" value="Jan–Mar 2026" />
-      <FilterPill label="Geography" value="Singapore" />
+      <FilterPill label="Geography" value="Greater Sydney" />
       <FilterPill label="Indexed vs" value="National average" />
       <FilterPill label="Compare" value="vs previous quarter" />
       <div className="ml-auto flex items-center gap-px border border-[#e5e5e2] rounded-[8px] overflow-hidden bg-white">

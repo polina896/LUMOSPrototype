@@ -51,7 +51,7 @@ const DOC_GROUPS: DocGroup[] = [
     type: 'Audience Strategy',
     icon: <BarChart2 className="w-3.5 h-3.5" />,
     docs: [
-      { id: 'd1', name: 'Meridian Motors Singapore — Audience Strategy',  tags: ['Affluent Professionals', 'Tech-savvy Families', 'Expat Executives'], type: 'Audience Strategy', timestamp: 'Today, 10:18 pm' },
+      { id: 'd1', name: 'Costco Western Sydney — Audience Strategy',      tags: ['Marsden Park Stock-Ups', 'Parramatta Value Families', 'Castle Hill Bulk Buyers'], type: 'Audience Strategy', timestamp: 'Today, 10:18 pm' },
       { id: 'd2', name: 'Urban Upgrade Drivers — Audience Deep Dive',     tags: ['Urban Upgrade Drivers', 'Weekend Lifestyle Drivers'],                type: 'Audience Strategy', timestamp: '3 days ago' },
       { id: 'd3', name: 'Premium Sedan Intenders — Profile Report',        tags: ['Premium Sedan Intenders', 'EV Early Adopters'],                      type: 'Audience Strategy', timestamp: '5 days ago' },
     ],
@@ -60,7 +60,7 @@ const DOC_GROUPS: DocGroup[] = [
     type: 'Messaging Matrix',
     icon: <MessageSquare className="w-3.5 h-3.5" />,
     docs: [
-      { id: 'd4', name: 'Meridian Motors — Launch Messaging Matrix',      tags: ['Affluent Professionals', 'Expat Executives'],                        type: 'Messaging Matrix', timestamp: 'Today, 10:22 pm' },
+      { id: 'd4', name: 'Costco — Launch Messaging Matrix',               tags: ['Marsden Park Stock-Ups', 'Castle Hill Bulk Buyers'],                 type: 'Messaging Matrix', timestamp: 'Today, 10:22 pm' },
       { id: 'd5', name: 'EV Upgrade Shoppers — Messaging Guide',          tags: ['EV Upgrade Shoppers', 'Green Commuters'],                            type: 'Messaging Matrix', timestamp: '2 days ago' },
     ],
   },
@@ -68,14 +68,14 @@ const DOC_GROUPS: DocGroup[] = [
     type: 'Campaign Brief',
     icon: <FileText className="w-3.5 h-3.5" />,
     docs: [
-      { id: 'd6', name: 'Meridian Motors Q1 — Campaign Brief',            tags: ['Affluent Professionals', 'Tech-savvy Families', 'Expat Executives'], type: 'Campaign Brief',   timestamp: '2 days ago' },
+      { id: 'd6', name: 'Costco Opening Quarter — Campaign Brief',        tags: ['Marsden Park Stock-Ups', 'Parramatta Value Families', 'Castle Hill Bulk Buyers'], type: 'Campaign Brief',   timestamp: '2 days ago' },
     ],
   },
   {
     type: 'Media Plan',
     icon: <Map className="w-3.5 h-3.5" />,
     docs: [
-      { id: 'd7', name: 'Singapore Premium Auto — Q1 Media Plan',         tags: ['Affluent Professionals', 'Expat Executives'],                        type: 'Media Plan',       timestamp: 'Today, 10:24 pm' },
+      { id: 'd7', name: 'Western Sydney Bulk Grocery — Media Plan',       tags: ['Marsden Park Stock-Ups', 'Castle Hill Bulk Buyers'],                 type: 'Media Plan',       timestamp: 'Today, 10:24 pm' },
     ],
   },
 ];

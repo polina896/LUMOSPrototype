@@ -9,17 +9,17 @@ import type { AudienceId } from '../audienceData';
 //   • click a region/segment on the map → onSelectAudience(audienceId)
 //   • open an audience elsewhere        → lm.select(segment) flies the map there
 
-// The module ships its own demo segments keyed sedan/ev/suv, whose counts &
-// indices already match the three launch audiences — so we only need an id map.
+// The module ships its own demo segments keyed stockup/value/bulk, whose counts
+// & indices already match the three launch clusters — so we only need an id map.
 const AUD_TO_SEG: Record<AudienceId, string> = {
-  'premium-sedan-intenders': 'sedan',
-  'ev-upgrade-shoppers': 'ev',
-  'family-suv-upgraders': 'suv',
+  'marsden-park-stockups': 'stockup',
+  'parramatta-value-families': 'value',
+  'castle-hill-bulk-buyers': 'bulk',
 };
 const SEG_TO_AUD: Record<string, AudienceId> = {
-  sedan: 'premium-sedan-intenders',
-  ev: 'ev-upgrade-shoppers',
-  suv: 'family-suv-upgraders',
+  stockup: 'marsden-park-stockups',
+  value: 'parramatta-value-families',
+  bulk: 'castle-hill-bulk-buyers',
 };
 
 declare global {

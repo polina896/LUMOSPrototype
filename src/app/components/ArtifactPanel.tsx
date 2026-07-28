@@ -46,25 +46,25 @@ function proposeRewrite(prompt: string, before: string): { after: string; summar
   const p = (prompt || '').toLowerCase();
   if (/short|concise|tighten|punch|snappy|brief|trim/.test(p))
     return {
-      after: 'Three audiences own 71% of premium-auto intent — and they’re only in-corridor a few hours a week. Concentration is the whole opportunity.',
+      after: 'Three clusters own 71% of big-basket value — and they’re only in-corridor a few hours a week. Concentration is the whole opportunity.',
       summary: 'shortened to one punchy line',
       note: 'Tightened to a single sentence and led with the headline stat.',
     };
   if (/number|stat|data|quantif|metric|figure/.test(p))
     return {
-      after: 'Just three audiences hold 71% of qualified intent (218K intenders, ▲9% QoQ), clustering in 3 corridors for ~6 hours a week — a S$4.9B addressable window.',
+      after: 'Just three clusters hold 71% of big-basket value (566K households, ▲9% QoQ), passing 3 media corridors for ~6 hours a week — a $4.9B addressable window.',
       summary: 'added quantification',
-      note: 'Folded in the intender count, growth and spend figures.',
+      note: 'Folded in the household count, growth and spend figures.',
     };
   if (/formal|exec|profession|stakeholder/.test(p))
     return {
-      after: 'Qualified premium-auto intent is highly concentrated: three audiences account for 71% of demand, consistently present in three key corridors during a narrow weekly window — a targetable efficiency the launch should exploit.',
+      after: 'Big-basket demand is highly concentrated: three clusters account for 71% of value, consistently present in three key corridors during a narrow weekly window — a targetable efficiency the launch should exploit.',
       summary: 'more formal tone',
       note: 'Rewrote in a more executive register.',
     };
   if (/warm|human|friendly|approachable/.test(p))
     return {
-      after: 'Here’s the good news: most of the people Meridian wants are already showing up in the same few places each week. Meet them there and the launch does the heavy lifting for you.',
+      after: 'Here’s the good news: most of the households Costco wants are already driving past the same few places each week. Meet them there and the launch does the heavy lifting for you.',
       summary: 'warmer, more human tone',
       note: 'Softened the register while keeping the core insight.',
     };
@@ -177,25 +177,25 @@ export function PickerCard({
       id: 'cards' as const,
       label: 'A · AUDIENCE CARDS',
       title: 'Three segment cards',
-      description: 'Premium Sedan Intenders, EV Upgrade Shoppers, and Family SUV Upgraders as distinct audience segments — vehicle ownership level, consideration frequency, and upgrade behaviour.',
+      description: 'Marsden Park Stock-Ups, Parramatta Value Families, and Castle Hill Bulk Buyers as distinct clusters — basket size, shopping frequency, and travel behaviour.',
       bestWhen: 'Best when the segments are genuinely different in behaviour. Reads as a slide.',
-      reasoning: 'Your brief calls out distinct buyer types — cards make each segment feel like a separate persona with clear ownership frequency and upgrade behaviour differentiation.',
+      reasoning: 'Your brief calls out distinct shopper types — cards make each cluster feel like a separate persona with clear frequency and basket-size differentiation.',
     },
     {
       id: 'comparison' as const,
       label: 'B · COMPARISON',
       title: 'Ranked comparison bars',
-      description: 'Segments ranked by reach with index scores and Q1 uplift signals side-by-side.',
-      bestWhen: 'Best when you need to prioritize which segments to activate first.',
-      reasoning: 'Since this is a launch campaign, you need to prioritise — a ranked view shows which segments deliver the highest consideration impact and fastest Q1 uplift.',
+      description: 'Clusters ranked by reach with index scores and seasonal uplift signals side-by-side.',
+      bestWhen: 'Best when you need to prioritize which clusters to activate first.',
+      reasoning: 'Since this is a store launch, you need to prioritise — a ranked view shows which clusters deliver the highest value impact and fastest opening-week uplift.',
     },
     {
       id: 'map' as const,
       label: 'C · GEO MAP',
       title: 'Top metro area heatmap',
-      description: 'Singapore planning areas shaded by vehicle registration concentration with district-level detail.',
-      bestWhen: 'Best when you are planning geo-targeted dealer activations, test-drive event locations, or OOH placement.',
-      reasoning: 'Launch campaigns benefit from geographic targeting — this shows exactly where high-intent automotive buyers concentrate across Singapore\'s planning areas.',
+      description: 'Greater Sydney regions shaded by big-basket household concentration with SA2-level detail.',
+      bestWhen: 'Best when you are planning catchment activations, drive-to-store campaigns, or OOH placement.',
+      reasoning: 'Store launches live or die on catchment — this shows exactly where high-value big-basket households concentrate across Greater Sydney.',
     },
   ];
 
@@ -266,9 +266,9 @@ export function PickerCard({
 
 function SketchCards() {
   const audiences = [
-    { name: 'Premium Sedan Intenders', age: '28-50', income: '$120k+ HHI', reach: '32%' },
-    { name: 'EV Upgrade Shoppers', age: '25-45', income: '$95k+ HHI', reach: '44%' },
-    { name: 'Family SUV Upgraders', age: '30-48', income: '$85k+ HHI', reach: '24%' }
+    { name: 'Marsden Park Stock-Ups', age: '30-45', income: '$145k+ HHI', reach: '29%' },
+    { name: 'Parramatta Value Families', age: '28-48', income: '$105k+ HHI', reach: '38%' },
+    { name: 'Castle Hill Bulk Buyers', age: '35-55', income: '$185k+ HHI', reach: '21%' }
   ];
 
   return (
@@ -297,9 +297,9 @@ function SketchCards() {
 
 function SketchComparison() {
   const audiences = [
-    { name: 'Premium Sedan Intenders', reach: 32, index: 245, growth: '+22%' },
-    { name: 'EV Upgrade Shoppers', reach: 44, index: 212, growth: '+18%' },
-    { name: 'Family SUV Upgraders', reach: 24, index: 188, growth: '+31%' }
+    { name: 'Marsden Park Stock-Ups', reach: 29, index: 264, growth: '+22%' },
+    { name: 'Parramatta Value Families', reach: 38, index: 218, growth: '+18%' },
+    { name: 'Castle Hill Bulk Buyers', reach: 21, index: 186, growth: '+31%' }
   ];
 
   return (
@@ -331,15 +331,15 @@ function SketchMap() {
     <div className="space-y-4">
       <div className="h-2 rounded w-36 bg-gray-300 mb-3" />
       <div className="relative h-64 bg-gray-100 rounded border border-gray-300 overflow-hidden">
-        {/* Rough Singapore island shape */}
+        {/* Rough Greater Sydney shape */}
         <svg viewBox="0 0 300 180" className="w-full h-full">
-          {/* Central/Downtown districts (darker - Affluent Professionals) */}
+          {/* Western Sydney (darker - Stock-Ups & Value Families) */}
           <ellipse cx="150" cy="90" rx="35" ry="25" fill="#7c6bf0" opacity="0.7" />
-          {/* Northeast/East (medium - Tech Families) */}
+          {/* Hills District (medium - Bulk Buyers) */}
           <ellipse cx="190" cy="70" rx="30" ry="20" fill="#7c6bf0" opacity="0.4" />
-          {/* West (lighter - mixed) */}
+          {/* Outer west (lighter - mixed) */}
           <ellipse cx="100" cy="100" rx="28" ry="22" fill="#7c6bf0" opacity="0.25" />
-          {/* Northwest */}
+          {/* North-West growth corridor */}
           <ellipse cx="120" cy="60" rx="20" ry="15" fill="#7c6bf0" opacity="0.3" />
           {/* Legend boxes */}
         </svg>
@@ -390,7 +390,7 @@ function ResultPanel({
   onSaveDocument?: (doc: { name: string; type: string; tags: string[] }) => void;
   savedDocumentNames?: string[];
 }) {
-  const [pageTitle, setPageTitle] = useState('Meridian Motors Singapore Launch — Audiences');
+  const [pageTitle, setPageTitle] = useState('Costco Western Sydney Launch — Audiences');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const isDocSaved = savedDocumentNames.includes(pageTitle);
   const [blocks, setBlocks] = useState<BlockData[]>([
@@ -522,13 +522,13 @@ function ResultPanel({
   const HERO_SEED: Record<BlockData['type'], string> = {
     insight: '',
     text: '',
-    'geo-map': 'Three corridors — Central/East, North/West and the HDB towns — hold the large majority of qualified reach, so a tightly geo-fenced launch beats island-wide spend.',
-    audiences: 'These three segments carry the bulk of qualified intent; lead with Premium Sedan Intenders for challenger impact.',
-    growth: 'Too small to lead with, but the fastest climbers — worth seeding now ahead of the Q1 launch surge.',
-    postcodes: 'Six districts index well above baseline, with Orchard / River Valley the clear anchor for OOH-to-showroom seeding.',
-    'campaign-recs': 'Sequence the launch by segment: a broad-reach hero for sedans, always-on consideration for EV, and retargeting for SUV upgraders.',
-    messaging: 'Each segment needs its own value prop and hook — one message won’t carry all three.',
-    narrative: 'These three segments aren’t just the biggest — they’re the most reachable, which is what makes them the right place to start.',
+    'geo-map': 'Three corridors — the North-West growth belt, Parramatta and the Hills — hold the large majority of qualified reach, so a tightly geo-fenced launch beats metro-wide spend.',
+    audiences: 'These three clusters carry the bulk of big-basket value; lead with Marsden Park Stock-Ups for launch impact.',
+    growth: 'Too small to lead with, but the fastest climbers — worth seeding now ahead of the opening-week surge.',
+    postcodes: 'Six SA2s index well above baseline, with Marsden Park / Riverstone the clear anchor for OOH-to-store seeding.',
+    'campaign-recs': 'Sequence the launch by cluster: a broad-reach hero for the North-West, always-on unit-price messaging in Parramatta, and a switching play in the Hills.',
+    messaging: 'Each cluster needs its own value prop and hook — one message won’t carry all three.',
+    narrative: 'These three clusters aren’t just the biggest — they’re the most reachable, which is what makes them the right place to start.',
   };
 
   return (
@@ -571,7 +571,7 @@ function ResultPanel({
               onSaveDocument?.({
                 name: pageTitle,
                 type: 'Audience Strategy',
-                tags: ['Premium Sedan Intenders', 'EV Upgrade Shoppers', 'Family SUV Upgraders'],
+                tags: ['Marsden Park Stock-Ups', 'Parramatta Value Families', 'Castle Hill Bulk Buyers'],
               })
             }
             disabled={isDocSaved}
@@ -672,7 +672,7 @@ function ResultPanel({
           }}
           className="text-[#888] leading-relaxed"
         >
-          An AI-generated audience analysis and campaign recommendation for the Meridian Motors Singapore launch. For internal planning use only.
+          An AI-generated audience analysis and campaign recommendation for the Costco Western Sydney launch. For internal planning use only.
         </p>
       </div>
 
@@ -680,8 +680,8 @@ function ResultPanel({
       {blocks.map((block, index) => {
         if (block.type === 'insight') {
           const summaryText = entryMode === 'upload'
-            ? "Your owner segments reveal distinct purchase and service patterns. Active Owners offer the highest immediate conquest potential through targeted test-drive mechanics. Lapsed Considerers show the strongest re-engagement opportunity with a compelling upgrade offer. Prioritise Active Owners for launch velocity, re-engage Lapsed Considerers with an upgrade incentive, and onboard New-to-Brand Enquirers with a strong first-trial moment."
-            : "Meridian Motors' Singapore launch opportunity sits across three audience segments with distinct consideration behaviours and purchase signals. Lead with Premium Sedan Intenders for brand challenger impact, activate EV Upgrade Shoppers for category leadership, and target Family SUV Upgraders for sustained new-model consideration.";
+            ? "Your member segments reveal distinct shopping and lapsing patterns. Active Members offer the highest immediate value through frequency and basket-growth mechanics. Lapsed Members show the strongest re-engagement opportunity now that the new warehouse is closer than the one they left. Prioritise Active Members for opening-week velocity, win back Lapsed Members with a proximity-led offer, and convert Never-Redeemed Sign-Ups with a concrete first-trip prompt."
+            : "Costco's Western Sydney launch opportunity sits across three household clusters with distinct shopping rhythms and travel behaviours. Lead with Marsden Park Stock-Ups for launch impact, activate Parramatta Value Families for breadth of reach, and target Castle Hill Bulk Buyers to take share of wallet from existing warehouse clubs.";
 
           return (
             <DraggableWrapper key={block.id} id={block.id} index={index} moveBlock={moveBlock} blockLabel="AI Summary" defaultHero={summaryText} heroInline>
@@ -695,14 +695,14 @@ function ResultPanel({
         if (block.type === 'audiences') {
           const audienceData = entryMode === 'upload'
             ? [
-                { number: 1, name: 'Active Owners', reach: '48%', demographics: '30–55 | $120k+ | 2+ vehicles', growth: 'Stable' },
-                { number: 2, name: 'Lapsed Considerers', reach: '28%', demographics: '25–50 | $95k+ | <1 visit/90 days', growth: '+19% re-eng.' },
-                { number: 3, name: 'New-to-Brand Enquirers', reach: '24%', demographics: '22–45 | $85k+ | First enquiry', growth: '+36% YoY' },
+                { number: 1, name: 'Active Members', reach: '48%', demographics: '30–55 | $120k+ | 2+ shops/month', growth: 'Stable' },
+                { number: 2, name: 'Lapsed Members', reach: '28%', demographics: '25–50 | $95k+ | no shop in 90 days', growth: '+19% re-eng.' },
+                { number: 3, name: 'Never-Redeemed Sign-Ups', reach: '24%', demographics: '22–45 | $85k+ | joined, never shopped', growth: '+36% YoY' },
               ]
             : [
-                { number: 1, name: 'Premium Sedan Intenders', reach: '32%', demographics: '28–50 | $120k+ | Index 245', growth: '+22% YoY' },
-                { number: 2, name: 'EV Upgrade Shoppers', reach: '44%', demographics: '25–45 | $95k+ | Index 212', growth: '+18% YoY' },
-                { number: 3, name: 'Family SUV Upgraders', reach: '24%', demographics: '30–48 | $85k+ | Index 188', growth: '+31% YoY' },
+                { number: 1, name: 'Marsden Park Stock-Ups', reach: '29%', demographics: '30–45 | $145k+ | Index 264', growth: '+22% YoY' },
+                { number: 2, name: 'Parramatta Value Families', reach: '38%', demographics: '28–48 | $105k+ | Index 218', growth: '+18% YoY' },
+                { number: 3, name: 'Castle Hill Bulk Buyers', reach: '21%', demographics: '35–55 | $185k+ | Index 186', growth: '+31% YoY' },
               ];
 
           return (
@@ -756,12 +756,12 @@ function ResultPanel({
               >
                 {postcodeView === 'ranking' ? (
                   <div className="space-y-3">
-                    <PostcodeRow rank={1} area="Orchard / River Valley" index={312} households={68000} styleConfig={styleConfig} />
-                    <PostcodeRow rank={2} area="Buona Vista / one-north" index={287} households={54000} styleConfig={styleConfig} />
-                    <PostcodeRow rank={3} area="Bishan / Ang Mo Kio" index={264} households={91000} styleConfig={styleConfig} />
-                    <PostcodeRow rank={4} area="Jurong East" index={241} households={78000} styleConfig={styleConfig} />
-                    <PostcodeRow rank={5} area="Tampines / Pasir Ris" index={228} households={103000} styleConfig={styleConfig} />
-                    <PostcodeRow rank={6} area="Woodlands / Sembawang" index={209} households={87000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={1} area="Marsden Park / Riverstone" index={312} households={68000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={2} area="Schofields / Box Hill" index={287} households={54000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={3} area="Parramatta / Granville" index={264} households={91000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={4} area="Castle Hill / Kellyville" index={241} households={78000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={5} area="Merrylands / Auburn" index={228} households={103000} styleConfig={styleConfig} />
+                    <PostcodeRow rank={6} area="Blacktown / Rooty Hill" index={209} households={87000} styleConfig={styleConfig} />
                   </div>
                 ) : (
                   <HeatmapView styleConfig={styleConfig} />
@@ -859,8 +859,8 @@ function AnalysisLoadingState({ entryMode }: { entryMode: 'brief' | 'upload' | n
           </h3>
           <p className="font-['Jua',sans-serif] text-[14px] text-[#666] leading-relaxed">
             {entryMode === 'upload'
-              ? 'Enriching your owner segments with vehicle registration data, movement patterns, and geographic concentration...'
-              : 'Identifying segments, analysing registration concentration, and pulling seasonal automotive signals...'}
+              ? 'Enriching your member segments with transaction data, movement patterns, and geographic concentration...'
+              : 'Identifying clusters, analysing catchment concentration, and pulling seasonal shopping signals...'}
           </p>
         </div>
         <div className="flex items-center justify-center gap-1.5">
@@ -1334,59 +1334,59 @@ function MessagingBlock({ title, styleConfig, entryMode }: { title: string; styl
   const audiences = entryMode === 'upload'
     ? [
         {
-          name: 'Active Owners',
+          name: 'Active Members',
           themes: [
-            { message: 'Your next Meridian is ready — book a test drive today', channel: 'Email' },
-            { message: 'Exclusive owner preview — new model launch event', channel: 'Instagram' },
-            { message: 'Upgrade your drive — Meridian owners get first access', channel: 'Facebook' },
-            { message: 'Loyalty reward — priority delivery for existing owners', channel: 'Email' },
+            { message: 'Your new warehouse opens closer to home — see what’s in store', channel: 'Email' },
+            { message: 'Members-only opening week — first look at the new range', channel: 'Instagram' },
+            { message: 'Fill the trolley, then fill the tank — members save twice', channel: 'Facebook' },
+            { message: 'Priority opening-week hours for existing members', channel: 'Email' },
           ],
         },
         {
-          name: 'Lapsed Considerers',
+          name: 'Lapsed Members',
           themes: [
-            { message: "A lot has changed — come back and see the new lineup", channel: 'Email' },
-            { message: 'Your upgrade offer is waiting — limited Q1 availability', channel: 'Facebook' },
-            { message: 'New model, new reasons to reconsider Meridian', channel: 'Instagram' },
-            { message: 'Personalised re-engagement with an exclusive test-drive invite', channel: 'Email' },
+            { message: 'We moved closer. Your nearest warehouse is now 12 minutes away.', channel: 'Email' },
+            { message: 'Your membership is still worth it — here’s the maths', channel: 'Facebook' },
+            { message: 'New warehouse, new reasons to come back', channel: 'Instagram' },
+            { message: 'Personalised win-back with a first-trip reminder', channel: 'Email' },
           ],
         },
         {
-          name: 'New-to-Brand Enquirers',
+          name: 'Never-Redeemed Sign-Ups',
           themes: [
-            { message: 'Your first Meridian experience starts here — book a drive', channel: 'Email' },
-            { message: 'Discover what precision feels like — test drive this week', channel: 'Instagram' },
-            { message: "See why Singapore's premium buyers choose Meridian", channel: 'Facebook' },
-            { message: 'First-enquiry welcome offer — complimentary test drive', channel: 'Email' },
+            { message: 'You’re already a member — here’s what your first trip looks like', channel: 'Email' },
+            { message: 'Twelve minutes away, one trolley, a month sorted', channel: 'Instagram' },
+            { message: 'See why Western Sydney families make the trip', channel: 'Facebook' },
+            { message: 'First-shop welcome offer — bring the card, fill the boot', channel: 'Email' },
           ],
         },
       ]
     : [
         {
-          name: 'Premium Sedan Intenders',
+          name: 'Marsden Park Stock-Ups',
           themes: [
-            { message: 'Not the sedan you expected. Better.', channel: 'Instagram' },
-            { message: 'Meridian Motors — precision engineered for Singapore roads', channel: 'YouTube' },
-            { message: 'The drive everyone will be talking about', channel: 'Instagram' },
-            { message: 'Book your test drive — limited launch allocations available', channel: 'Email' },
+            { message: 'One trip. One month sorted.', channel: 'Instagram' },
+            { message: 'Costco Marsden Park — built for households like yours', channel: 'YouTube' },
+            { message: 'The Saturday shop everyone will be talking about', channel: 'Instagram' },
+            { message: 'The membership pays for itself in two shops', channel: 'Email' },
           ],
         },
         {
-          name: 'EV Upgrade Shoppers',
+          name: 'Parramatta Value Families',
           themes: [
-            { message: 'Go electric without compromise — Meridian EV is here', channel: 'Mobile' },
-            { message: 'Charge smarter, drive further — Q1 launch pricing available', channel: 'Facebook' },
-            { message: 'Singapore Green Plan incentive eligible — enquire now', channel: 'Mobile' },
-            { message: 'The EV your current car wishes it was', channel: 'Facebook' },
+            { message: 'Buy it by the box. Pay less by the unit.', channel: 'Mobile' },
+            { message: 'Big enough for the whole family — and the family next door', channel: 'Facebook' },
+            { message: 'The shop Western Sydney families share', channel: 'Mobile' },
+            { message: 'Bring a friend. Split the trolley, not the value.', channel: 'Facebook' },
           ],
         },
         {
-          name: 'Family SUV Upgraders',
+          name: 'Castle Hill Bulk Buyers',
           themes: [
-            { message: 'More space. More safety. More Meridian.', channel: 'Instagram' },
-            { message: 'The SUV built for Singapore family life', channel: 'Email' },
-            { message: 'Seven seats, zero compromise — see the new SUV', channel: 'Instagram' },
-            { message: 'Flexible finance — upgrade your family drive today', channel: 'Email' },
+            { message: 'Bulk, without the compromise.', channel: 'Instagram' },
+            { message: 'Everything the long table needs, in one trip', channel: 'Email' },
+            { message: 'Already a member somewhere? Compare the trolley.', channel: 'Instagram' },
+            { message: 'Twenty minutes from the Hills — worth the drive, once a month', channel: 'Email' },
           ],
         },
       ];
@@ -1616,8 +1616,8 @@ function NarrativeBlock({ styleConfig, entryMode }: { styleConfig: StyleConfig; 
   const [isHovered, setIsHovered] = useState(false);
 
   const narrativeText = entryMode === 'upload'
-    ? "Your owner segments reveal distinct service and consideration patterns. Active Owners concentrate in high-frequency ownership behaviours with strong upsell and retention potential. Lapsed Considerers represent a significant re-engagement opportunity — a targeted test-drive offer or exclusive preview event is the most effective re-activation lever. We recommend prioritising Active Owners for immediate launch velocity, while running a dedicated re-engagement campaign for Lapsed Considerers through the Q1 window."
-    : "Meridian Motors' Singapore launch opportunity splits cleanly across three audience groups, each with distinct ownership behaviours and upgrade signals. Volume impact is highest with Premium Sedan Intenders, who drive the broadest dealership visit reach per activation. The highest-value brand-building opportunity sits with EV Upgrade Shoppers, where technology-challenger creative consistently drives brand switching. We recommend leading with Premium Sedan Intenders for volume, and activating EV Upgrade Shoppers with a test-drive campaign to build sustained consideration.";
+    ? "Your member segments reveal distinct visit and lapsing patterns. Active Members concentrate in high-frequency shopping behaviours with strong basket-growth and retention potential. Lapsed Members represent a significant re-engagement opportunity — a proximity-led offer tied to the new warehouse is the most effective re-activation lever. We recommend prioritising Active Members for immediate opening-week velocity, while running a dedicated win-back campaign for Lapsed Members through the first quarter of trade."
+    : "Costco's Western Sydney launch opportunity splits cleanly across three household clusters, each with distinct shopping rhythms and travel signals. Volume impact is highest with Parramatta Value Families, who deliver the broadest household reach per activation. The highest-value opportunity sits with Marsden Park Stock-Ups, whose long, planned trips make roadside media unusually efficient. We recommend leading with Marsden Park Stock-Ups for launch velocity, and activating Parramatta Value Families with unit-price messaging to build sustained frequency.";
 
   return (
     <div
@@ -1664,30 +1664,30 @@ function GrowthAudiencesBlock({ title, styleConfig, entryMode }: { title: string
   const growthAudiences = entryMode === 'upload'
     ? [
         {
-          name: 'Re-engaged Lapsed Owners',
+          name: 'Re-engaged Lapsed Members',
           growth: '+19% YoY',
           signal: 'Recovery opportunity',
-          reason: 'Lapsed Meridian owners re-entering consideration driven by new model launch and competitive upgrade offers',
+          reason: 'Lapsed members re-entering consideration now that the new Western Sydney warehouse is closer than the one they left',
         },
         {
-          name: 'EV Converts (Petrol → Electric)',
+          name: 'Club Switchers (Rival → Costco)',
           growth: '+36% YoY',
           signal: 'Emerging segment',
-          reason: 'Petrol car owners actively shifting to EV or hybrid as Singapore Green Plan incentives increase',
+          reason: 'Existing warehouse-club members actively comparing trolleys as cost-of-living pressure sharpens unit-price sensitivity',
         }
       ]
     : [
         {
-          name: 'Premium Finance Upgraders',
+          name: 'Café & Small Business Buyers',
           growth: '+31% YoY',
           signal: 'Emerging opportunity',
-          reason: 'Higher-spend segment trading up from mid-range to premium vehicles via flexible financing structures',
+          reason: 'Small hospitality and trade operators buying wholesale volumes on a business membership rather than through a distributor',
         },
         {
-          name: 'Expat High Earners',
+          name: 'New-Build Movers',
           growth: '+44% YoY',
           signal: 'Fastest-growing',
-          reason: 'Expat residents with high disposable income and strong brand affinity for European and Japanese premium marques',
+          reason: 'Households settling into new North-West estates, forming their shopping habits in the first six months after moving in',
         }
       ];
 
@@ -1832,7 +1832,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
           <svg viewBox="0 0 500 350" className="w-full h-auto">
             {/* District boundaries - Choropleth map */}
 
-            {/* Central Region - Districts 9, 10, 11 (Darkest) */}
+            {/* North-West growth corridor (Darkest) */}
             <path
               d="M 220 150 L 240 140 L 260 145 L 270 160 L 265 175 L 245 180 L 225 175 Z"
               fill={styleConfig.brandColor}
@@ -1841,7 +1841,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* Orchard (District 9) */}
+            {/* Marsden Park */}
             <path
               d="M 200 160 L 220 150 L 225 175 L 210 180 Z"
               fill={styleConfig.brandColor}
@@ -1850,7 +1850,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* Bukit Timah (District 10) */}
+            {/* Parramatta */}
             <path
               d="M 180 130 L 200 160 L 210 180 L 190 190 L 170 170 L 165 145 Z"
               fill={styleConfig.brandColor}
@@ -1859,7 +1859,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* Holland Village (District 10) */}
+            {/* Granville */}
             <path
               d="M 165 145 L 170 170 L 155 180 L 145 165 L 150 145 Z"
               fill={styleConfig.brandColor}
@@ -1868,7 +1868,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* East - Districts 15, 19, 21 (Medium) */}
+            {/* Hills District (Medium) */}
             <path
               d="M 270 160 L 290 155 L 310 165 L 320 180 L 315 200 L 295 205 L 275 195 L 265 175 Z"
               fill={styleConfig.brandColor}
@@ -1893,7 +1893,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* North (Medium-Low) */}
+            {/* Blacktown & Rooty Hill (Medium-Low) */}
             <path
               d="M 180 130 L 200 110 L 230 105 L 250 120 L 240 140 L 220 150 L 200 160 Z"
               fill={styleConfig.brandColor}
@@ -1910,7 +1910,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* West (Low) */}
+            {/* Outer west (Low) */}
             <path
               d="M 150 145 L 155 180 L 145 200 L 120 205 L 105 185 L 110 160 L 130 150 Z"
               fill={styleConfig.brandColor}
@@ -1927,7 +1927,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* South (Low) */}
+            {/* Inner west & south (Low) */}
             <path
               d="M 190 190 L 210 180 L 245 180 L 265 175 L 265 225 L 235 240 L 200 230 L 175 210 Z"
               fill={styleConfig.brandColor}
@@ -1944,43 +1944,8 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               strokeWidth="1.5"
             />
 
-            {/* District labels */}
-            <text x="207" y="165"
-              style={{
-                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
-                fontSize: '11px',
-                fontWeight: '600',
-              }}
-              fill="#ffffff"
-              textAnchor="middle"
-            >
-              Orchard
-            </text>
-
-            <text x="180" y="165"
-              style={{
-                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
-                fontSize: '10px',
-                fontWeight: '600',
-              }}
-              fill="#ffffff"
-              textAnchor="middle"
-            >
-              Bukit
-            </text>
-            <text x="180" y="176"
-              style={{
-                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
-                fontSize: '10px',
-                fontWeight: '600',
-              }}
-              fill="#ffffff"
-              textAnchor="middle"
-            >
-              Timah
-            </text>
-
-            <text x="157" y="165"
+            {/* Region labels */}
+            <text x="243" y="167"
               style={{
                 fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
                 fontSize: '9px',
@@ -1989,9 +1954,10 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               fill="#ffffff"
               textAnchor="middle"
             >
-              Holland
+              Marsden Pk
             </text>
-            <text x="157" y="175"
+
+            <text x="186" y="163"
               style={{
                 fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
                 fontSize: '9px',
@@ -2000,7 +1966,41 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               fill="#ffffff"
               textAnchor="middle"
             >
-              Village
+              Parra-
+            </text>
+            <text x="186" y="174"
+              style={{
+                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
+                fontSize: '9px',
+                fontWeight: '600',
+              }}
+              fill="#ffffff"
+              textAnchor="middle"
+            >
+              matta
+            </text>
+
+            <text x="155" y="164"
+              style={{
+                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
+                fontSize: '9px',
+                fontWeight: '600',
+              }}
+              fill="#ffffff"
+              textAnchor="middle"
+            >
+              Castle
+            </text>
+            <text x="155" y="174"
+              style={{
+                fontFamily: `'${styleConfig.bodyFont}',sans-serif`,
+                fontSize: '9px',
+                fontWeight: '600',
+              }}
+              fill="#ffffff"
+              textAnchor="middle"
+            >
+              Hill
             </text>
           </svg>
         </div>
@@ -2014,7 +2014,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="text-[#999] mb-0.5"
             >
-              Central / East
+              North-West corridor
             </div>
             <div
               style={{
@@ -2024,7 +2024,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="font-semibold"
             >
-              52%
+              46%
             </div>
           </div>
           <div className="p-2 bg-gray-50 rounded">
@@ -2035,7 +2035,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="text-[#999] mb-0.5"
             >
-              North / West
+              Parramatta / Inner West
             </div>
             <div
               style={{
@@ -2045,7 +2045,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="font-semibold"
             >
-              31%
+              34%
             </div>
           </div>
           <div className="p-2 bg-gray-50 rounded">
@@ -2056,7 +2056,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="text-[#999] mb-0.5"
             >
-              South / HDB towns
+              Hills District
             </div>
             <div
               style={{
@@ -2066,7 +2066,7 @@ function GeoMapBlock({ title, styleConfig }: { title: string; styleConfig: Style
               }}
               className="font-semibold"
             >
-              17%
+              20%
             </div>
           </div>
         </div>
@@ -2081,78 +2081,78 @@ function CampaignRecommendationsBlock({ title, styleConfig, entryMode }: { title
   const campaigns = entryMode === 'upload'
     ? [
         {
-          segment: 'Active Owners',
+          segment: 'Active Members',
           color: '#7c6bf0',
-          messaging: '"You already drive Meridian. The next generation is ready for you."',
+          messaging: '"You already shop with us. Now we’re closer."',
           channels: [
             { name: 'Email / CRM', percentage: 40 },
-            { name: 'Owner loyalty push', percentage: 30 },
+            { name: 'Member loyalty push', percentage: 30 },
             { name: 'Social media', percentage: 20 },
             { name: 'Digital display', percentage: 10 },
           ],
-          creative: 'Retention and upsell — personalised upgrade offers, exclusive owner preview events, Q1 launch priority access.',
+          creative: 'Retention and basket growth — personalised category offers, members-only opening hours, fuel-and-shop bundling.',
         },
         {
-          segment: 'Lapsed Considerers',
+          segment: 'Lapsed Members',
           color: '#5b8def',
-          messaging: '"Your next Meridian is worth the wait."',
+          messaging: '"We moved closer. Your trolley is waiting."',
           channels: [
             { name: 'Email re-engagement', percentage: 40 },
             { name: 'Social retargeting', percentage: 30 },
             { name: 'Digital display', percentage: 20 },
             { name: 'Limited-time offers', percentage: 10 },
           ],
-          creative: 'Warm and compelling — new model imagery, limited-allocation offer mechanic, low-friction re-entry via test-drive booking.',
+          creative: 'Warm and concrete — drive-time proximity messaging, a named product and price, low-friction return with no re-join step.',
         },
         {
-          segment: 'New-to-Brand Enquirers',
+          segment: 'Never-Redeemed Sign-Ups',
           color: '#4db8d8',
-          messaging: '"Discover what Meridian feels like from the driver\'s seat."',
+          messaging: '"You’re already a member. Here’s what the first trip looks like."',
           channels: [
             { name: 'Email onboarding', percentage: 45 },
             { name: 'Mobile / app', percentage: 25 },
             { name: 'Social media', percentage: 20 },
             { name: 'Digital display', percentage: 10 },
           ],
-          creative: 'Bright and welcoming — first test-drive moment, brand story-forward, low barrier to showroom visit.',
+          creative: 'Bright and practical — a walkthrough of the first shop, drive time from home, low barrier to the first visit.',
         },
       ]
     : [
         {
-          segment: 'Premium Sedan Intenders',
+          segment: 'Marsden Park Stock-Ups',
           color: '#7c6bf0',
-          messaging: '"The sedan Singapore\'s most discerning drivers have been waiting for."',
+          messaging: '"One trip. One month sorted."',
           channels: [
-            { name: 'Instagram / Meta', percentage: 35 },
-            { name: 'Email / CRM', percentage: 30 },
-            { name: 'OOH (premium districts)', percentage: 20 },
-            { name: 'Digital display', percentage: 15 },
+            { name: 'Roadside OOH (M7 / Richmond Rd)', percentage: 36 },
+            { name: 'Meta / social', percentage: 26 },
+            { name: 'Catalogue & letterbox', percentage: 22 },
+            { name: 'Drive-time radio', percentage: 16 },
           ],
-          creative: 'Aspirational and precise — premium automotive imagery, Orchard / River Valley placement, exclusivity and craftsmanship framing.',
+          creative: 'Scale and practicality — a full trolley and a full boot, M7 and Richmond Road placement, Thursday-to-Saturday weighting.',
         },
         {
-          segment: 'EV Upgrade Shoppers',
+          segment: 'Parramatta Value Families',
           color: '#5b8def',
-          messaging: '"Drive electric. Drive smarter. Drive Meridian."',
+          messaging: '"Buy it by the box. Pay less by the unit."',
           channels: [
-            { name: 'Social media', percentage: 35 },
-            { name: 'Search / intent', percentage: 25 },
-            { name: 'Digital display', percentage: 25 },
-            { name: 'EDM', percentage: 15 },
+            { name: 'Digital OOH — Parramatta CBD', percentage: 33 },
+            { name: 'Multicultural radio & press', percentage: 27 },
+            { name: 'Community referral', percentage: 24 },
+            { name: 'Catalogue & letterbox', percentage: 16 },
           ],
-          creative: 'Technology-forward and progressive — EV range and charging imagery, Green Plan incentive callout, challenger brand positioning.',
+          creative: 'Unit-price led and community-proofed — household-scale imagery, referral mechanic, Ramadan / Diwali / Lunar New Year weighting.',
         },
         {
-          segment: 'Family SUV Upgraders',
+          segment: 'Castle Hill Bulk Buyers',
           color: '#4db8d8',
-          messaging: '"Room for every journey. Built for Singapore roads."',
+          messaging: '"Bulk, without the compromise."',
           channels: [
-            { name: 'Mobile / app', percentage: 40 },
-            { name: 'Digital OOH (family districts)', percentage: 30 },
-            { name: 'YouTube pre-roll', percentage: 20 },
-            { name: 'Social media', percentage: 10 },
+            { name: 'Roadside OOH — Windsor Rd', percentage: 31 },
+            { name: 'Retail media & search', percentage: 28 },
+            { name: 'Email / CRM', percentage: 23 },
+            { name: 'Local press & school networks', percentage: 18 },
           ],
-          creative: 'Warm and family-forward — lifestyle imagery with space and safety emphasis, flexible finance mechanic, Tampines / Bishan placement.',
+          creative: 'Range-led and quality-forward — entertaining imagery, compare-the-trolley mechanic, Windsor Road and Old Northern Road placement.',
         },
       ];
 

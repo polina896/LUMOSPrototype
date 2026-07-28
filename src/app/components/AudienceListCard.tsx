@@ -48,7 +48,7 @@ export default function AudienceListCard({ audience, onClick, isSelected, clicka
               <path d="M0 0V10L4 7L8 10V0H0Z" fill="#8A8494" />
             </svg>
             <span className="font-['Jua',sans-serif] text-[11px] text-[#8a8494]">
-              Purchase intent segment · Vehicle Registration Data
+              Shopper behaviour segment · Grocery Transaction Data
             </span>
           </div>
         </div>

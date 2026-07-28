@@ -31,7 +31,7 @@ function hourWeight(mode: GeoModeKey, h: number, weekend: boolean, earlyRiser = 
       return weekend
         ? gauss(h, 13, 3.0) * 1.0 + gauss(h, 19, 2.2) * 0.4 + 0.12
         : gauss(h, 10.5, 2.6) * 0.9 + gauss(h, 13, 1.4) * 0.6 + 0.10;
-    case 'Transaction': // spend / showroom windows — evenings & weekend afternoons
+    case 'Transaction': // spend / in-store windows — evenings & weekend afternoons
       return weekend
         ? gauss(h, 14.5, 2.6) * 1.0 + gauss(h, 11, 1.8) * 0.5 + 0.12
         : gauss(h, 19.5, 2.0) * 1.0 + gauss(h, 12.5, 1.4) * 0.4 + 0.10;
@@ -45,9 +45,9 @@ function hourWeight(mode: GeoModeKey, h: number, weekend: boolean, earlyRiser = 
 
 // per-audience personality — which days lean hot
 const AUD_DAY_FACTOR: Record<string, Record<string, number>> = {
-  'ev-upgrade-shoppers':     { Mon: 0.95, Tue: 0.98, Wed: 1.0, Thu: 1.0, Fri: 0.9,  Sat: 1.18, Sun: 1.05 },
-  'premium-sedan-intenders': { Mon: 1.0,  Tue: 1.02, Wed: 1.03, Thu: 1.05, Fri: 1.1, Sat: 0.95, Sun: 0.85 },
-  'family-suv-upgraders':    { Mon: 0.9,  Tue: 0.92, Wed: 0.95, Thu: 0.95, Fri: 1.0, Sat: 1.25, Sun: 1.12 },
+  'parramatta-value-families': { Mon: 0.95, Tue: 0.98, Wed: 1.0, Thu: 1.0, Fri: 0.9,  Sat: 1.18, Sun: 1.05 },
+  'marsden-park-stockups':     { Mon: 0.88, Tue: 0.9,  Wed: 0.95, Thu: 1.05, Fri: 1.12, Sat: 1.3, Sun: 1.0 },
+  'castle-hill-bulk-buyers':   { Mon: 0.9,  Tue: 0.92, Wed: 0.95, Thu: 0.95, Fri: 1.0, Sat: 1.25, Sun: 1.12 },
   'urban-upgrade-drivers':   { Mon: 0.85, Tue: 0.88, Wed: 0.9, Thu: 0.9,  Fri: 0.95, Sat: 1.32, Sun: 1.16 },
 };
 const DEFAULT_DAY_FACTOR = { Mon: 1, Tue: 1, Wed: 1, Thu: 1, Fri: 1, Sat: 1.05, Sun: 0.95 };

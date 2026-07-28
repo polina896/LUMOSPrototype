@@ -4,13 +4,13 @@ import { Info } from 'lucide-react';
 const DATA_SOURCES = [
   {
     icon: '🔒',
-    name: 'Vehicle Registration Data',
-    description: 'Anonymised ownership and purchase-intent signals from Singapore LTA vehicle registration records.',
+    name: 'Grocery Transaction Data',
+    description: 'Anonymised basket and purchase signals from Australian grocery and warehouse-club transaction records.',
   },
   {
     icon: '📍',
     name: 'Lumos Geospatial Intelligence',
-    description: 'Foot traffic and POI visit signals enriching owner location and dealership behaviour.',
+    description: 'Foot traffic and POI visit signals enriching household location and store-visit behaviour.',
   },
   {
     icon: '👤',
@@ -20,12 +20,12 @@ const DATA_SOURCES = [
   {
     icon: '🌐',
     name: 'LiveRamp Digital Identity Graph',
-    description: 'Cross-channel digital behaviour signals linked to owner and intender profiles.',
+    description: 'Cross-channel digital behaviour signals linked to household and shopper profiles.',
   },
   {
-    icon: '🚗',
-    name: 'Automotive Purchase Index',
-    description: 'Vehicle category classification system ranking consideration frequency and upgrade timing patterns.',
+    icon: '🛒',
+    name: 'Grocery Basket Index',
+    description: 'Category classification system ranking basket size, shop frequency and seasonal timing patterns.',
   },
 ];
 

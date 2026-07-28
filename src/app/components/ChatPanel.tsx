@@ -5,22 +5,22 @@ import type { ModuleRef } from './ModuleAsk';
 
 const CLARIFY_QUESTIONS = [
   {
-    aiIntro: "Before I run this, a few quick things — which vehicle segments are you prioritising for the Singapore launch?",
-    chips: ['Luxury Sedan Buyers', 'Family SUV Shoppers', 'EV Early Adopters', 'First-Time Buyers'],
-    multi: false,
-    placeholder: 'Or describe the vehicle segment...',
-  },
-  {
-    aiIntro: "What's your primary campaign objective?",
-    chips: ['Drive test-drive bookings', 'Build brand awareness in Singapore', 'Win share from competitor brands', 'Grow repeat consideration rate'],
-    multi: false,
-    placeholder: 'Or describe your objective...',
-  },
-  {
-    aiIntro: "And last one — any other audience segments you'd like to layer in?",
-    chips: ['High-income professionals', 'Expat residents', 'Frequent business travellers', 'Upgrade-ready existing owners'],
+    aiIntro: "Before we dive into the data, I'd like to understand the outcome you're working towards — what are you trying to do?",
+    chips: ['Understand my existing customers', 'Find new customer opportunities', 'Decide where to advertise', 'Compare against competitors', 'Build a customer persona'],
     multi: true,
-    placeholder: 'Or describe additional segments...',
+    placeholder: 'Or describe the outcome in your own words...',
+  },
+  {
+    aiIntro: "Got it — so this is a media planning question, not a demographic profile. Which channels are on the table for the launch?",
+    chips: ['Out-of-home & billboards', 'Radio & audio', 'Digital & social', 'Catalogue & letterbox'],
+    multi: true,
+    placeholder: 'Or describe your channel mix...',
+  },
+  {
+    aiIntro: "And last one — anything you already believe to be true about the Costco shopper in Western Sydney?",
+    chips: ['Large family households', 'Bulk & big-basket buyers', 'Car-dependent, drive to shop', 'Price-conscious switchers'],
+    multi: true,
+    placeholder: 'Or describe what you already know...',
   },
 ] as const;
 import type { Screen } from '../App';
@@ -40,30 +40,30 @@ interface SavedAudience {
 }
 
 const AUDIENCE_LIBRARY: SavedAudience[] = [
-  { id: 1,  category: 'Premium Sedans',               name: 'Luxury Sedan Buyers – High Value',              tag: 'High Value'      },
-  { id: 2,  category: 'Premium Sedans',               name: 'Luxury Sedan Buyers – Frequent Buyers',         tag: 'Frequent Buyers' },
-  { id: 3,  category: 'Family SUV',                   name: 'Family SUV Shoppers – High Value',              tag: 'High Value'      },
-  { id: 4,  category: 'Family SUV',                   name: 'Family SUV Shoppers – Frequent Buyers',         tag: 'Frequent Buyers' },
-  { id: 5,  category: 'EV & Hybrid',                  name: 'EV & Hybrid Intenders – High Value',            tag: 'High Value'      },
-  { id: 6,  category: 'EV & Hybrid',                  name: 'EV & Hybrid Intenders – Frequent Buyers',       tag: 'Frequent Buyers' },
-  { id: 7,  category: 'First-Time Buyers',            name: 'First-Time Buyers – High Value',                tag: 'High Value'      },
-  { id: 8,  category: 'First-Time Buyers',            name: 'First-Time Buyers – Frequent Buyers',           tag: 'Frequent Buyers' },
-  { id: 9,  category: 'Fleet & Corporate',            name: 'Fleet & Corporate Drivers – High Value',        tag: 'High Value'      },
-  { id: 10, category: 'Fleet & Corporate',            name: 'Fleet & Corporate Drivers – Frequent Buyers',   tag: 'Frequent Buyers' },
-  { id: 11, category: 'Upgrade Owners',               name: 'Upgrade-Ready Owners – High Value',             tag: 'High Value'      },
-  { id: 12, category: 'Upgrade Owners',               name: 'Upgrade-Ready Owners – Lapsed',                 tag: 'Frequent Buyers' },
-  { id: 13, category: 'Weekend Lifestyle',            name: 'Weekend Lifestyle Drivers – High Value',        tag: 'High Value'      },
-  { id: 14, category: 'Weekend Lifestyle',            name: 'Weekend Lifestyle Drivers – Frequent Buyers',   tag: 'Frequent Buyers' },
-  { id: 15, category: 'Performance',                  name: 'Performance Car Buyers – High Value',           tag: 'High Value'      },
-  { id: 16, category: 'Performance',                  name: 'Performance Car Buyers – Frequent Buyers',      tag: 'Frequent Buyers' },
-  { id: 17, category: 'Car Services',                 name: 'Petrol Station Regulars – Frequent',            tag: 'Frequent Buyers' },
-  { id: 18, category: 'Car Services',                 name: 'Car Service Regulars – Loyal',                  tag: 'High Value'      },
-  { id: 19, category: 'Finance',                      name: 'Premium Finance Users – High Value',            tag: 'High Value'      },
-  { id: 20, category: 'Finance',                      name: 'Trade-In Prospects – Lapsed',                   tag: 'Frequent Buyers' },
-  { id: 21, category: 'Professional',                 name: 'High-Income Professionals – High Value',        tag: 'High Value'      },
-  { id: 22, category: 'Professional',                 name: 'Expat Residents – High Value',                  tag: 'High Value'      },
-  { id: 23, category: 'Travel',                       name: 'Business Frequent Travellers – High Value',     tag: 'High Value'      },
-  { id: 24, category: 'Travel',                       name: 'Business Frequent Travellers – Frequent',       tag: 'Frequent Buyers' },
+  { id: 1,  category: 'Bulk Grocery',                 name: 'Big-Basket Households – High Value',            tag: 'High Value'      },
+  { id: 2,  category: 'Bulk Grocery',                 name: 'Big-Basket Households – Frequent Buyers',       tag: 'Frequent Buyers' },
+  { id: 3,  category: 'Family Households',            name: 'Large Family Shoppers – High Value',            tag: 'High Value'      },
+  { id: 4,  category: 'Family Households',            name: 'Large Family Shoppers – Frequent Buyers',       tag: 'Frequent Buyers' },
+  { id: 5,  category: 'Warehouse Club',               name: 'Existing Club Members – High Value',            tag: 'High Value'      },
+  { id: 6,  category: 'Warehouse Club',               name: 'Existing Club Members – Frequent Buyers',       tag: 'Frequent Buyers' },
+  { id: 7,  category: 'New Movers',                   name: 'New-Build Movers – High Value',                 tag: 'High Value'      },
+  { id: 8,  category: 'New Movers',                   name: 'New-Build Movers – Frequent Buyers',            tag: 'Frequent Buyers' },
+  { id: 9,  category: 'Small Business',               name: 'Café & Small Business Buyers – High Value',     tag: 'High Value'      },
+  { id: 10, category: 'Small Business',               name: 'Café & Small Business Buyers – Frequent',       tag: 'Frequent Buyers' },
+  { id: 11, category: 'Lapsed Members',               name: 'Lapsed Members – High Value',                   tag: 'High Value'      },
+  { id: 12, category: 'Lapsed Members',               name: 'Lapsed Members – Never Redeemed',               tag: 'Frequent Buyers' },
+  { id: 13, category: 'Weekend Shoppers',             name: 'Saturday Big-Shop Households – High Value',     tag: 'High Value'      },
+  { id: 14, category: 'Weekend Shoppers',             name: 'Saturday Big-Shop Households – Frequent',       tag: 'Frequent Buyers' },
+  { id: 15, category: 'Premium Grocery',              name: 'Premium & Entertaining Buyers – High Value',    tag: 'High Value'      },
+  { id: 16, category: 'Premium Grocery',              name: 'Premium & Entertaining Buyers – Frequent',      tag: 'Frequent Buyers' },
+  { id: 17, category: 'Fuel & Convenience',           name: 'Fuel Station Regulars – Frequent',              tag: 'Frequent Buyers' },
+  { id: 18, category: 'Fuel & Convenience',           name: 'Combined Fuel & Shop Trips – Loyal',            tag: 'High Value'      },
+  { id: 19, category: 'Value Seekers',                name: 'Unit-Price Switchers – High Value',             tag: 'High Value'      },
+  { id: 20, category: 'Value Seekers',                name: 'Discount Grocery Cross-Shoppers – Lapsed',      tag: 'Frequent Buyers' },
+  { id: 21, category: 'Multicultural',                name: 'Multi-Generational Households – High Value',    tag: 'High Value'      },
+  { id: 22, category: 'Multicultural',                name: 'Community Bulk Buyers – High Value',            tag: 'High Value'      },
+  { id: 23, category: 'Home & Garden',                name: 'Hardware & Home Project Buyers – High Value',   tag: 'High Value'      },
+  { id: 24, category: 'Home & Garden',                name: 'Hardware & Home Project Buyers – Frequent',     tag: 'Frequent Buyers' },
 ];
 
 const SAVED_AUDIENCES = AUDIENCE_LIBRARY;
@@ -361,8 +361,8 @@ export default function ChatPanel({
     setEntryMode(homeTab);
     setIsAnalysisComplete(false);
     const title = homeTab === 'brief'
-      ? 'Meridian Motors — Singapore Launch'
-      : 'Owner Upload Enrichment';
+      ? 'Costco — Western Sydney Launch'
+      : 'Member Upload Enrichment';
     onNewAnalysis?.(homeTab, title);
     setVisibleMessages({});
     setShowClarifyCard(false);
@@ -453,7 +453,7 @@ export default function ChatPanel({
   };
 
   const handleFileSelect = () => {
-    setUploadedFile('automotive_audiences.csv');
+    setUploadedFile('costco_member_segments.csv');
   };
 
   const handleMessaging = () => {
@@ -471,8 +471,8 @@ export default function ChatPanel({
       if (onAddTextBlock) {
         const content =
           entryMode === 'upload'
-            ? 'Active Owners show strong repeat-consideration potential — focus on loyalty service benefits and upgrade incentives to maintain brand preference. Lapsed Considerers need re-engagement with a compelling reason to revisit Meridian. New-to-Brand Enquirers require nurture campaigns with a low-commitment first step, such as a complimentary test drive.'
-            : 'Premium Sedan Intenders are the highest-affinity segment — lead with precision engineering and aspirational positioning to win consideration from existing premium buyers. EV Upgrade Shoppers are the broadest reach opportunity; technology leadership and Singapore Green Plan messaging drive immediate interest. Family SUV Upgraders have the highest upgrade propensity and respond strongly to safety credentials and family-lifestyle activations.';
+            ? 'Active Members are already in the habit — protect frequency with fuel and bulk-unit-price messaging rather than acquisition spend. Lapsed Members need a single concrete reason to return, ideally tied to the new Western Sydney warehouse being closer than the one they left. Never-Redeemed Sign-Ups are the biggest untapped pool; a first-trip prompt with a named product and a drive time converts far harder than a generic reminder.'
+            : 'Marsden Park Stock-Ups are the highest-affinity cluster — weight roadside OOH along the M7 and Richmond Road corridors Thursday to Saturday, immediately ahead of the trip. Parramatta Value Families are the broadest reach opportunity; lead on unit price through digital OOH in the Parramatta CBD and multicultural radio. Castle Hill Bulk Buyers are a switching play rather than first trial — range and quality messaging via retail media and CRM will move share of wallet.';
         onAddTextBlock('Campaign recommendations', content);
       }
     }, 3500);
@@ -573,20 +573,20 @@ export default function ChatPanel({
             <div className="flex flex-wrap gap-2 justify-center">
               {homeTab === 'brief' ? (
                 <>
-                  <Pill text="Help me find my highest-potential launch audience in Singapore" />
-                  <Pill text="Identify new-to-brand intenders for a premium sedan launch" />
-                  <Pill text="Help me build a test-drive campaign for Meridian Motors" />
+                  <Pill text="Who are the ideal customers for a Costco in Western Sydney?" />
+                  <Pill text="Show me where my big-basket shoppers live and travel" />
+                  <Pill text="Help me decide where to advertise for the Marsden Park launch" />
                 </>
               ) : homeTab === 'upload' ? (
                 <>
-                  <Pill text="Help me understand which segments have the most growth potential" />
-                  <Pill text="Help me unlock new strategies based on my owner data" />
+                  <Pill text="Help me understand which member segments have the most growth potential" />
+                  <Pill text="Help me unlock new strategies based on my membership data" />
                 </>
               ) : (
                 <>
-                  <Pill text="Compare Premium Sedan Intenders vs EV Upgrade Shoppers" />
+                  <Pill text="Compare Marsden Park Stock-Ups vs Parramatta Value Families" />
                   <Pill text="Where do my two audiences overlap, and where do they differ?" />
-                  <Pill text="Compare the same audience across Singapore and Malaysia" />
+                  <Pill text="Compare the same audience across Western Sydney and South-West Sydney" />
                 </>
               )}
             </div>
@@ -602,7 +602,7 @@ export default function ChatPanel({
 
               {/* ── Brief user message ── */}
               {entryMode === 'brief' && (
-                <UserMessage text="We are launching Meridian Motors in Singapore and want to identify the best audience segments to target for test-drive bookings and brand awareness. Help me select the right audiences and build campaign recommendations." />
+                <UserMessage text="I'm launching Costco in Western Sydney and want to understand who our ideal customers are, so we know where to advertise." />
               )}
 
               {/* ── Upload user message ── */}
@@ -614,15 +614,15 @@ export default function ChatPanel({
                         <svg className="w-4 h-4 text-[#666]" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
                         </svg>
-                        <span className="font-['Jua',sans-serif] text-[14px] text-black opacity-70">meridian_owners.csv</span>
+                        <span className="font-['Jua',sans-serif] text-[14px] text-black opacity-70">costco_members.csv</span>
                       </div>
                       <p className="font-['Jua',sans-serif] text-[14px] text-black opacity-70 leading-relaxed">
-                        We have an owner database of 8,400 registered Meridian owners in Singapore with vehicle purchase history over the last 36 months. We want to understand who these owners are — purchase patterns, service frequency, upgrade timing, and who else in the market looks like them.
+                        We have a membership database of 42,000 Costco members across Greater Sydney with basket and visit history over the last 24 months. We want to understand who these members are — basket size, visit frequency, how far they travel, and who else in Western Sydney looks like them.
                       </p>
                     </div>
                   </div>
                   {(screen !== 'planning') && (
-                    <AIMessage text="Got it — I can see you've uploaded 3 segments: Active Owners, Lapsed Considerers, and New-to-Brand Shoppers. Enriching these with vehicle registration data, movement patterns, and purchase intent signals." />
+                    <AIMessage text="Got it — I can see you've uploaded 3 segments: Active Members, Lapsed Members, and Never-Redeemed Sign-Ups. Enriching these with transaction data, movement patterns, and catchment signals across Greater Sydney." />
                   )}
                 </>
               )}
@@ -632,14 +632,14 @@ export default function ChatPanel({
                 <div className="my-6 space-y-3">
                   {entryMode === 'brief' ? (
                     <CollapsibleReasoning
-                      summary="Reading the brief — Meridian Motors Singapore launch, automotive category audiences, test-drive and awareness objectives..."
-                      steps={['Parsing brief requirements', 'Identifying key vehicle segments', 'Understanding campaign objectives']}
+                      summary="Reading the brief — Costco Western Sydney launch, big-basket grocery category, ideal-customer discovery..."
+                      steps={['Parsing brief requirements', 'Identifying the Western Sydney catchment', 'Understanding the underlying objective']}
                     />
                   ) : (
                     <div className="space-y-3">
-                      <StepIndicator active text="Analyzing uploaded owner segment definitions" />
-                      <StepIndicator active={false} text="Enriching with vehicle registration and movement data" />
-                      <StepIndicator active={false} text="Pulling purchase frequency and upgrade timing insights per segment" />
+                      <StepIndicator active text="Analyzing uploaded member segment definitions" />
+                      <StepIndicator active={false} text="Enriching with transaction and movement data" />
+                      <StepIndicator active={false} text="Pulling basket size, visit frequency and travel distance per segment" />
                     </div>
                   )}
                 </div>
@@ -652,8 +652,8 @@ export default function ChatPanel({
                 <>
                   {/* Reasoning block — persistent */}
                   <CollapsibleReasoning
-                    summary="Reading the brief — Meridian Motors Singapore launch, automotive category audiences, test-drive and awareness objectives..."
-                    steps={['Parsing brief requirements', 'Identifying key vehicle segments', 'Understanding campaign objectives']}
+                    summary="Reading the brief — Costco Western Sydney launch, big-basket grocery category, ideal-customer discovery..."
+                    steps={['Parsing brief requirements', 'Identifying the Western Sydney catchment', 'Understanding the underlying objective']}
                   />
 
                   {/* Q+A pairs — appear one by one as answered */}
@@ -677,32 +677,32 @@ export default function ChatPanel({
                           <div key={d} className="w-2 h-2 bg-[#7c6bf0] rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                         ))}
                       </div>
-                      <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Scanning vehicle registration data — purchase frequency, seasonal uplift, automotive category concentration...</span>
+                      <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Scanning transaction and movement data — basket size, visit frequency, Western Sydney catchment concentration...</span>
                     </div>
                   )}
 
                   {/* Market summary message */}
                   {(showMarketMessage || isAtOrAfter(screen, 'profiles')) && (
-                    <AIMessage text="Here's the market picture. New vehicle registrations in Singapore index 42% above baseline in Q1, with premium sedans the fastest-growing sub-category. Consideration is highly concentrated — the top 30% of intenders account for 74% of total category conversions. And EV Early Adopters trial new brands at 3.8× the rate of the general market. Three segments stand out as the strongest launch targets — I'll define them now." />
+                    <AIMessage text="Here's the market picture. Bulk and warehouse-club shopping across Western Sydney indexes 38% above the Greater Sydney average, driven by larger households and a drive-to-shop habit. Spend is highly concentrated — the top 25% of big-basket households account for 68% of category value. And North-West growth-corridor households travel 2.4× further than the metro average for a single shop. Three clusters stand out — I'll build the Digital Twin now." />
                   )}
 
                   {/* 3 stat insight cards — staggered */}
                   {(statCardCount >= 1 || isAtOrAfter(screen, 'profiles')) && (
                     <MarketStatCard
-                      stat="+42% YoY"
-                      context="New vehicle registrations in Singapore index 42% above baseline in Q1 — the Jan–Mar window is the highest-potential launch period for Meridian Motors."
+                      stat="+38% vs metro"
+                      context="Bulk and warehouse-club shopping in Western Sydney indexes 38% above the Greater Sydney average — household size and drive-to-shop behaviour are the drivers."
                     />
                   )}
                   {(statCardCount >= 2 || isAtOrAfter(screen, 'profiles')) && (
                     <MarketStatCard
-                      stat="74% of conversions"
-                      context="The top 30% of intenders account for 74% of total category conversions — targeting the right segment matters more than reach."
+                      stat="68% of value"
+                      context="The top 25% of big-basket households account for 68% of category value — where you advertise matters more than how widely you advertise."
                     />
                   )}
                   {(statCardCount >= 3 || isAtOrAfter(screen, 'profiles')) && (
                     <MarketStatCard
-                      stat="3.8× more likely"
-                      context="EV Early Adopters are 3.8× more likely to trial a new automotive brand, driven by technology curiosity and Singapore's Green Plan incentives."
+                      stat="2.4× further"
+                      context="North-West growth-corridor households travel 2.4× further than the metro average for a single big shop, passing the M7 and Richmond Road media corridors on the way."
                     />
                   )}
 
@@ -728,12 +728,12 @@ export default function ChatPanel({
                   {/* Reasoning block while analysis runs */}
                   {(screen !== 'profiles' || visibleMessages['profiles-reasoning']) && (
                     <CollapsibleReasoning
-                      summary="Running full analysis — building owner profiles, pulling vehicle registration data, behavioural signals..."
+                      summary="Generating the Digital Twin — building cluster profiles, pulling transaction and movement data, mapping catchments..."
                       steps={[
-                        'Pulling vehicle registration and transaction distributions per segment',
-                        'Identifying upgrade frequency and consideration signals',
-                        'Mapping owner geographic concentration across Singapore',
-                        'Analysing channel and dealership visit indices',
+                        'Pulling basket size and spend distributions per cluster',
+                        'Identifying visit frequency and travel-distance signals',
+                        'Mapping household concentration across Greater Sydney',
+                        'Analysing media corridor and on-route exposure indices',
                         'Confirming audience reach and index estimates',
                       ]}
                     />
@@ -741,7 +741,7 @@ export default function ChatPanel({
 
                   {/* Full analysis done + audience cards */}
                   {(screen !== 'profiles' || visibleMessages['profiles-ai']) && (
-                    <AIMessage text="Full analysis done. Here are the 3 Meridian Motors launch audiences I've built — you can save these for more analysis later on." />
+                    <AIMessage text="I've generated the Digital Twin for Costco shoppers across Sydney. Immediately, I can see three strong audience clusters — around Marsden Park, Parramatta and Castle Hill. Click any cluster to open it on the map, or save these for more analysis later on." />
                   )}
                   {(screen !== 'profiles' || profilesLoaded) && (
                     <div className="my-5 space-y-3">
@@ -771,14 +771,14 @@ export default function ChatPanel({
               {isAtOrAfter(screen, 'profiles') && entryMode === 'upload' && (
                 <>
                   {(screen !== 'profiles' || visibleMessages['profiles-ai']) && (
-                    <AIMessage text="I've enriched your 3 uploaded segments with vehicle registration data, movement patterns, and purchase intent signals. Here's what they look like." />
+                    <AIMessage text="I've enriched your 3 uploaded segments with transaction data, movement patterns, and catchment signals. Here's what they look like." />
                   )}
                   {(screen !== 'profiles' || profilesLoaded) && (
                     <div className="my-5 space-y-3">
                       {[
-                        { name: 'Active Meridian Owners', desc: '4.2K owners · 2+ service visits/year · index 264 vs all registered' },
-                        { name: 'Lapsed Considerers', desc: '2.8K owners · <1 dealership visit in last 90 days · index 157 vs all registered' },
-                        { name: 'New-to-Brand Enquirers', desc: '1.4K prospects · First Meridian enquiry in last 60 days · index 131 vs all registered' },
+                        { name: 'Active Members', desc: '18.6K members · 2+ shops per month · index 264 vs all members' },
+                        { name: 'Lapsed Members', desc: '14.2K members · no shop in the last 90 days · index 157 vs all members' },
+                        { name: 'Never-Redeemed Sign-Ups', desc: '9.1K members · joined but never completed a first shop · index 131 vs all members' },
                       ].map((seg) => (
                         <UploadSegmentCard key={seg.name} name={seg.name} desc={seg.desc} />
                       ))}
@@ -802,18 +802,18 @@ export default function ChatPanel({
                   <UserMessage text="Yes, explore these audiences in more detail" />
                   {(screen !== 'deep-dive' || visibleMessages['deepdive-reasoning']) && (
                     <CollapsibleReasoning
-                      summary="Building full audience profiles — vehicle ownership patterns, consideration signals, channel behaviour, lifestyle overlap..."
+                      summary="Building full cluster profiles — shopping patterns, travel behaviour, channel exposure, lifestyle overlap..."
                       steps={[
-                        'Pulling vehicle registration and ownership distributions per segment',
-                        'Identifying upgrade frequency and consideration signals',
+                        'Pulling basket and category distributions per cluster',
+                        'Identifying visit frequency and trip-chain signals',
                         'Mapping cross-category spend overlap and seasonal patterns',
-                        'Analysing dealership and digital channel indices',
+                        'Analysing out-of-home and digital channel indices',
                         'Building timing and messaging insights',
                       ]}
                     />
                   )}
                   {(screen !== 'deep-dive' || visibleMessages['deepdive-ai']) && (
-                    <AIMessage text="Here's a detailed breakdown of each segment. Click any card to explore the full profile — vehicle ownership patterns, consideration behaviour, channel insights, and messaging thought starters." />
+                    <AIMessage text="Here's a detailed breakdown of each cluster. Click any card to explore the full profile — shopping patterns, travel behaviour, channel insights, and messaging thought starters." />
                   )}
                   {(screen !== 'deep-dive' || deepDiveLoaded) && (
                     <div className="my-5 space-y-3">
@@ -857,29 +857,29 @@ export default function ChatPanel({
                   } />
 
                   {visibleMessages['result-message-1'] && (
-                    <AIMessage text="Running the full analysis now — identifying consideration concentration by segment, building detailed owner profiles, and pulling Q1 uplift signals." />
+                    <AIMessage text="Running the full analysis now — identifying spend concentration by cluster, building detailed household profiles, and pulling the media corridors each cluster passes through." />
                   )}
                   {visibleMessages['result-reasoning'] && (
                     <CollapsibleReasoning
-                      summary="Cross-referencing vehicle registration data across segments and Singapore planning areas..."
+                      summary="Cross-referencing transaction and movement data across clusters and Greater Sydney SA2s..."
                       steps={[
-                        'Identifying high-value automotive buyers by purchase frequency and spend',
-                        'Analysing Q1 seasonal uplift patterns',
-                        'Segmenting by vehicle ownership behaviour and category',
+                        'Identifying high-value households by basket size and visit frequency',
+                        'Analysing seasonal and weekly shopping patterns',
+                        'Segmenting by household composition and travel behaviour',
                         'Confirming audience definitions and index scores',
-                        'Analysing geographic concentration and growth trends',
-                        'Building campaign-ready owner profiles',
+                        'Analysing geographic concentration and catchment overlap',
+                        'Building campaign-ready household profiles',
                       ]}
                     />
                   )}
                   {visibleMessages['result-message-2'] && (
-                    <AIMessage text="Done. The three segments show distinct ownership behaviours and different Q1 uplift trajectories. I'll add campaign recommendations for each segment now." />
+                    <AIMessage text="Done. The three clusters shop on distinctly different rhythms and pass through different media corridors. I'll add campaign recommendations for each cluster now." />
                   )}
 
                   {/* Messaging generation flow */}
                   {!showMessagingButton && (
                     <div className="mt-4 space-y-3 my-6">
-                      <StepIndicator active text="Analysing competitive positioning per segment" />
+                      <StepIndicator active text="Analysing competitive positioning per cluster" />
                       <StepIndicator active={false} text="Identifying campaign angles and channels" />
                       <StepIndicator active={false} text="Generating creative recommendations" />
                     </div>
@@ -891,16 +891,16 @@ export default function ChatPanel({
                           <div key={d} className="w-2 h-2 bg-[#7c6bf0] rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                         ))}
                       </div>
-                      <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Building messaging angles for each segment based on ownership behaviour and seasonal patterns...</span>
+                      <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Building messaging angles for each cluster based on shopping behaviour and seasonal patterns...</span>
                     </div>
                   )}
                   {messagingComplete && visibleMessages['messaging-complete'] && (
                     <>
                       <CollapsibleReasoning
-                        summary="Analysing consideration drivers: premium sedan intent vs. EV curiosity vs. family upgrade need..."
-                        steps={['Analysing owner consideration positioning per segment', 'Identifying campaign angles and channels', 'Generating creative recommendations']}
+                        summary="Analysing purchase drivers: one-trip convenience vs. unit price vs. premium bulk range..."
+                        steps={['Analysing household positioning per cluster', 'Identifying campaign angles and channels', 'Generating creative recommendations']}
                       />
-                      <AIMessage text="Campaign recommendations added to the analysis — messaging angles, channel mix, and creative direction for each segment." />
+                      <AIMessage text="Campaign recommendations added to the analysis — messaging angles, channel mix, and creative direction for each cluster." />
                       <StrategyDocCard entryMode={entryMode} />
                       <AIMessageFooter />
                       <FollowUpQuestions entryMode={entryMode} />
@@ -1014,7 +1014,7 @@ function CTAExploreCard({
             Want to explore these audiences further?
           </p>
           <p className="font-['Jua',sans-serif] text-[14px] text-[#666] leading-relaxed">
-            I can build detailed profiles for each segment — demographics, lifestyle signals, channel consumption, competitor overlap, and messaging thought starters.
+            I can build detailed profiles for each cluster — household make-up, shopping signals, channel consumption, competitor overlap, and messaging thought starters.
           </p>
         </div>
       </div>
@@ -1180,22 +1180,22 @@ function MarketStatCard({ stat, context }: { stat: string; context: string }) {
 function AudienceSegmentsCard({ onConfirm }: { onConfirm?: () => void }) {
   const segments = [
     {
-      name: 'Premium Sedan Intenders',
-      desc: 'Ages 28–50, SGD $120k+ HHI, 1–2 vehicle purchases in last 5 years. Strong brand loyalty with high receptiveness to premium features. Peaks around year-end bonuses and Chinese New Year. Index 245.',
+      name: 'Marsden Park Stock-Ups',
+      desc: 'Ages 30–45, $145k+ household income, new-build family homes across the North-West growth corridor. Monthly big shop, median 14km travelled, basket 3.4× the metro average. Index 264.',
     },
     {
-      name: 'EV Upgrade Shoppers',
-      desc: 'Ages 25–45, SGD $95k+ HHI, current hybrid or EV owner. Actively comparing next-gen EVs. Highest new-brand consideration rate. Strong Q1 and post-Budget purchase behaviour. Index 212.',
+      name: 'Parramatta Value Families',
+      desc: 'Ages 28–48, $105k+ household income, multi-generational and multicultural households from Parramatta to Auburn. Highest unit volume in Sydney, fortnightly rhythm, switches on unit price. Index 218.',
     },
     {
-      name: 'Family SUV Upgraders',
-      desc: 'Ages 30–48, SGD $85k+ HHI, current MPV or mid-size SUV owner. Upgrade trigger linked to family growth or school-zone relocation. Index 188.',
+      name: 'Castle Hill Bulk Buyers',
+      desc: 'Ages 35–55, $185k+ household income, established Hills District families. Fewest trips, biggest baskets, premium and entertaining lines — already members elsewhere. Index 186.',
     },
   ];
 
   return (
     <div className="mb-5">
-      <AIMessage text="I've identified three core audience segments for Meridian Motors based on vehicle ownership patterns, brand consideration, and upgrade propensity:" />
+      <AIMessage text="I've built the Digital Twin for Costco shoppers in Western Sydney. Three clusters carry the launch, defined by basket size, household composition, and how far they travel to shop:" />
       <div className="mb-4 bg-white border border-[#e8e4f4] rounded-2xl overflow-hidden">
         {segments.map((s, i) => (
           <div key={s.name} className={`px-5 py-3.5 ${i < segments.length - 1 ? 'border-b border-[#f0edf8]' : ''}`}>
@@ -1235,7 +1235,7 @@ const OUTPUT_TEMPLATES = [
     sections: [
       'Audience overview & sizing',
       'Channel mix & media weighting',
-      'Messaging angles by segment',
+      'Messaging angles by cluster',
       'Timing & seasonality calendar',
       'Creative direction thought starters',
     ],
@@ -1247,8 +1247,8 @@ const OUTPUT_TEMPLATES = [
     goodFor: 'Stakeholder presentations and leadership briefings with clear opportunity sizing.',
     sections: [
       'Executive summary',
-      'Audience profiles & index scores',
-      'Demographic & behavioural breakdown',
+      'Cluster profiles & index scores',
+      'Household & behavioural breakdown',
       'Market opportunity sizing',
       'Strategic recommendations',
     ],
@@ -1256,26 +1256,26 @@ const OUTPUT_TEMPLATES = [
   {
     id: 'conquest-plan',
     icon: '🎯',
-    title: 'Conquest Activation Plan',
-    goodFor: 'Identifying competitor brand switchers and new-to-brand conquest opportunities.',
+    title: 'Switching & Conquest Plan',
+    goodFor: 'Identifying which supermarket and warehouse-club shoppers are winnable, and how.',
     sections: [
-      'Competitive brand landscape',
+      'Competitive retail landscape',
       'Switching opportunity analysis',
-      'Conquest segment priorities',
-      'Activation tactics per segment',
+      'Conquest cluster priorities',
+      'Activation tactics per cluster',
       'Budget allocation guidance',
     ],
   },
   {
     id: 'launch-playbook',
     icon: '🚀',
-    title: 'Launch Playbook',
-    goodFor: 'End-to-end launch planning with test-drive events, timing and success metrics.',
+    title: 'Store Launch Playbook',
+    goodFor: 'End-to-end launch planning with catchment, opening-week timing and success metrics.',
     sections: [
       'Launch objectives & KPIs',
-      'Segment prioritisation matrix',
+      'Cluster prioritisation matrix',
       'Channel activation plan',
-      'Test-drive event strategy',
+      'Opening-week drive-to-store strategy',
       'Success metrics & measurement',
     ],
   },
@@ -1355,11 +1355,11 @@ function ProfilesCampaignCTA({ onProceed }: { onProceed: () => void }) {
 
 function StrategyDocCard({ entryMode }: { entryMode: 'brief' | 'upload' | null }) {
   const title = entryMode === 'upload'
-    ? 'Meridian Motors Singapore — Upload Analysis'
-    : 'Meridian Motors Singapore — Audience Strategy';
+    ? 'Costco Western Sydney — Member Upload Analysis'
+    : 'Costco Western Sydney — Audience Strategy';
   const meta = entryMode === 'upload'
-    ? '3 enriched segments · Campaign recommendations · Owner analysis'
-    : '3 audience segments · Campaign recommendations · Registration analysis';
+    ? '3 enriched segments · Campaign recommendations · Member analysis'
+    : '3 audience clusters · Campaign recommendations · Catchment analysis';
 
   return (
     <div className="my-5 bg-white border border-[#e0d4ff] rounded-xl overflow-hidden shadow-sm">
@@ -1424,13 +1424,13 @@ function AIMessageFooter() {
 
 function FollowUpQuestions({ entryMode }: { entryMode: 'brief' | 'upload' | null }) {
   const briefQuestions = [
-    'Tell me more about Premium Sedan Intenders — what their vehicle consideration journey looks like across the quarter',
-    'Go deeper on campaign recommendations by channel, timing, and offer mechanics',
+    'Tell me more about Marsden Park Stock-Ups — what their shopping trip looks like from home to checkout',
+    'Which billboards and corridors reach the most of these three clusters?',
     'Help me create a strategic doc that I can share with stakeholders',
   ];
   const uploadQuestions = [
-    'Tell me more about Active Meridian Owners — which vehicle categories they over-index on',
-    'Go deeper on re-engagement strategies for Lapsed Considerers',
+    'Tell me more about Active Members — which categories they over-index on',
+    'Go deeper on win-back strategies for Lapsed Members',
     'Help me create a strategic doc that I can share with stakeholders',
   ];
   const questions = entryMode === 'brief' ? briefQuestions : uploadQuestions;
@@ -1625,8 +1625,8 @@ function HomeInputBox({
             placeholder={placeholder}
             defaultValue={
               homeTab === 'brief'
-                ? 'We are launching Meridian Motors in Singapore and want to identify the best audience segments to target for test-drive bookings and brand awareness. Help me select the right audiences and build campaign recommendations.'
-                : 'We have an owner database of 8,400 registered Meridian owners in Singapore with vehicle purchase history over the last 36 months. We want to understand who these owners are — purchase patterns, service frequency, upgrade timing, and who else in the market looks like them.'
+                ? "I'm launching Costco in Western Sydney and want to understand who our ideal customers are, so we know where to advertise."
+                : 'We have a membership database of 42,000 Costco members across Greater Sydney with basket and visit history over the last 24 months. We want to understand who these members are — basket size, visit frequency, how far they travel, and who else in Western Sydney looks like them.'
             }
             className="w-full font-['Jua',sans-serif] text-[14px] text-black outline-none placeholder:text-[#999] resize-none"
           />

@@ -84,15 +84,15 @@ const LUMOS_TEMPLATES: Template[] = [
 const MY_TEMPLATES: Template[] = [
   {
     id: 'm1',
-    title: 'Meridian Motors Launch Brief',
-    description: 'Custom campaign brief template tailored for premium automotive audience segments in Singapore.',
+    title: 'Costco Western Sydney Launch Brief',
+    description: 'Custom campaign brief template tailored for big-basket household clusters in Western Sydney.',
     sections: 4,
     icon: <FileText className="w-4 h-4 text-[#6b3c72]" />,
   },
   {
     id: 'm2',
     title: 'EV Segment Playbook',
-    description: 'Activation playbook for EV intender segments with Singapore Green Plan messaging angles.',
+    description: 'Activation playbook for value-seeking household segments with unit-price messaging angles.',
     sections: 3,
     icon: <Layers className="w-4 h-4 text-[#6b3c72]" />,
   },

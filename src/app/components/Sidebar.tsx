@@ -36,7 +36,7 @@ export default function Sidebar({
       <div className="p-4 flex-1 flex flex-col">
         {/* Workspace Switcher */}
         <button className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-[#e5e5e5] transition-colors mb-4">
-          <span className="font-['Jua',sans-serif] text-[14px] text-[#6a6a6a]">Meridian Motors</span>
+          <span className="font-['Jua',sans-serif] text-[14px] text-[#6a6a6a]">Costco Australia</span>
           <ChevronDown className="w-4 h-4 text-[#323745]" />
         </button>
 

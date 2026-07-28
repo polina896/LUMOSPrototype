@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { ChevronDown, Calendar } from 'lucide-react';
 import type { StyleConfig } from './CustomizationPopover';
-import SingaporeHeatmap from './SingaporeHeatmap';
+import SydneyHeatmap from './SydneyHeatmap';
 
 interface HeatmapViewProps {
   styleConfig: StyleConfig;
 }
 
 const postcodeData = [
-  { rank: 1, area: 'Orchard / River Valley', postcode: '238843', index: 214, reach: '350k' },
-  { rank: 2, area: 'Bukit Timah', postcode: '279623', index: 189, reach: '120k' },
-  { rank: 3, area: 'Bishan / Ang Mo Kio', postcode: '579837', index: 160, reach: '100k' },
-  { rank: 4, area: 'Tampines / Pasir Ris', postcode: '520512', index: 120, reach: '50k' },
-  { rank: 5, area: 'Jurong East', postcode: '600233', index: 100, reach: '23k' },
+  { rank: 1, area: 'Marsden Park / Riverstone', postcode: '2765', index: 214, reach: '350k' },
+  { rank: 2, area: 'Schofields / Box Hill', postcode: '2762', index: 189, reach: '120k' },
+  { rank: 3, area: 'Parramatta / Granville', postcode: '2150', index: 160, reach: '100k' },
+  { rank: 4, area: 'Castle Hill / Kellyville', postcode: '2154', index: 120, reach: '50k' },
+  { rank: 5, area: 'Blacktown / Rooty Hill', postcode: '2148', index: 100, reach: '23k' },
 ];
 
 export default function HeatmapView({ styleConfig }: HeatmapViewProps) {
@@ -101,7 +101,7 @@ export default function HeatmapView({ styleConfig }: HeatmapViewProps) {
 
       {/* Map Visualization */}
       <div className="relative bg-white rounded-lg overflow-hidden h-[400px]">
-        <SingaporeHeatmap styleConfig={styleConfig} />
+        <SydneyHeatmap styleConfig={styleConfig} />
       </div>
 
       {/* Legend */}

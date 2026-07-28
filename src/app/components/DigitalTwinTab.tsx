@@ -53,24 +53,24 @@ const WHOLE: Persona = {
   role: '387k · blended',
   voice: 'aggregate',
   starters: [
-    'What do they drive now?',
-    'Which competitor showrooms do they visit?',
+    'Where do they shop now?',
+    'Which competitor supermarkets do they visit?',
     'Best channel & time to reach them?',
-    'How would they react to a S$180k launch?',
+    'How would they react to a membership offer?',
     'Stress-test message A vs B',
   ],
   seeded: [
-    { role: 'you', text: 'What do they actually drive now, and which competitor showrooms do they visit?' },
+    { role: 'you', text: 'Where do they actually shop now, and which competitor supermarkets do they visit?' },
     {
       role: 'twin',
-      text: 'They skew heavily to premium sedans (2.1×) and continental marques (1.8×), typically on their second or third car with an outstanding loan around S$95k. On visitation, 42% have been to a BMW or Mercedes-Benz showroom in the last 3 months (1.6× vs Singapore avg), 31% to Audi, 27% Lexus or a premium used-car dealer.',
-      grounded: 'Vehicle ownership · Competitor showroom visitation',
+      text: 'They skew heavily to bulk and pantry categories (2.1×) and multipack lines (1.8×), typically running one large monthly shop with an average basket around $420. On visitation, 42% have shopped a Woolworths or Coles in the last month (1.6× vs Sydney avg), 31% ALDI, 27% BIG W or an independent bulk grocer.',
+      grounded: 'Category spend · Competitor store visitation',
       trust: [{ label: 'measured', kind: 'measured' }],
     },
     { role: 'you', text: 'Best way and time to reach them for a launch?' },
     {
       role: 'twin',
-      text: 'Connected TV and YouTube on weekday evenings 7–9pm is the strongest single window (2.3×). OOH along the Orchard–CBD corridor indexes on weekday mornings, and dealership districts on weekends. A “book a private test drive” framing lands better than horsepower claims for this crowd.',
+      text: 'Connected TV and YouTube on weekday evenings 7–9pm is the strongest single window (2.3×). OOH along the M7 and Richmond Road corridors indexes on weekday mornings, and retail precincts on weekends. A “one trip, one month sorted” framing lands better than generic price claims for this crowd.',
       grounded: 'Peak dayparts · Best time by channel · Brand affinity',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'phrasing modelled', kind: 'modelled' }],
     },
@@ -81,24 +81,24 @@ const MARCUS: Persona = {
   id: 'marcus',
   name: 'Marcus, 38',
   avatar: 'M',
-  role: 'Upgrade-Ready Professional · Tanglin',
+  role: 'Stock-Up Parent · Marsden Park',
   lms: 'LMS-0131',
   basisShare: '34%',
   voice: 'character',
-  starters: ['What would make you switch brands?', 'React to this tagline', 'What do you look for in your next car?', 'S$180k launch — yes or no?'],
+  starters: ['What would make you switch supermarkets?', 'React to this tagline', 'What do you look for in a big shop?', 'Membership fee — worth it or not?'],
   seeded: [
-    { role: 'you', text: 'Would you pay S$180k for a premium sedan?' },
+    { role: 'you', text: 'Would you pay $65 a year for a membership?' },
     {
       role: 'twin',
-      text: 'Honestly? Maybe — but you’d have to earn it. I’m driving a five-year-old Continental and I’ll change when the COE math tips, not on a schedule. If it genuinely upgrades the daily drive and holds its resale I’d stretch, but “most powerful in class” on its own doesn’t move me.',
-      grounded: 'Vehicle value & price sensitivity · Ownership cycle',
+      text: 'Honestly? Maybe — but you’d have to earn it. We do one big shop a month and I’ll switch when the maths tips, not because of an ad. If the unit prices genuinely beat what I pay now and the drive is under twenty minutes, I’d sign up — but “premium range” on its own doesn’t move me.',
+      grounded: 'Basket value & price sensitivity · Shopping cycle',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
     { role: 'you', text: 'Where would an ad actually reach you?' },
     {
       role: 'twin',
-      text: 'Evenings once the kids are down — YouTube and connected TV. On the road it’s the Orchard–CBD corridor on my morning commute. Radio and horsepower banners mostly wash over me.',
-      grounded: 'Peak dayparts · Channel affinity (Central)',
+      text: 'Evenings once the kids are down — YouTube and connected TV. On the road it’s the M7 on my morning commute. Generic price banners mostly wash over me.',
+      grounded: 'Peak dayparts · Channel affinity (North-West)',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
   ],
@@ -108,17 +108,17 @@ const DEEPA: Persona = {
   id: 'deepa',
   name: 'Deepa, 43',
   avatar: 'D',
-  role: 'Family SUV Upgrader · Bishan',
+  role: 'Value Family Shopper · Granville',
   lms: 'LMS-0119',
   basisShare: '22%',
   voice: 'character',
-  starters: ['What gets the family upgrading?', 'React to this tagline', 'Would you go EV next?', 'Where do you shop for a car?'],
+  starters: ['What gets the family switching?', 'React to this tagline', 'Would you shop in bulk?', 'Where do you shop now?'],
   seeded: [
-    { role: 'you', text: 'What actually gets you into a new car?' },
+    { role: 'you', text: 'What actually gets you into a new supermarket?' },
     {
       role: 'twin',
-      text: 'It’s usually the family, honestly — a second kid and the current SUV feels tight on the weekend runs up to Johor. I buy practical and safe over flashy, and I’ll wait for a year-end deal unless the COE’s up. Weekends are when we actually get to a showroom.',
-      grounded: 'Purchase triggers · Weekend mobility · Price sensitivity',
+      text: 'It’s usually the family, honestly — we cook for eight most Sundays and the weekly shop doesn’t stretch. I buy practical and cheap by the unit over fancy, and I’ll wait for a special unless we’ve run out. Weekends are when we actually get to a big store.',
+      grounded: 'Purchase triggers · Weekend mobility · Unit-price sensitivity',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
   ],
@@ -131,50 +131,50 @@ const SANA: Persona = {
   id: 'sana',
   name: 'Sana, 31',
   avatar: 'S',
-  role: 'Upgrade-Ready Professional · Novena',
+  role: 'Stock-Up Parent · Schofields',
   lms: 'LMS-0148',
   basisShare: '34%',
   voice: 'character',
   isNew: true,
   starters: [
-    'Test launch copy — would you book a S$180k test drive?',
-    'What do you look for in your next car?',
+    'Test launch copy — would you make the trip for opening week?',
+    'What do you look for in a big shop?',
     'Where would an ad reach you?',
     'React to this tagline',
   ],
   seeded: [],
 };
 
-// The Singapore Motor Show launch copy-test exchange — injected when Sana's
+// The opening-week launch copy-test exchange — injected when Sana's
 // launch starter is used. Demonstrates pressure-testing copy for a purchase nudge.
 function launchCopyTest(): ChatMsg[] {
   return [
     {
       role: 'you',
-      text: 'It’s ~3 weeks out from the Singapore Motor Show. Which of these would get you to book a test drive for the new S$180k sedan?',
+      text: 'It’s ~3 weeks out from the Marsden Park opening. Which of these would get you to make the trip in opening week?',
       variants: [
-        { lab: 'A', text: '“Class-leading performance — the most powerful in its segment.”' },
-        { lab: 'B', text: '“Your city. Your drive. The new sedan, built for Singapore.”' },
-        { lab: 'C', text: '“Engineered to outlast your COE — value that holds.”' },
+        { lab: 'A', text: '“The widest premium range in the category.”' },
+        { lab: 'B', text: '“Your suburb. Your shop. Now open in Marsden Park.”' },
+        { lab: 'C', text: '“One trip. One month sorted. The membership pays for itself in two shops.”' },
       ],
     },
     {
       role: 'twin',
-      text: 'Three weeks out from the Show is exactly when I’m weighing an upgrade — so the timing’s right, this is when I actually think about the next car.',
+      text: 'Three weeks out is exactly when I’m planning the next big shop — so the timing’s right, this is when I actually think about where we go.',
       reactions: [
-        { tag: 'cold', heat: 'cold', text: 'A — leaves me cold. I don’t chase power figures, I drive the daily commute. “Most powerful” feels aimed at someone else.' },
-        { tag: 'leans in', heat: 'hot', text: 'B — this lands. It’s my city, Orchard to the East Coast. Nod to Singapore and the Show I’m actually going to and I lean in.' },
-        { tag: 'opens wallet', heat: 'hot', text: 'C — the one that opens my wallet. I buy on value and resale, and “outlast your COE” tells me S$180k is justified, not hype.' },
+        { tag: 'cold', heat: 'cold', text: 'A — leaves me cold. I’m not shopping for gourmet, I’m filling a pantry. “Widest premium range” feels aimed at someone else.' },
+        { tag: 'leans in', heat: 'hot', text: 'B — this lands. It’s my suburb, twelve minutes down Richmond Road. Tell me it’s finally out here and I lean in.' },
+        { tag: 'opens wallet', heat: 'hot', text: 'C — the one that opens my wallet. I buy on unit price, and “pays for itself in two shops” tells me the $65 is justified, not hype.' },
       ],
-      grounded: 'Price sensitivity · Local driving (58%) · Event affinity — Singapore Motor Show 3.2×',
+      grounded: 'Price sensitivity · Local driving (58%) · Opening-week affinity — new-store trial 3.2×',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice modelled', kind: 'modelled' }],
     },
-    { role: 'you', text: 'So — would you actually book at S$180k before the Show?' },
+    { role: 'you', text: 'So — would you actually make the trip in opening week?' },
     {
       role: 'twin',
-      text: 'Probably yes — but only if B and C run together. Frame it as “built for Singapore — value that outlasts your COE,” put it in the fortnight before the Show, on my evening YouTube or the Orchard commute. Lead on raw horsepower and I scroll straight past.',
-      verdict: 'Nudge read: booking likely if event-timed local framing (B) is paired with a value/resale hook (C), delivered in the 2 weeks pre-Show via CTV + Orchard OOH. Pure-performance framing (A) does not move her.',
-      grounded: 'Price sensitivity (S$95k outstanding loan / premium-sedan spend) · Peak dayparts · Event calendar',
+      text: 'Probably yes — but only if B and C run together. Frame it as “now open in Marsden Park — one trip, one month sorted,” put it in the fortnight before opening, on my evening YouTube or the M7 commute. Lead on premium range and I scroll straight past.',
+      verdict: 'Nudge read: first trip likely if proximity framing (B) is paired with a value hook (C), delivered in the 2 weeks pre-opening via CTV + M7 roadside OOH. Premium-range framing (A) does not move her.',
+      grounded: 'Price sensitivity ($420 average basket / monthly cadence) · Peak dayparts · Opening calendar',
       trust: [{ label: 'measured', kind: 'measured' }, { label: 'voice & verdict modelled', kind: 'modelled' }],
     },
   ];
@@ -182,10 +182,10 @@ function launchCopyTest(): ChatMsg[] {
 
 // ── segments offered by the create flow ──────────────────────────────────────
 const SEGMENTS = [
-  { id: 'upgrade', name: 'Upgrade-Ready Professionals', share: 34, size: '~132k', idx: 'premium sedan 1.8×' },
-  { id: 'family', name: 'Family SUV Upgraders', share: 22, size: '~85k', idx: 'safety & space 2.1×' },
-  { id: 'ev', name: 'EV-Curious Commuters', share: 18, size: '~70k', idx: 'EV research 1.6×' },
-  { id: 'event', name: 'Motor Show Intenders', share: 14, size: '~54k', idx: 'show sign-ups 3.2×' },
+  { id: 'upgrade', name: 'Stock-Up Parents', share: 34, size: '~132k', idx: 'bulk pantry 1.8×' },
+  { id: 'family', name: 'Value Family Shoppers', share: 22, size: '~85k', idx: 'unit price 2.1×' },
+  { id: 'ev', name: 'Premium Bulk Buyers', share: 18, size: '~70k', idx: 'entertaining range 1.6×' },
+  { id: 'event', name: 'Opening-Week Triallists', share: 14, size: '~54k', idx: 'new-store trial 3.2×' },
 ];
 
 // ── small presentational bits ────────────────────────────────────────────────
@@ -258,7 +258,7 @@ export default function DigitalTwinTab() {
     const q = text.trim();
     if (!q) return;
     // Special: Sana's launch starter injects the full copy-test exchange.
-    if (selectedId === 'sana' && /launch|test drive|180k/i.test(q)) {
+    if (selectedId === 'sana' && /launch|opening|trip/i.test(q)) {
       append('sana', launchCopyTest());
     } else {
       append(selectedId, [{ role: 'you', text: q }, stub(q)]);
@@ -572,7 +572,7 @@ export default function DigitalTwinTab() {
                     <span className="w-[54px] h-[54px] rounded-full bg-[#bebde7] text-[#6b3c72] flex items-center justify-center text-[22px] font-['Jua',sans-serif] shrink-0">S</span>
                     <div className="flex-1">
                       <div className="font-['Jua',sans-serif] text-[17px] text-[#1a1a1a]">Sana, 31</div>
-                      <div className="text-[11px] text-[#6b6b6b] mt-[3px]">Upgrade-Ready Professional · Novena</div>
+                      <div className="text-[11px] text-[#6b6b6b] mt-[3px]">Stock-Up Parent · Schofields</div>
                       <div className="flex items-center gap-2 mt-[6px]">
                         <TrustPill t={{ label: 'identity modelled', kind: 'modelled' }} />
                         <TrustPill t={{ label: 'LMS-0148', kind: 'measured' }} />
@@ -592,17 +592,17 @@ export default function DigitalTwinTab() {
                     One-line bio <TrustPill t={{ label: 'modelled', kind: 'modelled' }} />
                   </div>
                   <div className="border border-[#e5e5e2] rounded-[9px] px-[11px] py-[9px] text-[12px] bg-[#fafaf8] leading-[1.5]">
-                    Drives the Orchard–CBD commute daily; shops the category actively, buys on value and resale not hype.
+                    Drives the M7 commute daily; shops the category actively, buys on unit price not hype.
                   </div>
 
                   <div className="flex items-center gap-2 mt-4 mb-[6px] text-[10px] uppercase tracking-[0.06em] text-[#9a9a9a]">
                     Defining atoms <TrustPill t={{ label: 'measured — fixed by the segment', kind: 'measured' }} />
                   </div>
                   {[
-                    { k: 'Top behaviours', v: 'Premium sedan, continental marque', i: '2.1× / 1.8×' },
-                    { k: 'Competitor / POI', v: 'BMW, Mercedes-Benz showrooms', i: '1.6×' },
+                    { k: 'Top behaviours', v: 'Bulk pantry, multipack lines', i: '2.1× / 1.8×' },
+                    { k: 'Competitor / POI', v: 'Woolworths, Coles supermarkets', i: '1.6×' },
                     { k: 'Peak daypart', v: 'Weekday 7–9pm', i: '2.3×' },
-                    { k: 'Channel affinity', v: 'CTV evenings · Orchard OOH', i: '1.7×' },
+                    { k: 'Channel affinity', v: 'CTV evenings · M7 roadside OOH', i: '1.7×' },
                     { k: 'Vehicle budget', v: 'S$180k', i: '—' },
                   ].map((a, i, arr) => (
                     <div key={a.k} className={`flex items-baseline gap-[10px] text-[12px] py-[9px] ${i < arr.length - 1 ? 'border-b border-[#e5e5e2]' : ''}`}>

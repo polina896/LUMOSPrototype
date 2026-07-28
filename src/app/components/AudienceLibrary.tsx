@@ -17,8 +17,8 @@ function detailToLibraryRow(id: AudienceId): Audience | null {
     segment: "in-market",
     segmentLabel: "In-market",
     size,
-    location: "Singapore",
-    category: "Automotive",
+    location: "Greater Sydney",
+    category: "Bulk Grocery",
   };
 }
 
@@ -113,29 +113,29 @@ function CategoryIcon({ category }: { category: string }) {
 // ── Data ───────────────────────────────────────────────────────────────────
 
 const AUDIENCES: Audience[] = [
-  // Automotive — Core
-  { id: "a1",  name: "Urban Upgrade Drivers — Singapore",     segment: "in-market",  segmentLabel: "In-market",        size: 387000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a2",  name: "Premium Sedan Intenders — Singapore",   segment: "in-market",  segmentLabel: "In-market",        size: 284000,  location: "Central Singapore",          category: "Automotive" },
-  { id: "a3",  name: "EV Early Adopters — Singapore",         segment: "new",        segmentLabel: "New",              size: 218000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a4",  name: "Family SUV Shoppers — Singapore",       segment: "high-value", segmentLabel: "High value",       size: 462000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a5",  name: "First-Time Buyers — Singapore",         segment: "new",        segmentLabel: "New",              size: 195000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a6",  name: "Upgrade-Ready Owners",                  segment: "loyal",      segmentLabel: "Loyal / Returning",size: 278000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a7",  name: "Fleet & Corporate Drivers",             segment: "frequent",   segmentLabel: "Frequent",         size: 312000,  location: "Singapore",                  category: "Fleet / Corporate" },
-  // Professional & Lifestyle
-  { id: "a8",  name: "High-Income Professionals — CBD",       segment: "high-value", segmentLabel: "High value",       size: 394000,  location: "Central Business District",  category: "Professional" },
-  { id: "a9",  name: "Expat High Earners — Singapore",        segment: "high-value", segmentLabel: "High value",       size: 148000,  location: "Central Singapore",          category: "Professional" },
-  { id: "a10", name: "Weekend Lifestyle Drivers",             segment: "frequent",   segmentLabel: "Frequent",         size: 520000,  location: "Singapore",                  category: "Lifestyle" },
-  { id: "a11", name: "Business Frequent Travellers",          segment: "frequent",   segmentLabel: "Frequent",         size: 267000,  location: "Singapore",                  category: "Travel" },
-  { id: "a12", name: "Young Aspirationals — Singapore",       segment: "new",        segmentLabel: "New",              size: 445000,  location: "Singapore",                  category: "Lifestyle" },
-  // Sustainability & Family
-  { id: "a13", name: "Green Commuters — Singapore",           segment: "in-market",  segmentLabel: "In-market",        size: 338000,  location: "Singapore",                  category: "Sustainability" },
-  { id: "a14", name: "Suburban Families — Singapore",         segment: "loyal",      segmentLabel: "Loyal / Returning",size: 612000,  location: "Singapore",                  category: "Family" },
+  // Bulk grocery — Core
+  { id: "a1",  name: "Big-Basket Households — Greater Sydney", segment: "in-market",  segmentLabel: "In-market",        size: 387000,  location: "Greater Sydney",             category: "Bulk Grocery" },
+  { id: "a2",  name: "Marsden Park Stock-Ups",                 segment: "in-market",  segmentLabel: "In-market",        size: 186000,  location: "North-West corridor",        category: "Bulk Grocery" },
+  { id: "a3",  name: "Parramatta Value Families",              segment: "new",        segmentLabel: "New",              size: 248000,  location: "Western Sydney",             category: "Bulk Grocery" },
+  { id: "a4",  name: "Castle Hill Bulk Buyers",                segment: "high-value", segmentLabel: "High value",       size: 132000,  location: "Hills District",             category: "Bulk Grocery" },
+  { id: "a5",  name: "New-Build Movers — North-West",          segment: "new",        segmentLabel: "New",              size: 195000,  location: "North-West corridor",        category: "New Movers" },
+  { id: "a6",  name: "Existing Warehouse-Club Members",        segment: "loyal",      segmentLabel: "Loyal / Returning",size: 278000,  location: "Greater Sydney",             category: "Warehouse Club" },
+  { id: "a7",  name: "Café & Small Business Buyers",           segment: "frequent",   segmentLabel: "Frequent",         size: 312000,  location: "Greater Sydney",             category: "Small Business" },
+  // Household & Lifestyle
+  { id: "a8",  name: "High-Income Households — Inner North",   segment: "high-value", segmentLabel: "High value",       size: 394000,  location: "Lower North Shore",          category: "Premium Grocery" },
+  { id: "a9",  name: "Premium & Entertaining Buyers",          segment: "high-value", segmentLabel: "High value",       size: 148000,  location: "Hills District",             category: "Premium Grocery" },
+  { id: "a10", name: "Saturday Big-Shop Households",           segment: "frequent",   segmentLabel: "Frequent",         size: 520000,  location: "Greater Sydney",             category: "Weekend Shoppers" },
+  { id: "a11", name: "Fuel & Convenience Regulars",            segment: "frequent",   segmentLabel: "Frequent",         size: 267000,  location: "Greater Sydney",             category: "Fuel & Convenience" },
+  { id: "a12", name: "Unit-Price Switchers",                   segment: "new",        segmentLabel: "New",              size: 445000,  location: "Greater Sydney",             category: "Value Seekers" },
+  // Community & Family
+  { id: "a13", name: "Multi-Generational Households",          segment: "in-market",  segmentLabel: "In-market",        size: 338000,  location: "Western Sydney",             category: "Multicultural" },
+  { id: "a14", name: "Large Family Shoppers",                  segment: "loyal",      segmentLabel: "Loyal / Returning",size: 612000,  location: "Greater Sydney",             category: "Family Households" },
   // Lapsed
-  { id: "a15", name: "Lapsed Considerers — Sedan",            segment: "lapsed",     segmentLabel: "Lapsed",           size: 174000,  location: "Singapore",                  category: "Automotive" },
-  { id: "a16", name: "Trade-In Prospects",                    segment: "lapsed",     segmentLabel: "Lapsed",           size: 243000,  location: "Singapore",                  category: "Automotive" },
-  // Premium Finance
-  { id: "a17", name: "Premium Finance Users",                 segment: "high-value", segmentLabel: "High value",       size: 189000,  location: "Singapore",                  category: "Financial" },
-  { id: "a18", name: "Car Service Regulars",                  segment: "loyal",      segmentLabel: "Loyal / Returning",size: 421000,  location: "Singapore",                  category: "Automotive" },
+  { id: "a15", name: "Lapsed Members — 90+ days",              segment: "lapsed",     segmentLabel: "Lapsed",           size: 174000,  location: "Greater Sydney",             category: "Lapsed Members" },
+  { id: "a16", name: "Never-Redeemed Sign-Ups",                segment: "lapsed",     segmentLabel: "Lapsed",           size: 243000,  location: "Greater Sydney",             category: "Lapsed Members" },
+  // Adjacent categories
+  { id: "a17", name: "Hardware & Home Project Buyers",         segment: "high-value", segmentLabel: "High value",       size: 189000,  location: "Greater Sydney",             category: "Home & Garden" },
+  { id: "a18", name: "Discount Grocery Cross-Shoppers",        segment: "loyal",      segmentLabel: "Loyal / Returning",size: 421000,  location: "Greater Sydney",             category: "Value Seekers" },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -399,7 +399,7 @@ export default function AudienceLibrary({ onSelectAudience, onCreateAudience, sa
           <div className="flex items-center justify-between px-[18px] py-[11px] border-b border-[#F2F0EC]">
             <div className="flex items-center gap-2 text-[13.5px] font-medium text-[#262329]">
               <span className="w-[22px] h-[22px] rounded-[6px] bg-[#1D9E75] text-white text-[10px] font-bold flex items-center justify-center flex-none">MM</span>
-              Meridian Motors
+              Costco Australia
               <span className="text-[#A6A2AA] text-[10px]">▾</span>
             </div>
             <div className="flex items-center gap-[14px]">

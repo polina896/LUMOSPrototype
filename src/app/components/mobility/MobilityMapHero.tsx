@@ -8,7 +8,7 @@ import { useMyView } from '../MyView';
 import type { ModuleRef } from '../ModuleAsk';
 
 // ── Mobility map hero — Leaflet planning-area choropleth ──────────────────────
-// The real, recognisable Singapore basemap is the hero of the Mobility tab: a
+// The real, recognisable Sydney basemap is the hero of the Mobility tab: a
 // 600px live map with the URA planning-area choropleth, floating signal/weekday
 // toggles + a hotspots switch, and a right insight rail. Ask Lumos + Pin-to-My-
 // View live on the map itself and drive the same app-wide machinery as every
@@ -93,7 +93,7 @@ export default function MobilityMapHero({
     geoRef.current = geoLayer;
 
     // Fit only once the container has its real size — otherwise fitBounds
-    // computes a zoom/centre against a mis-sized box and Singapore ends up
+    // computes a zoom/centre against a mis-sized box and Sydney ends up
     // shoved to one edge. invalidateSize first, then frame the island.
     const fit = () => {
       map.invalidateSize();

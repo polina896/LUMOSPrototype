@@ -18,14 +18,14 @@ interface SavedAudience {
 }
 
 const SAVED_AUDIENCES: SavedAudience[] = [
-  { id: 'premium-sedan-intenders', category: 'Premium Sedans', name: 'Premium Sedan Intenders', size: '284k', tag: 'High Value' },
-  { id: 'ev-upgrade-shoppers',     category: 'EV & Hybrid',    name: 'EV Upgrade Shoppers',     size: '218k', tag: 'High Value' },
-  { id: 'family-suv-upgraders',    category: 'Family SUV',     name: 'Family SUV Upgraders',    size: '195k', tag: 'Frequent Buyers' },
-  { id: 'first-time-buyers',       category: 'First-Time Buyers', name: 'First-Time Buyers',    size: '312k', tag: 'Frequent Buyers' },
-  { id: 'fleet-corporate',         category: 'Fleet & Corporate', name: 'Fleet & Corporate Drivers', size: '148k', tag: 'High Value' },
-  { id: 'upgrade-ready-owners',    category: 'Upgrade Owners', name: 'Upgrade-Ready Owners',    size: '387k', tag: 'High Value' },
-  { id: 'weekend-lifestyle',       category: 'Weekend Lifestyle', name: 'Weekend Lifestyle Drivers', size: '462k', tag: 'Frequent Buyers' },
-  { id: 'performance-buyers',      category: 'Performance',    name: 'Performance Car Buyers',  size: '394k', tag: 'High Value' },
+  { id: 'marsden-park-stockups',   category: 'Bulk Grocery',      name: 'Marsden Park Stock-Ups',    size: '186k', tag: 'High Value' },
+  { id: 'parramatta-value-families', category: 'Bulk Grocery',    name: 'Parramatta Value Families', size: '248k', tag: 'High Value' },
+  { id: 'castle-hill-bulk-buyers', category: 'Premium Grocery',   name: 'Castle Hill Bulk Buyers',   size: '132k', tag: 'Frequent Buyers' },
+  { id: 'new-build-movers',        category: 'New Movers',        name: 'New-Build Movers',          size: '312k', tag: 'Frequent Buyers' },
+  { id: 'cafe-small-business',     category: 'Small Business',    name: 'Café & Small Business Buyers', size: '148k', tag: 'High Value' },
+  { id: 'existing-club-members',   category: 'Warehouse Club',    name: 'Existing Club Members',     size: '387k', tag: 'High Value' },
+  { id: 'saturday-big-shop',       category: 'Weekend Shoppers',  name: 'Saturday Big-Shop Households', size: '462k', tag: 'Frequent Buyers' },
+  { id: 'unit-price-switchers',    category: 'Value Seekers',     name: 'Unit-Price Switchers',      size: '394k', tag: 'High Value' },
 ];
 
 function TagBadge({ tag }: { tag: AudTag }) {
@@ -44,7 +44,7 @@ function TagBadge({ tag }: { tag: AudTag }) {
 type DimId = 'geography' | 'demographics' | 'time';
 
 const DIMENSIONS: { id: DimId; icon: typeof MapPin; title: string; eg: string; desc: string }[] = [
-  { id: 'geography',    icon: MapPin,   title: 'Geography',          eg: 'Same audiences across markets — e.g. Singapore vs Malaysia', desc: 'comparing same audiences across markets' },
+  { id: 'geography',    icon: MapPin,   title: 'Geography',          eg: 'Same audiences across markets — e.g. Western Sydney vs South-West Sydney', desc: 'comparing same audiences across markets' },
   { id: 'demographics', icon: PieChart, title: 'Age & demographics', eg: 'Across age groups or income bands — e.g. 18–24 vs 35–44',    desc: 'across age groups or income bands' },
   { id: 'time',         icon: Calendar, title: 'Time period',        eg: 'Across seasons or moments — e.g. April vs December, or Black Friday vs Christmas', desc: 'across seasons or moments' },
 ];
@@ -68,8 +68,8 @@ export default function CompareFlow({ seed = [], seedPrompt = '', onExit }: Comp
   const [prompt, setPrompt] = useState(seedPrompt);
   const [dimension, setDimension] = useState<DimId>('geography');
   const [geoLevel, setGeoLevel] = useState('City / Suburb');
-  const [locA, setLocA] = useState('Singapore');
-  const [locB, setLocB] = useState('Malaysia');
+  const [locA, setLocA] = useState('Western Sydney');
+  const [locB, setLocB] = useState('South-West Sydney');
   const [ageBands, setAgeBands] = useState<string[]>(['18–24', '35–44']);
   const [demoSplits, setDemoSplits] = useState<string[]>(['Income band']);
   const [timeMoments, setTimeMoments] = useState<string[]>(['Christmas period']);
@@ -240,9 +240,9 @@ function Conversation(p: ConvProps) {
               <h2 className="font-['Geist',sans-serif] font-bold text-[22px] text-[#1a1a1a] mb-5">Which specific cities or suburbs should I compare?</h2>
               <QuestionCard progress={[true, true]} count="Question 2 of 2" subtitle="Enter the locations you want to compare:" hint="You can enter multiple — Lumos will compare both audiences across all of them.">
                 <div className="flex items-center gap-3 mb-3">
-                  <input value={p.locA} onChange={(e) => p.setLocA(e.target.value)} placeholder="e.g. Singapore" className="flex-1 px-4 py-3 bg-[#faf9ff] border border-[#e8e4f4] rounded-xl font-['Jua',sans-serif] text-[14px] outline-none focus:border-[#732d93]" />
+                  <input value={p.locA} onChange={(e) => p.setLocA(e.target.value)} placeholder="e.g. Western Sydney" className="flex-1 px-4 py-3 bg-[#faf9ff] border border-[#e8e4f4] rounded-xl font-['Jua',sans-serif] text-[14px] outline-none focus:border-[#732d93]" />
                   <span className="font-['Geist',sans-serif] text-[13px] font-medium text-[#aaa]">vs</span>
-                  <input value={p.locB} onChange={(e) => p.setLocB(e.target.value)} placeholder="e.g. Malaysia" className="flex-1 px-4 py-3 bg-[#faf9ff] border border-[#e8e4f4] rounded-xl font-['Jua',sans-serif] text-[14px] outline-none focus:border-[#732d93]" />
+                  <input value={p.locB} onChange={(e) => p.setLocB(e.target.value)} placeholder="e.g. South-West Sydney" className="flex-1 px-4 py-3 bg-[#faf9ff] border border-[#e8e4f4] rounded-xl font-['Jua',sans-serif] text-[14px] outline-none focus:border-[#732d93]" />
                 </div>
                 <button className="flex items-center gap-1.5 font-['Geist',sans-serif] text-[13px] font-medium text-[#732d93] mb-4 hover:opacity-70">
                   <Plus className="w-3.5 h-3.5" /> Add another location
@@ -368,7 +368,7 @@ function SetupScreen({
         <div className="mb-5">
           <textarea
             rows={2} value={prompt} onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Add a prompt (optional) — e.g. which is the better launch audience for Singapore?"
+            placeholder="Add a prompt (optional) — e.g. which is the better launch audience for Western Sydney?"
             className="w-full px-4 py-3 bg-[#faf9ff] border border-[#e8e4f4] rounded-xl font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] outline-none focus:border-[#732d93] placeholder:text-[#b8b0c8] resize-none transition-colors"
           />
         </div>
@@ -461,16 +461,16 @@ function DimensionQuestion({ dimension, setDimension, onNext }: { dimension: Dim
 // ─── Report doc (right panel) ─────────────────────────────────────────────────
 
 const ATTRIBUTES = [
-  { name: 'Affluent urban professional',       flag: 'Shared',        a: 78, av: 'Index 245', b: 74, bv: 'Index 231' },
-  { name: 'Extensive pre-purchase research',   flag: 'Shared',        a: 70, av: 'Index 218', b: 73, bv: 'Index 226' },
-  { name: 'Sustainability & green incentives', flag: 'Biggest delta', a: 22, av: 'Index 68',  b: 71, bv: 'Index 219' },
-  { name: 'Brand prestige & financing',        flag: 'Delta',         a: 68, av: 'Index 211', b: 34, bv: 'Index 104' },
+  { name: 'Large household, big basket',       flag: 'Shared',        a: 78, av: 'Index 245', b: 74, bv: 'Index 231' },
+  { name: 'Plans the shop days in advance',    flag: 'Shared',        a: 70, av: 'Index 218', b: 73, bv: 'Index 226' },
+  { name: 'Switches on unit price',            flag: 'Biggest delta', a: 22, av: 'Index 68',  b: 71, bv: 'Index 219' },
+  { name: 'Premium & entertaining range',      flag: 'Delta',         a: 68, av: 'Index 211', b: 34, bv: 'Index 104' },
 ] as const;
 
 const STRATEGIES = [
-  { icon: Target, title: 'Run one shared brand message in the overlap', desc: 'In central Singapore (Orchard, Bukit Timah, Holland V) the two audiences overlap 38% — lead with a single premium-professional message here for efficient reach before splitting creative.' },
-  { icon: Zap,    title: 'Split creative on the biggest delta', desc: 'Lead EV Upgrade Shoppers with sustainability + Green Plan rebate messaging; lead Premium Sedan Intenders with prestige, performance and financing offers.' },
-  { icon: MapIcon, title: 'Geo-weight the spend', desc: 'Prioritise Singapore for the EV launch push where intent indexes 240; in Malaysia, lead with the Premium Sedan + family-prestige angle and treat EV as secondary.' },
+  { icon: Target, title: 'Run one shared brand message in the overlap', desc: 'Across the Parramatta–Granville spine the two audiences overlap 38% — lead with a single big-basket value message here for efficient reach before splitting creative.' },
+  { icon: Zap,    title: 'Split creative on the biggest delta', desc: 'Lead Parramatta Value Families with unit-price and pack-size messaging; lead Marsden Park Stock-Ups with one-trip convenience and fuel savings.' },
+  { icon: MapIcon, title: 'Geo-weight the spend', desc: 'Prioritise Western Sydney for the launch push where intent indexes 240; in South-West Sydney, lead with the value + large-household angle and treat premium range as secondary.' },
 ];
 
 function ReportDoc({ pair, lens, locA, locB }: { pair: SavedAudience[]; dimension: DimId; lens: string; locA: string; locB: string }) {
@@ -489,12 +489,12 @@ function ReportDoc({ pair, lens, locA, locB }: { pair: SavedAudience[]; dimensio
         <div className="rounded-2xl p-5 bg-[#e9f5ec]">
           <div className="flex items-center gap-1.5 font-['Geist',sans-serif] text-[12px] font-bold text-[#2e7d46] uppercase tracking-wide mb-2"><GitMerge className="w-3.5 h-3.5" /> Biggest overlap</div>
           <div className="font-['Geist',sans-serif] font-bold text-[36px] leading-none text-[#2e7d46]">38%</div>
-          <p className="font-['Geist',sans-serif] text-[14px] text-[#33473a] leading-snug mt-2.5">Both skew to affluent urban professionals 35–44 who research heavily before buying — concentrated in central Singapore districts.</p>
+          <p className="font-['Geist',sans-serif] text-[14px] text-[#33473a] leading-snug mt-2.5">Both skew to large households 35–44 who plan the shop in advance — concentrated across the Parramatta and Granville catchments.</p>
         </div>
         <div className="rounded-2xl p-5 bg-[#fbeae3]">
           <div className="flex items-center gap-1.5 font-['Geist',sans-serif] text-[12px] font-bold text-[#b14a22] uppercase tracking-wide mb-2"><Split className="w-3.5 h-3.5" /> Biggest delta</div>
           <div className="font-['Geist',sans-serif] font-bold text-[36px] leading-none text-[#b14a22]">3.2×</div>
-          <p className="font-['Geist',sans-serif] text-[14px] text-[#5e3a2b] leading-snug mt-2.5">EV Upgrade Shoppers index 3.2× higher on sustainability & green-incentive motivation, and far stronger in SG than MY.</p>
+          <p className="font-['Geist',sans-serif] text-[14px] text-[#5e3a2b] leading-snug mt-2.5">Parramatta Value Families index 3.2× higher on unit-price motivation, and far stronger in Western Sydney than the South-West.</p>
         </div>
       </div>
 
@@ -526,8 +526,8 @@ function ReportDoc({ pair, lens, locA, locB }: { pair: SavedAudience[]; dimensio
             <span className="font-['Geist',sans-serif] text-[11px] font-semibold rounded-full px-2.5 py-0.5 bg-[#fbeae3] text-[#b14a22]">Delta</span>
           </div>
           <div className="space-y-1.5">
-            <BarLine width={80} color="#4d6bf0" value={`SG · Index 240`} />
-            <BarLine width={30} color="#4d6bf0" value={`MY · Index 90`} faded />
+            <BarLine width={80} color="#4d6bf0" value={`West · Index 240`} />
+            <BarLine width={30} color="#4d6bf0" value={`South-West · Index 90`} faded />
           </div>
         </div>
       </div>
@@ -558,7 +558,7 @@ function DocCard({ names }: { names: string[] }) {
     <div className="my-4 bg-white border border-[#e0d4ff] rounded-xl overflow-hidden shadow-sm">
       <div className="bg-[#732d93] px-5 pt-4 pb-4">
         <p className="font-['Geist',sans-serif] text-[11px] font-semibold text-white/70 uppercase tracking-wider mb-1.5">Audience comparison</p>
-        <p className="font-['Jua',sans-serif] text-[17px] text-white leading-tight">Meridian Motors Singapore — Audience Comparison</p>
+        <p className="font-['Jua',sans-serif] text-[17px] text-white leading-tight">Costco Western Sydney — Audience Comparison</p>
       </div>
       <div className="px-5 py-4">
         <p className="font-['Geist',sans-serif] text-[12px] text-[#888] mb-3">2 audience segments · {names.join(' vs ')}</p>

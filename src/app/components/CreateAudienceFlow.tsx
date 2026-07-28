@@ -7,23 +7,23 @@ import AudienceDetailPanel from './AudienceDetailPanel';
 
 // The created audience reuses a real dataset so the preview renders the
 // genuine AudienceDetailPanel (headline, who/where/how, geo, density…).
-const AUD_ID = 'premium-sedan-intenders';
-const AUD_NAME = 'Premium Sedan Intenders';
+const AUD_ID = 'marsden-park-stockups';
+const AUD_NAME = 'Marsden Park Stock-Ups';
 
 const STARTERS: { icon: typeof TrendingUp; title: string; sub: string; brief: string }[] = [
   { icon: TrendingUp, title: 'In-market for a category', sub: 'People actively shopping now',
-    brief: 'People in Singapore in-market for a premium sedan — launching our new flagship, want to raise consideration.' },
+    brief: 'Households in Western Sydney in-market for a big monthly grocery shop — opening our new warehouse, want to raise consideration.' },
   { icon: Check, title: 'Loyal / returning customers', sub: 'Your repeat, high-retention base',
-    brief: 'Our loyal, returning premium-sedan owners in Singapore — high retention, ripe for an upgrade.' },
+    brief: 'Our loyal, returning members across Greater Sydney — high retention, ripe for a bigger basket.' },
   { icon: UserPlus, title: 'Lookalike of an existing audience', sub: "Expand from one you've saved",
-    brief: 'A lookalike of our Premium Sedan Intenders — expand reach to similar high-value buyers.' },
+    brief: 'A lookalike of our Marsden Park Stock-Ups — expand reach to similar high-value households.' },
 ];
 
-const DESCRIBE_CHIPS = ['Lapsed owners due to upgrade', 'Families shopping 7-seaters', 'EV-curious commuters'];
+const DESCRIBE_CHIPS = ['Lapsed members due a return', 'Large households buying in bulk', 'New-build movers in the North-West'];
 
 const QUESTIONS: { headline: string; chips: string[]; multi: boolean; placeholder: string }[] = [
-  { headline: 'Before I build it, a couple of quick things — which competitor owners should count as "in-market"?',
-    chips: ['BMW', 'Mercedes-Benz', 'Audi', 'Lexus'], multi: true, placeholder: 'Or name another competitor…' },
+  { headline: 'Before I build it, a couple of quick things — which competitor shoppers should count as "in-market"?',
+    chips: ['Woolworths', 'Coles', 'ALDI', 'BIG W'], multi: true, placeholder: 'Or name another competitor…' },
   { headline: 'How tightly should I scope it?',
     chips: ['Broad reach', 'Balanced', 'Precise / high-intent'], multi: false, placeholder: 'Or describe the scope…' },
 ];
@@ -73,7 +73,7 @@ function SessionRail({ step, narrow }: { step: Step; narrow: boolean }) {
           <div className="space-y-2">
             {hasAudience ? (
               <RailCard icon={saved ? Check : Users} name={AUD_NAME}
-                meta={built ? (saved ? 'Saved · 284k · Singapore' : '284k · Singapore') : 'building… ~340k · narrowing'}
+                meta={built ? (saved ? 'Saved · 186k · Western Sydney' : '186k · Western Sydney') : 'building… ~240k · narrowing'}
                 selected={built} building={!built} metaColor={saved ? '#1D9E75' : undefined} />
             ) : (
               <RailCard icon={Users} name="No audiences yet" meta="The audience you're building will appear here" placeholder />
@@ -85,8 +85,8 @@ function SessionRail({ step, narrow }: { step: Step; narrow: boolean }) {
           <div className="space-y-2">
             {hasAudience ? (
               <>
-                <RailCard icon={BarChart2} name="Auto-intent index — SG" meta="Stat · premium sedan segment" />
-                <RailCard icon={MapPin} name="Competitor showroom visitation" meta="Heatmap · district level" />
+                <RailCard icon={BarChart2} name="Bulk-shopping index — Western Sydney" meta="Stat · big-basket households" />
+                <RailCard icon={MapPin} name="Competitor supermarket visitation" meta="Heatmap · SA2 level" />
               </>
             ) : (
               <RailCard icon={BarChart2} name="No insights yet" meta="Charts & stats appear as Lumos works" placeholder />
@@ -221,7 +221,7 @@ export default function CreateAudienceFlow({ onExit, onSaved }: { onExit: () => 
             <>
               <div className="flex items-start gap-2.5 bg-[#f4f3f1] rounded-xl px-3.5 py-3 mb-4 max-w-[560px]">
                 <span className="text-[#c5c1c9] text-[13px] mt-px">›</span>
-                <span className="font-['Jua',sans-serif] text-[12.5px] italic text-[#6a6a6a] leading-relaxed">Reading the brief — premium sedan intenders, Singapore, competitor &amp; showroom-visitation signals, launch-consideration objective…</span>
+                <span className="font-['Jua',sans-serif] text-[12.5px] italic text-[#6a6a6a] leading-relaxed">Reading the brief — big-basket households, Western Sydney, competitor &amp; store-visitation signals, launch-consideration objective…</span>
               </div>
               <p className="font-['Jua',sans-serif] text-[16px] text-[#1a1a1a] leading-snug mb-4 max-w-[560px]">{QUESTIONS[qIndex].headline}</p>
               <ClarifyWidget key={qIndex} index={qIndex} onSubmit={answerQuestion} />
@@ -234,7 +234,7 @@ export default function CreateAudienceFlow({ onExit, onSaved }: { onExit: () => 
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-[#e0d8f8] border-t-[#732d93] animate-spin flex-shrink-0" />
                 <span className="font-['Jua',sans-serif] text-[13px] text-[#6a6a6a]">Building the audience — applying filters, matching against auto-intent &amp; visitation data…</span>
               </div>
-              <p className="font-['Jua',sans-serif] text-[12px] text-[#9a9a9a]">Reading 14 sources · showroom foot-traffic, premium-purchase, digital auto-research &amp; lifestyle signals</p>
+              <p className="font-['Jua',sans-serif] text-[12px] text-[#9a9a9a]">Reading 14 sources · store foot-traffic, grocery-transaction, movement &amp; household-composition signals</p>
             </>
           )}
 

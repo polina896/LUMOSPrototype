@@ -15,7 +15,7 @@ export const KEY_SECTIONS: Record<string, string[]> = {
   't7': ['Segment Profile', 'Demographic Deep Dive', 'Spend & Lifestyle Signals', 'Brand Affinity', 'Recommendations', 'End'],
   't8': ['Growth Opportunity Overview', 'Segment Index Scores', 'Activation Priorities', 'End'],
   't9': ['Channel Recommendations', 'Reach Estimates', 'Cost Guidance', 'End'],
-  'm1': ['Launch Objectives', 'Singapore Segment Matrix', 'Channel Plan', 'Test-Drive Strategy', 'End'],
+  'm1': ['Launch Objectives', 'Western Sydney Cluster Matrix', 'Channel Plan', 'Drive-to-Store Strategy', 'End'],
   'm2': ['EV Intender Profile', 'Green Plan Messaging', 'Digital Activation', 'End'],
 };
 
@@ -29,8 +29,8 @@ export const DESCRIPTIONS: Record<string, string> = {
   't7': 'Use this template for a single-segment deep dive covering demographics, spend patterns, lifestyle signals, and brand affinity.',
   't8': 'Use this template to identify the highest-growth audience segments with index scores and activation recommendations.',
   't9': 'Use this template to recommend channel allocation per audience with reach estimates and cost guidance.',
-  'm1': 'Custom launch brief template for premium automotive audiences in the Singapore market.',
-  'm2': 'Activation playbook for EV intender segments with Singapore Green Plan messaging angles.',
+  'm1': 'Custom launch brief template for big-basket grocery audiences in the Western Sydney market.',
+  'm2': 'Activation playbook for value-seeking household segments with unit-price messaging angles.',
 };
 
 // Maps each template to the editor's Document Type dropdown options.
