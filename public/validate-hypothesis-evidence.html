@@ -73,15 +73,22 @@
   .hero{font-family:var(--disp);font-size:30px;font-weight:800;color:var(--plum);line-height:1}
   .hero small{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-top:4px}
 
-  /* verdict */
-  .verdict{border:1px solid #BFE3CE;background:#F0FAF4;border-radius:14px;padding:14px 16px;margin-bottom:18px}
-  .verdict .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#1F7A4C;margin-bottom:7px}
-  .verdict p{font-family:var(--chat);font-size:14px;color:#123D28;line-height:1.6}
-  .verdict .rows{margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
-  .vrow{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#245239;font-weight:600}
-  .vrow .tick{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:#1F7A4C}
-  .vrow .tick.no{background:var(--muted2)}
-  .vrow .tick svg{width:9px;height:9px;stroke:#fff}
+  /* key findings */
+  .findings{border:1px solid #BFE3CE;background:#F0FAF4;border-radius:14px;padding:16px 18px 17px;margin-bottom:18px}
+  .findings h3{font-family:var(--disp);font-size:15px;font-weight:800;color:#1F7A4C;letter-spacing:-.01em;margin-bottom:12px}
+  .findings ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .findings li{display:flex;align-items:flex-start;gap:10px;font-family:var(--chat);font-size:13.5px;line-height:1.5;color:#123D28}
+  .findings li .dot{width:16px;height:16px;border-radius:50%;background:#1F7A4C;display:grid;place-items:center;flex:0 0 auto;margin-top:2px}
+  .findings li .dot svg{width:9px;height:9px;stroke:#fff}
+
+  /* next-turn actions */
+  .nexts{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+  .body.wide .nexts{display:grid;grid-template-columns:1fr 1fr}
+  .nx{display:flex;align-items:center;gap:10px;text-align:left;padding:13px 14px;background:#f8f8f8;border:1px solid transparent;border-radius:11px;cursor:pointer;transition:.16s;font-family:var(--chat);font-size:14px;color:#1a1a1a;line-height:1.4}
+  .nx:hover{background:var(--lilac3);border-color:#d9cdf0}
+  .nx.on{background:var(--lilac);border-color:var(--plum2)}
+  .nx .ic{width:24px;height:24px;border-radius:7px;background:#fff;border:1px solid var(--line2);display:grid;place-items:center;flex:0 0 auto}
+  .nx .ic svg{width:13px;height:13px;color:var(--plum2)}
 
   /* tooltip */
   .tt{position:fixed;z-index:900;background:#211A2E;color:#fff;border-radius:9px;padding:7px 10px;font-family:var(--body);font-size:11.5px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.28)}
@@ -207,7 +214,15 @@ function pairBars(host,{rows,max,fmt}){
 /* ══ the evidence ════════════════════════════════════════════════════════════ */
 const RAMP=['var(--s2)','var(--s3)','var(--s4)','var(--s5)'];
 const EVIDENCE=[
-  { id:'when', n:'Signal 1', t:'Weekday vs weekend', sub:'Share of visits by day',
+  { id:'far', t:'Distance travelled', sub:'Share of trips by distance band',
+    read:'Median <b>14 km</b> against a metro average of 8.4 km. Two thirds of trips start beyond 10 km.',
+    map:'Distance rings · median vs metro',
+    draw(host){ columns(host,{max:44,fmt:v=>v+'%',labelEvery:1,
+      data:[{label:'≤5 km',v:12,fill:RAMP[0]},{label:'5–10',v:24,fill:RAMP[1]},
+            {label:'10–15',v:24,fill:RAMP[2]},{label:'15+ km',v:40,fill:RAMP[3],tag:1}]}); },
+    legend:[['var(--s2)','Nearer'],['var(--s5)','Further']] },
+
+  { id:'when', t:'Weekday vs weekend', sub:'Share of visits by day',
     read:'<b>57%</b> of visits fall on Saturday or Sunday — the metro grocery average is 41%. A planned outing, not a top-up.',
     map:'Weekend density · Sat–Sun only',
     draw(host){ columns(host,{max:36,fmt:v=>v+'%',labelEvery:1,
@@ -216,15 +231,7 @@ const EVIDENCE=[
         .map(d=>({...d,fill:d.fill||'var(--ctx)'}))}); },
     legend:[['var(--acc)','Weekend'],['var(--ctx)','Weekday']] },
 
-  { id:'far', n:'Signal 2', t:'Distance travelled', sub:'Share of trips by distance band',
-    read:'Median <b>14 km</b> against a metro average of 8.4 km. Two thirds of trips start beyond 10 km.',
-    map:'Distance rings · median vs metro',
-    draw(host){ columns(host,{max:44,fmt:v=>v+'%',labelEvery:1,
-      data:[{label:'≤5 km',v:12,fill:RAMP[0]},{label:'5–10',v:24,fill:RAMP[1]},
-            {label:'10–15',v:24,fill:RAMP[2]},{label:'15+ km',v:40,fill:RAMP[3],tag:1}]}); },
-    legend:[['var(--s2)','Nearer'],['var(--s5)','Further']] },
-
-  { id:'repeat', n:'Signal 3', t:'Repeat visitors', sub:'Return within 60 days',
+  { id:'repeat', t:'Repeat visitors', sub:'Return within 60 days',
     read:'<b>68%</b> come back inside 60 days — 1.9× the category norm. They are not trying it once.',
     hero:['68%','RETURN WITHIN 60 DAYS'],
     map:'Density weighted to repeat households',
@@ -232,25 +239,25 @@ const EVIDENCE=[
       data:[{label:'1 visit',v:32,fill:RAMP[0]},{label:'2–3',v:41,fill:RAMP[2],tag:1},{label:'4+',v:27,fill:RAMP[3]}]}); },
     legend:[['var(--s2)','One-off'],['var(--s5)','Frequent']] },
 
-  { id:'ikea', n:'Signal 4', t:'IKEA overlap', sub:'Visited an IKEA in the last 90 days',
+  { id:'household', t:'Household size', sub:'People per household',
+    read:'<b>66%</b> are four-person households or larger, against 29% across the metro. Explains the basket — not the distance.',
+    map:'Households of 4+ only',
+    draw(host){ columns(host,{max:44,fmt:v=>v+'%',series:['This audience','Metro average'],labelEvery:1,
+      data:[{label:'1',a:4,b:22},{label:'2',a:11,b:29},{label:'3',a:19,b:20},{label:'4',a:38,b:18},{label:'5+',a:28,b:11}]}); },
+    legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] },
+
+  { id:'ikea', t:'IKEA overlap', sub:'Visited an IKEA in the last 90 days',
     read:'<b>3.4×</b> the metro rate. Destination retail begets destination retail.',
     map:'IKEA stores · co-visitation',
     draw(host){ pairBars(host,{max:60,fmt:v=>v+'%',rows:[
       {label:'This audience',v:41,note:'index 341'},{label:'Metro average',v:12,ctx:1}]}); },
     legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] },
 
-  { id:'bunnings', n:'Signal 5', t:'Bunnings overlap', sub:'Visited a Bunnings in the last 90 days',
+  { id:'bunnings', t:'Bunnings overlap', sub:'Visited a Bunnings in the last 90 days',
     read:'<b>2.9×</b> the metro rate, and usually on the same trip — the chain runs hardware then grocery.',
     map:'Bunnings stores · co-visitation',
     draw(host){ pairBars(host,{max:60,fmt:v=>v+'%',rows:[
       {label:'This audience',v:56,note:'index 292'},{label:'Metro average',v:19,ctx:1}]}); },
-    legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] },
-
-  { id:'household', n:'Signal 6', t:'Household size', sub:'People per household',
-    read:'<b>66%</b> are four-person households or larger, against 29% across the metro. Explains the basket — not the distance.',
-    map:'Households of 4+ only',
-    draw(host){ columns(host,{max:44,fmt:v=>v+'%',series:['This audience','Metro average'],labelEvery:1,
-      data:[{label:'1',a:4,b:22},{label:'2',a:11,b:29},{label:'3',a:19,b:20},{label:'4',a:38,b:18},{label:'5+',a:28,b:11}]}); },
     legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] }
 ];
 
@@ -339,7 +346,7 @@ function evidenceGrid(){
   const grid=wrap.querySelector('#evgrid');
   EVIDENCE.forEach((ev,i)=>{
     const card=document.createElement('div'); card.className='ev'; card.dataset.ev=ev.id;
-    card.innerHTML=`<div class="ev-h"><span class="ev-t">${ev.t}</span><span class="ev-n">${ev.n}</span></div>
+    card.innerHTML=`<div class="ev-h"><span class="ev-t">${ev.t}</span><span class="ev-n">Signal ${i+1}</span></div>
       <div class="ev-sub">${ev.sub}</div>
       ${ev.hero?`<div class="hero">${ev.hero[0]}<small>${ev.hero[1]}</small></div>`:''}
       <div class="chart-host"></div>
@@ -353,16 +360,42 @@ function evidenceGrid(){
     card.querySelector('.showmap').onclick=()=>showOnMap(ev);
   });
 }
-function verdict(){
-  const rows=[['Weekend concentration',1],['Distance travelled',1],['Repeat visitation',1],
-              ['IKEA overlap',1],['Bunnings overlap',1],['Household size',0]];
-  add(`<div class="verdict">
-    <div class="k">Verdict</div>
-    <p>Supported. Five of six signals point the same way — the trip is <b>planned, long, repeated and chained</b> to other destination retail. Household size explains the basket, not the distance.</p>
-    <div class="rows">${rows.map(r=>`<div class="vrow"><span class="tick ${r[1]?'':'no'}">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">${r[1]?'<path d="M5 13l4 4L19 7"/>':'<path d="M6 12h12"/>'}</svg></span>${r[0]}</div>`).join('')}</div>
+function keyFindings(){
+  const items=[
+    'Highest-value Costco customers are affluent families.',
+    'They travel significantly further than average.',
+    'Weekend visitation dominates.',
+    'IKEA and Bunnings are the strongest overlap brands.',
+    'North-West Sydney offers the highest concentration of lookalike customers.'
+  ];
+  add(`<div class="findings">
+    <h3>Key findings</h3>
+    <ul>${items.map(t=>`<li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>${t}</li>`).join('')}</ul>
   </div>`,80);
-  add(`<div class="ai">Want me to turn this into a targeting rule — everyone inside the 20–30 km band who also visits Bunnings or IKEA on a weekend?</div>`,300);
+  nextTurn();
+}
+const NEXTS=[
+  {id:'ooh',   t:'Recommend billboard locations?', ic:'<rect x="3" y="4" width="18" height="11" rx="1.5"/><path d="M8 20h8M12 15v5"/>'},
+  {id:'aud',   t:'Build a media audience?',        ic:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0"/><circle cx="17.5" cy="9" r="2.4"/><path d="M16 20a5 5 0 016.5-4.4"/>'},
+  {id:'comp',  t:"Compare against Sam’s Club?",    ic:'<path d="M7 16l-4-4 4-4"/><path d="M3 12h12"/><path d="M17 8l4 4-4 4"/><path d="M21 12H9"/>'},
+  {id:'export',t:'Export an executive summary?',   ic:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6M9 15l3 3 3-3"/>'}
+];
+const ACKS={
+  ooh:'Pulling the panels inside the 20–30 km band that these households pass on a Saturday morning — ranked by weekly reach against this audience, not against the metro.',
+  aud:'Building it now: households in the 20–30 km band with a weekend big-basket pattern and an IKEA or Bunnings visit in the last 90 days. I’ll size it before you activate.',
+  comp:'Running the same six signals against Sam’s Club shoppers so you can see where the two overlap and where they part.',
+  export:'Assembling the summary — hypothesis, the six signals, and the key findings, with the map states as figures.'
+};
+function nextTurn(){
+  const wrap=add(`<div class="ai">Would you like me to:</div><div class="nexts" id="nexts">
+    ${NEXTS.map(n=>`<button class="nx" data-nx="${n.id}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${n.ic}</svg></span>${n.t}</button>`).join('')}
+  </div>`,300);
+  wrap.querySelectorAll('.nx').forEach(b=>b.onclick=()=>{
+    wrap.querySelectorAll('.nx').forEach(x=>x.classList.toggle('on',x===b));
+    const n=NEXTS.find(x=>x.id===b.dataset.nx);
+    add(`<div class="user"><span>${n.t.replace(/\?$/,'')}</span></div>`,20);
+    add(`<div class="ai">${ACKS[n.id]}</div>`,260);
+  });
 }
 function run(){
   thread.innerHTML=''; fx.clearLayers(); drawBase();
@@ -371,7 +404,7 @@ function run(){
   add(`<div class="ai">Testing it now. I’ll compare six signals against a like-for-like grocery baseline — if this is destination shopping, the trip should be long, planned, repeated and chained to other big-box retail.</div>`,220);
   add(`<div class="ai">Here’s the evidence. Each one can drive the map — <b>Show on map</b> puts that filter on the geography.</div>`,700);
   setTimeout(evidenceGrid,900);
-  setTimeout(verdict,1700);
+  setTimeout(keyFindings,1700);
 }
 document.getElementById('seg').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
