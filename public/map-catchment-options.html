@@ -1,0 +1,400 @@
+<meta charset="utf-8">
+<title>Catchment click — map treatment options</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --plum:#4A2A6E; --plum2:#6B3C72; --violet:#7C4FC7;
+    --ink:#211A2E; --ink2:#4A3E5C; --muted:#7E7490; --muted2:#A79FB6;
+    --line:#EBE5F1; --line2:#E1D9EC; --lilac:#EFE8F8; --lilac3:#F5F0FB;
+    --stockup:#7A4C82; --value:#2F8F63; --bulk:#C07A2E;
+    --disp:"Baloo 2",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  }
+  body{font-family:var(--body);background:#2E2E2E;color:var(--ink);height:100vh;overflow:hidden}
+  .wrap{display:flex;height:100vh;background:#fff}
+
+  /* ── left rail ───────────────────────────────────────────────────────────── */
+  .rail{width:340px;flex:0 0 340px;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#fff}
+  .rail-h{padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+  .rail-h h1{font-family:var(--disp);font-size:18px;font-weight:700;color:var(--ink);margin-top:4px;letter-spacing:-.01em}
+  .rail-h p{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+  .opts{padding:14px 16px;overflow-y:auto;flex:1;min-height:0}
+  .opt{display:flex;gap:11px;padding:12px;border:1px solid var(--line2);border-radius:14px;margin-bottom:9px;cursor:pointer;transition:.16s;background:#fff}
+  .opt:hover{border-color:var(--violet);background:var(--lilac3)}
+  .opt.on{border-color:var(--plum2);background:var(--lilac3);box-shadow:0 2px 10px rgba(74,42,110,.09)}
+  .tick{width:20px;height:20px;border-radius:6px;border:1.8px solid var(--line2);flex:0 0 auto;display:grid;place-items:center;margin-top:1px;transition:.16s;background:#fff}
+  .opt.on .tick{background:var(--plum2);border-color:var(--plum2)}
+  .tick svg{width:12px;height:12px;opacity:0;transition:.16s}
+  .opt.on .tick svg{opacity:1}
+  .opt b{font-family:var(--disp);font-size:13.5px;font-weight:700;color:var(--ink);display:block;line-height:1.3}
+  .opt span{font-size:11.5px;color:var(--muted);line-height:1.45;display:block;margin-top:3px}
+  .opt .tag{display:inline-block;margin-top:6px;font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--plum2);background:var(--lilac);padding:2px 7px;border-radius:5px}
+
+  .rail-f{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
+  .btn{font-family:var(--disp);font-size:13px;font-weight:700;padding:11px 14px;border-radius:11px;border:none;cursor:pointer;transition:.16s;display:flex;align-items:center;justify-content:center;gap:7px}
+  .btn.primary{background:var(--plum2);color:#fff}
+  .btn.primary:hover{background:var(--plum)}
+  .btn.ghost{background:#fff;color:var(--ink2);border:1px solid var(--line2)}
+  .btn.ghost:hover{border-color:var(--violet);color:var(--plum2)}
+  .hint{font-size:11px;color:var(--muted2);text-align:center;line-height:1.5}
+
+  /* ── mini chat, so the staged timing can be judged in context ────────────── */
+  .chat{border-top:1px solid var(--line);padding:14px 16px;max-height:250px;overflow-y:auto;background:var(--lilac3)}
+  .chat .eyebrow{margin-bottom:9px}
+  .cmsg{opacity:0;transform:translateY(9px);transition:.42s cubic-bezier(.22,1,.36,1)}
+  .cmsg.in{opacity:1;transform:none}
+  .cchip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 5px;border-radius:99px;border:1px solid;font-family:var(--disp);font-size:10.5px;font-weight:700;margin-bottom:8px}
+  .cchip i{width:15px;height:15px;border-radius:50%;display:grid;place-items:center}
+  .cchip i svg{width:9px;height:9px}
+  .cai{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-bottom:8px}
+
+  /* ── map ─────────────────────────────────────────────────────────────────── */
+  .stage{flex:1;position:relative;min-width:0;background:#E8E6EF}
+  #map{position:absolute;inset:0}
+  .leaflet-container{background:#E8E6EF;font-family:var(--body)}
+  .leaflet-control-attribution{font-size:9px;background:rgba(255,255,255,.7)!important}
+
+  .float{position:absolute;z-index:600;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 8px rgba(33,26,46,.07),0 18px 44px rgba(74,42,110,.14);backdrop-filter:blur(10px)}
+  .legend{left:16px;bottom:16px;padding:12px 14px;min-width:200px}
+  .legend .eyebrow{margin-bottom:9px}
+  .lrow{display:flex;align-items:center;gap:9px;font-size:11.5px;color:var(--ink2);margin-bottom:6px;font-weight:600}
+  .lrow:last-child{margin-bottom:0}
+  .sw{width:22px;height:11px;border-radius:3px;flex:0 0 auto}
+  .lrow .dashline{width:22px;height:0;border-top:2px dashed var(--plum2);flex:0 0 auto}
+  .lrow .arrow{width:22px;height:0;border-top:3px solid #E11D74;flex:0 0 auto;position:relative}
+  .lrow .arrow::after{content:"";position:absolute;right:-1px;top:-4px;border:4px solid transparent;border-left-color:#E11D74}
+
+  .banner{top:16px;left:50%;transform:translateX(-50%);padding:9px 16px;font-family:var(--disp);font-weight:700;font-size:12.5px;color:var(--plum);display:flex;align-items:center;gap:9px;white-space:nowrap;opacity:0;transition:.3s}
+  .banner.show{opacity:1}
+  .banner .dot{width:8px;height:8px;border-radius:50%;background:var(--violet)}
+
+  /* map labels */
+  .catchlab{font-family:var(--disp);font-weight:700;font-size:11px;color:#4E2A54;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;padding:3px 8px;white-space:nowrap;transform:translateX(-50%);box-shadow:0 2px 8px rgba(33,26,46,.12)}
+  .bandlab{font-family:var(--disp);font-weight:800;font-size:10px;letter-spacing:.04em;color:#5A2E62;background:rgba(255,255,255,.9);border-radius:6px;padding:2px 6px;white-space:nowrap;transform:translate(-50%,-50%)}
+  .ctxlab{font-family:var(--disp);font-weight:700;font-size:11px;background:rgba(255,255,255,.92);border-radius:8px;padding:3px 8px;white-space:nowrap;transform:translate(-50%,-50%);border:1px solid var(--line);box-shadow:0 1px 5px rgba(33,26,46,.1)}
+  .flowlab{font-family:var(--disp);font-weight:800;font-size:11px;color:#fff;background:#E11D74;border-radius:99px;padding:2px 8px;white-space:nowrap;transform:translate(-50%,-50%);box-shadow:0 2px 7px rgba(225,29,116,.4)}
+  .storemk{width:30px;height:30px;border-radius:50%;background:var(--plum);border:3px solid #fff;box-shadow:0 3px 12px rgba(74,42,110,.45);display:grid;place-items:center}
+  .storemk svg{width:15px;height:15px}
+  .storelab{font-family:var(--disp);font-weight:800;font-size:11px;color:#fff;background:var(--plum);border-radius:8px;padding:3px 9px;white-space:nowrap;transform:translate(-50%,-50%);box-shadow:0 2px 9px rgba(74,42,110,.4)}
+
+  /* corridor + boundary animation */
+  @keyframes dashflow{to{stroke-dashoffset:-140}}
+  .inflow{stroke-dasharray:9 11;animation:dashflow 2.4s linear infinite}
+  @keyframes drawon{to{stroke-dashoffset:0}}
+  .drawing{stroke-dasharray:2600;stroke-dashoffset:2600;animation:drawon 1s cubic-bezier(.4,0,.2,1) forwards}
+  .tip{background:#211A2E!important;color:#fff!important;border:none!important;border-radius:9px!important;font-family:var(--body)!important;font-size:12px!important;font-weight:700!important;padding:6px 10px!important}
+  .tip::before{border-top-color:#211A2E!important}
+</style>
+
+<div class="wrap">
+  <div class="rail">
+    <div class="rail-h">
+      <div class="eyebrow">Step 4 · catchment click</div>
+      <h1>How the map should respond</h1>
+      <p>Four treatments for “the map updates with catchments and movement”. Toggle any combination, then replay the click on Marsden Park.</p>
+    </div>
+
+    <div class="opts" id="opts"></div>
+
+    <div class="rail-f">
+      <button class="btn primary" id="play">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M8 5l11 7-11 7z" fill="currentColor" stroke="none"/></svg>
+        Replay the Marsden Park click
+      </button>
+      <button class="btn ghost" id="reset">Reset the map</button>
+      <div class="hint">You can also click any catchment on the map.</div>
+    </div>
+
+    <div class="chat">
+      <div class="eyebrow">Chat rail</div>
+      <div id="chatBody"></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div id="map"></div>
+    <div class="float banner" id="banner"><span class="dot"></span><span id="bannerText"></span></div>
+    <div class="float legend" id="legend" style="display:none">
+      <div class="eyebrow">Catchment</div>
+      <div id="legendBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── the same Western Sydney geography the prototype map uses ─────────────── */
+const CLUSTERS = {
+  stockup: { name:'Marsden Park Stock-Ups',   color:'#7A4C82' },
+  value:   { name:'Parramatta Value Families',color:'#2F8F63' },
+  bulk:    { name:'Castle Hill Bulk Buyers',  color:'#C07A2E' }
+};
+const REGIONS = [
+  { id:'marsden', name:'Marsden Park · Riverstone', c:[-33.700,150.850], r:0.038, score:156, share:22, dom:'stockup' },
+  { id:'schof',   name:'Schofields · Box Hill',     c:[-33.692,150.884], r:0.030, score:148, share:14, dom:'stockup' },
+  { id:'rouse',   name:'Rouse Hill · Kellyville',   c:[-33.696,150.936], r:0.032, score:141, share:15, dom:'bulk'    },
+  { id:'parra',   name:'Parramatta · Granville',    c:[-33.824,151.005], r:0.030, score:138, share:18, dom:'value'   },
+  { id:'castle',  name:'Castle Hill · Baulkham',    c:[-33.746,151.000], r:0.030, score:132, share:11, dom:'bulk'    },
+  { id:'black',   name:'Blacktown · Mount Druitt',  c:[-33.770,150.868], r:0.036, score:127, share:10, dom:'value'   },
+  { id:'merry',   name:'Merrylands · Auburn',       c:[-33.843,151.012], r:0.026, score:116, share: 6, dom:'value'   },
+  { id:'penrith', name:'Penrith · St Marys',        c:[-33.755,150.735], r:0.040, score:108, share: 4, dom:'stockup' }
+];
+// the launch site, and where its shoppers come from
+const STORE = [-33.7080, 150.8450];
+const INBOUND = [
+  { from:[-33.6790,150.8580], name:'Riverstone',   pct:18 },
+  { from:[-33.7100,150.8730], name:'Schofields',   pct:24 },
+  { from:[-33.6650,150.8880], name:'Box Hill',     pct:12 },
+  { from:[-33.6870,150.9200], name:'Rouse Hill',   pct:15 },
+  { from:[-33.7710,150.9060], name:'Blacktown',    pct:16 },
+  { from:[-33.7660,150.7750], name:'St Marys',     pct: 9 }
+];
+
+/* ── options ─────────────────────────────────────────────────────────────── */
+const OPTIONS = [
+  { id:'bands',   on:true,  title:'Drive-time bands + inbound trips',
+    desc:'Three drive-time bands anchored on the launch site, and home→store trips flowing inward, weighted by share of visits.', tag:'Recommended' },
+  { id:'spot',    on:false, title:'Spotlight the catchment',
+    desc:'Everything outside the catchment dims behind a soft mask, so the selection is the only lit part of the map.' },
+  { id:'staged',  on:false, title:'Staged reveal timed to the chat',
+    desc:'The boundary draws itself, then corridors arrive one at a time, each beat landing with its sentence in the chat.' },
+  { id:'context', on:false, title:'Show the pick in context',
+    desc:'The other catchments stay as thin outlines carrying their share label, so the pick is read against its rivals.' }
+];
+const isOn = id => OPTIONS.find(o => o.id === id).on;
+
+const optsEl = document.getElementById('opts');
+function paintOptions(){
+  optsEl.innerHTML = OPTIONS.map(o => `
+    <div class="opt ${o.on?'on':''}" data-opt="${o.id}">
+      <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+      <span>
+        <b>${o.title}</b>
+        <span>${o.desc}</span>
+        ${o.tag?`<span class="tag">${o.tag}</span>`:''}
+      </span>
+    </div>`).join('');
+  optsEl.querySelectorAll('.opt').forEach(el => el.onclick = () => {
+    const o = OPTIONS.find(x => x.id === el.dataset.opt);
+    o.on = !o.on; paintOptions();
+    if (selected) select(selected, false);
+  });
+}
+paintOptions();
+
+/* ── map ─────────────────────────────────────────────────────────────────── */
+const map = L.map('map',{zoomControl:true,attributionControl:true,scrollWheelZoom:true}).setView([-33.785,150.920],11);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,pane:'markerPane',opacity:.9}).addTo(map);
+
+function rng(s){ return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
+// slightly irregular blob so a catchment never reads as a drawn circle
+function blob(lat,lng,r,seed,wobble){
+  const rr=rng(seed), pts=[], N=44, w=wobble===undefined?0.16:wobble;
+  for(let i=0;i<N;i++){
+    const a=(i/N)*Math.PI*2;
+    // stretch along the motorway axis (NE–SW), the way a drive-time band does
+    const stretch = 1 + 0.34*Math.abs(Math.cos(a - 0.7));
+    const rad = r*stretch*(1 - w/2 + ((Math.sin(a*3+seed)+1)/2)*w);
+    pts.push([lat+Math.sin(a)*rad*0.82, lng+Math.cos(a)*rad]);
+  }
+  return pts;
+}
+function curve(a,b,bend,n){
+  const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2], dx=b[0]-a[0], dy=b[1]-a[1];
+  const cp=[mid[0]-dy*bend, mid[1]+dx*bend], out=[];
+  for(let i=0;i<=n;i++){ const t=i/n, u=1-t;
+    out.push([u*u*a[0]+2*u*t*cp[0]+t*t*b[0], u*u*a[1]+2*u*t*cp[1]+t*t*b[1]]); }
+  return out;
+}
+
+/* base layers: the audience field + clickable catchments */
+const baseGroup = L.layerGroup().addTo(map);
+const hulls = {};
+function drawBase(){
+  baseGroup.clearLayers();
+  REGIONS.forEach((rg,i) => {
+    const col = CLUSTERS[rg.dom].color;
+    // density scatter
+    const rr = rng(i*97+13);
+    for(let k=0;k<Math.round(rg.score*0.62);k++){
+      const a=rr()*Math.PI*2, d=Math.sqrt(rr())*rg.r*1.05;
+      L.circleMarker([rg.c[0]+Math.sin(a)*d*0.82, rg.c[1]+Math.cos(a)*d],
+        {radius:3.1,stroke:false,fillColor:col,fillOpacity:.62,interactive:false,pane:'overlayPane'}).addTo(baseGroup);
+    }
+    const hull = L.polygon(blob(rg.c[0],rg.c[1],rg.r,i+7,.2),
+      {color:col,weight:1.2,opacity:.4,fillColor:col,fillOpacity:.07});
+    hull.bindTooltip(`${rg.name} · index ${rg.score}`,{className:'tip',sticky:true});
+    hull.on('click',()=>select(rg.id,true));
+    hull.addTo(baseGroup);
+    hulls[rg.id]=hull;
+  });
+}
+drawBase();
+
+/* the layer everything for a selection lands in */
+let fx = L.layerGroup().addTo(map);
+let selected = null, timers = [];
+const banner = document.getElementById('banner'), bannerText = document.getElementById('bannerText');
+const legend = document.getElementById('legend'), legendBody = document.getElementById('legendBody');
+const chatBody = document.getElementById('chatBody');
+
+function clearAll(){
+  timers.forEach(clearTimeout); timers=[];
+  fx.clearLayers();
+  banner.classList.remove('show');
+  legend.style.display='none';
+  chatBody.innerHTML='';
+  REGIONS.forEach(rg => hulls[rg.id].setStyle({opacity:.4,fillOpacity:.07}));
+}
+const after = (ms,fn) => timers.push(setTimeout(fn,ms));
+
+/* ── the four treatments ─────────────────────────────────────────────────── */
+function spotlightMask(rg){
+  const world=[[-85,-360],[-85,360],[85,360],[85,-360]];
+  const hole=blob(rg.c[0],rg.c[1],rg.r*1.75,99,.1);
+  return L.polygon([world,hole],{color:'transparent',fillColor:'#1A1030',fillOpacity:.42,interactive:false});
+}
+function driveBands(rg,staged){
+  const anchor = rg.id==='marsden' ? STORE : rg.c;
+  const bands=[
+    {r:rg.r*0.95,lab:'≈10 min drive',op:.20},
+    {r:rg.r*1.55,lab:'≈20 min drive',op:.13},
+    {r:rg.r*2.25,lab:'≈30 min drive',op:.07}
+  ];
+  bands.slice().reverse().forEach((b,i) => {
+    const draw = () => {
+      const poly=L.polygon(blob(anchor[0],anchor[1],b.r,31+i*5,.1),
+        {color:'#5A2E62',weight:1.6,opacity:.85,dashArray:'7 6',fillColor:'#6B3C72',fillOpacity:b.op,interactive:false});
+      poly.addTo(fx);
+      if(staged && poly.getElement) { try{ poly.getElement().classList.add('drawing'); }catch(e){} }
+      L.marker([anchor[0]+b.r*0.80,anchor[1]],{interactive:false,
+        icon:L.divIcon({html:`<div class="bandlab">${b.lab}</div>`,className:'',iconSize:[1,1]})}).addTo(fx);
+    };
+    staged ? after(160+i*230,draw) : draw();
+  });
+  // the launch site itself
+  const site = () => {
+    L.marker(anchor,{interactive:false,icon:L.divIcon({className:'',iconSize:[30,30],iconAnchor:[15,15],
+      html:`<div class="storemk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15l1.4-4.2A2 2 0 017.3 9.4h9.4a2 2 0 011.9 1.4L20 15"/><path d="M4 15h16v3H4z"/></svg></div>`})}).addTo(fx);
+    L.marker([anchor[0]-rg.r*0.28,anchor[1]],{interactive:false,
+      icon:L.divIcon({html:`<div class="storelab">${rg.id==='marsden'?'Costco Marsden Park':'Catchment centre'}</div>`,className:'',iconSize:[1,1]})}).addTo(fx);
+  };
+  staged ? after(760,site) : site();
+}
+function inboundTrips(rg,staged){
+  const anchor = rg.id==='marsden' ? STORE : rg.c;
+  const trips = INBOUND.slice().sort((a,b)=>b.pct-a.pct);
+  trips.forEach((t,i) => {
+    const draw = () => {
+      const pts=curve(t.from,anchor,0.13,30);
+      L.polyline(pts,{color:'#E11D74',weight:2+t.pct*0.22,opacity:.16,lineCap:'round',interactive:false}).addTo(fx);
+      const line=L.polyline(pts,{color:'#E11D74',weight:1.6+t.pct*0.16,opacity:.95,lineCap:'round',className:'inflow'});
+      line.bindTooltip(`${t.name} → store · ${t.pct}% of visits`,{className:'tip',sticky:true}).addTo(fx);
+      L.circleMarker(t.from,{radius:4.4,color:'#fff',weight:2,fillColor:'#E11D74',fillOpacity:1,interactive:false}).addTo(fx);
+      L.marker(t.from,{interactive:false,
+        icon:L.divIcon({html:`<div class="flowlab">${t.pct}%</div>`,className:'',iconSize:[1,1],iconAnchor:[-14,12]})}).addTo(fx);
+    };
+    staged ? after(1000+i*180,draw) : draw();
+  });
+}
+function plainRing(rg){
+  L.polygon(blob(rg.c[0],rg.c[1],rg.r*1.4,77,.12),
+    {color:'#6B3C72',weight:1.8,opacity:.9,dashArray:'6 6',fillColor:'#6B3C72',fillOpacity:.05,interactive:false}).addTo(fx);
+  L.marker([rg.c[0]+rg.r*1.1,rg.c[1]],{interactive:false,
+    icon:L.divIcon({html:`<div class="catchlab">${rg.name} catchment</div>`,className:'',iconSize:[1,1]})}).addTo(fx);
+}
+// today's behaviour: the home→work commute corridors, for a fair comparison
+const COMMUTE = [
+  { to:[-33.7370,150.9440], hub:'Norwest',      pct:31 },
+  { to:[-33.8150,151.0000], hub:'Parramatta',   pct:19 },
+  { to:[-33.7770,151.1250], hub:'Macquarie Pk', pct:13 }
+];
+function commuteCorridors(rg,staged){
+  COMMUTE.forEach((f,i) => {
+    const draw = () => {
+      const pts=curve(rg.c,f.to,0.15,30);
+      L.polyline(pts,{color:'#E11D74',weight:2+f.pct*0.30+6,opacity:.14,lineCap:'round',interactive:false}).addTo(fx);
+      L.polyline(pts,{color:'#E11D74',weight:2+f.pct*0.30,opacity:.95,lineCap:'round',className:'inflow'})
+        .bindTooltip(`${rg.name.split(' · ')[0]} → ${f.hub} · ${f.pct}% of weekday movement`,{className:'tip',sticky:true}).addTo(fx);
+      L.marker(f.to,{interactive:false,
+        icon:L.divIcon({html:`<div class="ctxlab" style="color:#E11D74;border-color:#E11D7455">${f.hub}</div>`,className:'',iconSize:[1,1]})}).addTo(fx);
+      L.marker(rg.c,{interactive:false,
+        icon:L.divIcon({html:`<div class="flowlab">${f.pct}%</div>`,className:'',iconSize:[1,1],iconAnchor:[-10-i*26,10]})}).addTo(fx);
+    };
+    staged ? after(900+i*220,draw) : draw();
+  });
+}
+function contextOutlines(rg){
+  REGIONS.filter(r=>r.id!==rg.id && r.share>=10).forEach(r => {
+    const col=CLUSTERS[r.dom].color;
+    L.polygon(blob(r.c[0],r.c[1],r.r,r.id.length+3,.18),
+      {color:col,weight:1.6,opacity:.85,dashArray:'5 6',fill:false,interactive:false}).addTo(fx);
+    L.marker(r.c,{interactive:false,
+      icon:L.divIcon({html:`<div class="ctxlab" style="color:${col};border-color:${col}55">${r.name.split(' · ')[0]} · ${r.share}%</div>`,className:'',iconSize:[1,1]})}).addTo(fx);
+  });
+}
+
+/* ── chat rail, so staged timing can be judged against the words ─────────── */
+function chatBeat(rg,delay,html){
+  after(delay,()=>{ const d=document.createElement('div'); d.className='cmsg'; d.innerHTML=html;
+    chatBody.appendChild(d); requestAnimationFrame(()=>d.classList.add('in'));
+    chatBody.parentElement.scrollTop = chatBody.parentElement.scrollHeight; });
+}
+function runChat(rg,staged){
+  const col=CLUSTERS[rg.dom].color;
+  const lead = rg.id==='marsden'
+    ? 'This audience is 2.3× more likely to be affluent families with larger households. They frequently visit Bunnings, IKEA and Costco Auburn on weekends — big-basket trips, made by car.'
+    : `${rg.name.split(' · ')[0]} indexes ${rg.score} — ${rg.share}% of your total audience lives inside this catchment.`;
+  const also = isOn('bands')
+    ? 'Just under a quarter of its visits come from Schofields alone, and 30 minutes of drive time covers three quarters of the cluster.'
+    : 'Their corridor into Norwest carries 31% of the cluster’s weekday movement.';
+  chatBeat(rg,staged?60:0,
+    `<span class="cchip" style="border-color:${col}44;background:${col}12;color:${col}">
+       <i style="background:${col}"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.6"/></svg></i>
+       Selected on map · ${rg.name}</span>`);
+  chatBeat(rg,staged?900:260,`<div class="cai">${lead}</div>`);
+  chatBeat(rg,staged?2200:520,`<div class="cai">${also}</div>`);
+}
+
+/* ── selection ───────────────────────────────────────────────────────────── */
+function select(id,fly){
+  const rg=REGIONS.find(r=>r.id===id); if(!rg) return;
+  selected=id; clearAll();
+  const staged=isOn('staged');
+
+  if(fly!==false) map.flyTo(rg.c,isOn('bands')?11.4:12,{duration:.7});
+
+  const build = () => {
+    if(isOn('spot')) spotlightMask(rg).addTo(fx);
+    if(isOn('context')) contextOutlines(rg);
+    if(isOn('bands')){ driveBands(rg,staged); inboundTrips(rg,staged); }
+    else { plainRing(rg); commuteCorridors(rg,staged); }
+    // the picked catchment leads, the rest recede
+    REGIONS.forEach(r => hulls[r.id].setStyle(r.id===rg.id
+      ? {opacity:.9,fillOpacity:.14}
+      : {opacity:isOn('spot')?.12:.22,fillOpacity:isOn('spot')?.02:.04}));
+    bannerText.textContent = isOn('bands')
+      ? `${rg.name} — drive-time catchment & inbound trips`
+      : `${rg.name} — catchment & movement`;
+    banner.classList.add('show');
+    legend.style.display='block';
+    legendBody.innerHTML = isOn('bands')
+      ? `<div class="lrow"><span class="sw" style="background:#6B3C72;opacity:.55"></span>≈10 min drive</div>
+         <div class="lrow"><span class="sw" style="background:#6B3C72;opacity:.32"></span>≈20 min drive</div>
+         <div class="lrow"><span class="sw" style="background:#6B3C72;opacity:.16"></span>≈30 min drive</div>
+         <div class="lrow"><span class="arrow"></span>Trips into the store</div>`
+      : `<div class="lrow"><span class="dashline"></span>Catchment boundary</div>
+         <div class="lrow"><span class="arrow"></span>Movement corridors</div>`;
+  };
+  staged ? after(420,build) : build();
+  runChat(rg,staged);
+}
+
+document.getElementById('play').onclick = () => { clearAll(); map.setView([-33.785,150.920],11); setTimeout(()=>select('marsden',true),420); };
+document.getElementById('reset').onclick = () => { selected=null; clearAll(); map.flyTo([-33.785,150.920],11,{duration:.6}); };
+
+setTimeout(()=>select('marsden',true),700);
+</script>
