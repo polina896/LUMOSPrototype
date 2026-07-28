@@ -204,7 +204,59 @@ interface ChatPanelProps {
   onRemoveChatContext?: (id: string) => void;
   onClearChatContext?: () => void;
   onStartCompare?: (seed: never[], prompt: string) => void;
+  regionPicks?: ChatRegionPick[];
+  onRequestLayer?: (key: string) => void;
 }
+
+// A catchment the user clicked on the map. The chat answers it in a sentence
+// rather than opening a panel — the numbers stay on the map's own index card.
+export interface ChatRegionPick {
+  key: number;
+  name: string;
+  index: number;
+  households: number;
+  share: number;
+  rank: number;
+  of: number;
+  segment: string;
+  corridors: { name: string; pct: number }[];
+}
+
+// One plain-language read per catchment — what the AI says when it is clicked.
+const REGION_READS: Record<string, { lead: string; also: string }> = {
+  'Marsden Park · Riverstone': {
+    lead: 'This audience is 2.3× more likely to be affluent families with larger households. They frequently visit Bunnings, IKEA and Costco Auburn on weekends — big-basket trips, made by car.',
+    also: 'Their corridor into Norwest carries 31% of the cluster’s weekday movement, so the M7 and Richmond Road see them twice a day before they ever see a catalogue.',
+  },
+  'Schofields · Box Hill': {
+    lead: 'Newer estates, same habit — 2.1× more likely to be young families in their first home, still forming where they shop.',
+    also: 'The weekend run chains hardware, groceries and a food-court stop into one trip. Reach them in the first six months after they move and the habit sticks.',
+  },
+  'Rouse Hill · Kellyville': {
+    lead: 'A crossover pocket — Stock-Ups and Bulk Buyers overlap here. They’re 1.9× more likely to already hold a warehouse-club membership.',
+    also: 'Rouse Hill Town Centre anchors the weekly trip, and the Metro line gives you a second, cheaper way to reach them.',
+  },
+  'Parramatta · Granville': {
+    lead: 'A different shopper entirely — 2.4× more likely to be multi-generational households buying for more than one family at a time.',
+    also: 'They shop fortnightly, on foot or a short drive, and switch on unit price rather than brand. Referral moves faster here than paid media.',
+  },
+  'Castle Hill · Baulkham': {
+    lead: 'The highest-value trolleys in Sydney — 2.2× more likely to be established families buying premium and entertaining lines.',
+    also: 'Fewest trips, biggest baskets, and most already hold a membership somewhere else. This is a switching play, not first trial.',
+  },
+  'Blacktown · Mount Druitt': {
+    lead: 'Broad and price-led — 1.8× more likely to cross-shop ALDI and BIG W in the same week.',
+    also: 'Westpoint anchors the trip, and the M7 and Richmond Road carry them straight past your catchment on the way home.',
+  },
+  'Merrylands · Auburn': {
+    lead: 'Value-led and community-driven — 2.0× more likely to be shopping for a large household on a fortnightly rhythm.',
+    also: 'Word of mouth travels faster here than any channel you can buy. Referral mechanics do the work paid media can’t.',
+  },
+  'Penrith · St Marys': {
+    lead: 'The edge of the catchment — 1.4× more likely to be big-basket families, but they already have a closer warehouse option.',
+    also: 'Worth reach, not weight. Lead here only once the three core clusters are covered.',
+  },
+};
 
 // ─── Screen ordering helper ───────────────────────────────────────────────────
 
@@ -231,6 +283,8 @@ export default function ChatPanel({
   onRemoveChatContext,
   onClearChatContext,
   onStartCompare,
+  regionPicks = [],
+  onRequestLayer,
 }: ChatPanelProps) {
   const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -277,7 +331,7 @@ export default function ChatPanel({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers]);
+  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length]);
 
   // ── Effects per screen ──────────────────────────────────────────────────────
 
@@ -897,6 +951,11 @@ export default function ChatPanel({
                 </>
               )}
 
+              {/* Catchment picks — the map click, answered in the chat */}
+              {regionPicks.map((pick) => (
+                <RegionSummary key={pick.key} pick={pick} onRequestLayer={onRequestLayer} />
+              ))}
+
               {/* Clarify widget — flows inline with the conversation it belongs to */}
               {screen === 'clarifying' && showClarifyCard && !clarifySubmitted && (
                 <div className="pt-1">
@@ -1149,6 +1208,45 @@ function FloatingClarifyWidget({
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function RegionSummary({ pick, onRequestLayer }: { pick: ChatRegionPick; onRequestLayer?: (key: string) => void }) {
+  const read = REGION_READS[pick.name];
+  const lead = read?.lead
+    ?? `This catchment indexes ${pick.index} — #${pick.rank} of ${pick.of} across Greater Sydney, with about ${(pick.households / 1000).toFixed(0)}k households of your audience living here.`;
+  const top = pick.corridors[0];
+  const compareTo = pick.name.startsWith('Parramatta') ? 'Marsden Park Stock-Ups' : 'Parramatta Value Families';
+
+  return (
+    <div className="mb-6">
+      <UserMessage text={`Tell me about ${pick.name.split(' · ')[0]}`} />
+      <AIMessage text={lead} />
+      {read?.also && <AIMessage text={read.also} />}
+      {!read?.also && top && (
+        <AIMessage text={`Their strongest corridor — ${top.name} — carries ${top.pct}% of the cluster’s weekday movement. I’ve drawn the catchment and its corridors on the map.`} />
+      )}
+      <div className="space-y-2">
+        <button
+          onClick={() => onRequestLayer?.('poi')}
+          className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
+        >
+          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Where else do they go?</span>
+        </button>
+        <button
+          onClick={() => onRequestLayer?.('media')}
+          className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors"
+        >
+          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Which billboards reach them?</span>
+        </button>
+        <button className="flex items-start gap-2 w-full text-left p-3 bg-[#f8f8f8] rounded-lg hover:bg-[#efefef] transition-colors">
+          <span className="text-[#999] text-[14px] mt-0.5 flex-shrink-0">↪</span>
+          <span className="font-['Jua',sans-serif] text-[14px] text-[#1a1a1a] leading-relaxed">Compare to {compareTo}</span>
+        </button>
       </div>
     </div>
   );

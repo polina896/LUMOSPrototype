@@ -33,22 +33,44 @@ interface LumosMapInstance {
   open: () => void;
   select: (id: string) => void;
   showAll: () => void;
+  setLayerOn: (key: string, on: boolean) => void;
+  clearFocus: () => void;
   destroy: () => void;
   readonly mode: string;
+}
+
+// What the map hands back when a catchment is clicked — the chat turns this
+// into a plain-language summary rather than dumping the numbers on screen.
+export interface RegionPick {
+  name: string;
+  index: number;
+  households: number;
+  share: number;
+  rank: number;
+  of: number;
+  segment: string;
+  corridors: { name: string; pct: number }[];
 }
 
 export default function LumosMapStage({
   selectedAudienceId,
   onSelectAudience,
+  onPickRegion,
+  layerRequest,
 }: {
   selectedAudienceId: AudienceId | null;
   onSelectAudience: (id: AudienceId | null) => void;
+  onPickRegion?: (pick: RegionPick & { audienceId: AudienceId | null }) => void;
+  // a chat follow-up asking the map to bring a layer up: {key, n} — n forces a re-run
+  layerRequest?: { key: string; n: number } | null;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const lmRef = useRef<LumosMapInstance | null>(null);
-  // keep the latest callback without re-mounting the map
+  // keep the latest callbacks without re-mounting the map
   const onSelectRef = useRef(onSelectAudience);
   onSelectRef.current = onSelectAudience;
+  const onPickRef = useRef(onPickRegion);
+  onPickRef.current = onPickRegion;
 
   // Mount once. The map reveals + fits Greater Sydney on open().
   useEffect(() => {
@@ -60,6 +82,9 @@ export default function LumosMapStage({
         if (aud) onSelectRef.current(aud);
       },
       onShowAll: () => onSelectRef.current(null),
+      onRegion: (pick: RegionPick) => {
+        onPickRef.current?.({ ...pick, audienceId: SEG_TO_AUD[pick.segment] ?? null });
+      },
     });
     lmRef.current = lm;
     lm.open();
@@ -81,6 +106,12 @@ export default function LumosMapStage({
       lm.showAll();
     }
   }, [selectedAudienceId]);
+
+  // A chat follow-up ("which billboards reach them?") brings a layer up on the map.
+  useEffect(() => {
+    if (!layerRequest) return;
+    try { lmRef.current?.setLayerOn(layerRequest.key, true); } catch { /* noop */ }
+  }, [layerRequest?.n]);
 
   return <div ref={hostRef} className="w-full h-full" />;
 }

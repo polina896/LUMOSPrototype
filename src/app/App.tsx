@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar, { type RecentAnalysis } from './components/Sidebar';
 import DocumentsPanel from './components/DocumentsPanel';
 import ChatPanel from './components/ChatPanel';
@@ -9,7 +9,8 @@ import AudienceLibrary from './components/AudienceLibrary';
 import AudienceProfileViewer from './components/AudienceProfileViewer';
 import CompareFlow, { type SavedAudience } from './components/CompareFlow';
 import CreateAudienceFlow from './components/CreateAudienceFlow';
-import LumosMapStage from './components/LumosMapStage';
+import LumosMapStage, { type RegionPick } from './components/LumosMapStage';
+import type { ChatRegionPick } from './components/ChatPanel';
 import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
 
@@ -67,6 +68,24 @@ export default function App() {
   const [activeAnalysisId, setActiveAnalysisId] = useState<string | null>(null);
   // Modules pinned into the main chat composer via the inline "Ask" affordance.
   const [chatContext, setChatContext] = useState<ModuleRef[]>([]);
+
+  // Clicking a catchment on the map is answered in the chat, not by opening a
+  // panel — each pick appends one plain-language summary to the thread.
+  const [regionPicks, setRegionPicks] = useState<ChatRegionPick[]>([]);
+  const pickSeq = useRef(0);
+  const handlePickRegion = (pick: RegionPick & { audienceId: AudienceId | null }) => {
+    pickSeq.current += 1;
+    const key = pickSeq.current;
+    setRegionPicks((prev) => {
+      // re-clicking the same catchment re-surfaces it rather than repeating it
+      const rest = prev.filter((p) => p.name !== pick.name);
+      return [...rest, { ...pick, key }];
+    });
+    // deliberately no panel: the chat carries the whole moment
+  };
+  // A chat follow-up asking the map to bring a layer up.
+  const [layerRequest, setLayerRequest] = useState<{ key: string; n: number } | null>(null);
+  const requestLayer = (key: string) => setLayerRequest((prev) => ({ key, n: (prev?.n ?? 0) + 1 }));
 
   const addChatContext = (ref: ModuleRef) =>
     setChatContext((prev) => (prev.some((r) => r.id === ref.id) ? prev : [...prev, ref]));
@@ -213,6 +232,8 @@ export default function App() {
               onRemoveChatContext={removeChatContext}
               onClearChatContext={() => setChatContext([])}
               onStartCompare={startCompare}
+              regionPicks={regionPicks}
+              onRequestLayer={requestLayer}
             />
           </div>
 
@@ -222,6 +243,8 @@ export default function App() {
               <LumosMapStage
                 selectedAudienceId={selectedAudienceId}
                 onSelectAudience={setSelectedAudienceId}
+                onPickRegion={handlePickRegion}
+                layerRequest={layerRequest}
               />
             </div>
           )}
