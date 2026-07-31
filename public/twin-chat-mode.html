@@ -93,6 +93,19 @@
   .sugg button{border:1px solid var(--line2);background:#fff;border-radius:10px;padding:9px 13px;font-family:var(--chat);font-size:13px;color:var(--ink);cursor:pointer;transition:.15s;text-align:left}
   .sugg button:hover{border-color:var(--twin);background:var(--twin-tint)}
 
+  /* the prompt library — a starting point, never the only way in */
+  .lib{border:1px solid var(--line2);background:#fff;border-radius:15px;padding:14px 16px 12px;margin-bottom:18px}
+  .lib-h{font-family:var(--disp);font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:11px}
+  .lib-g{margin-bottom:11px}
+  .lib-g:last-of-type{margin-bottom:6px}
+  .lib-k{font-family:var(--disp);font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+  .lib-r{display:flex;flex-wrap:wrap;gap:7px}
+  .lib-r button{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:#fff;border-radius:10px;padding:8px 12px;
+                font-family:var(--chat);font-size:13px;color:var(--ink);cursor:pointer;transition:.15s;text-align:left}
+  .lib-r button:hover{border-color:var(--twin);background:var(--twin-tint)}
+  .lib-hint{font-family:var(--body);font-size:10.5px;color:var(--muted2);font-weight:600}
+  .lib-f{padding-top:10px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted2)}
+
   /* composer + the mode switch that sits with it */
   .foot{flex:0 0 auto;padding:0 26px 20px}
   .modes{display:flex;align-items:center;gap:8px;margin-bottom:9px}
@@ -161,40 +174,139 @@
 
 <script>
 /* ── the twins ───────────────────────────────────────────────────────────────
-   Each one answers from its own behaviour, not a generic persona. The line it
-   reacts to is scored, and the reasons cite the evidence behind the audience.  */
+   Each answers from its own behaviour. What they answer *about* is up to the
+   reader — the question is classified, and the reply takes the shape that
+   question deserves. Copy gets scored; a question about their lives does not. */
 var TWINS = [
-  { id:'stockup', n:'Marsden Park Stock-Ups', sub:'186k · index 169', c:'#7A4C82', on:true,
-    score:42,
-    say:'“Every day” isn’t how I shop. I go once a month, I plan it on the Thursday, and I drive 25 minutes with the back seats down. Tell me what fits in the boot, not what’s cheap today.',
-    why:'<b>Median trip 14 km</b> · 57% of visits on a weekend · chained to Bunnings and IKEA' },
-  { id:'value', n:'Parramatta Value Families', sub:'248k · index 218', c:'#2F8F63', on:true,
-    score:71,
-    say:'Price talks, but “save big” doesn’t tell me anything. Show me the unit price against what I pay now. I’m buying for two households and I’ll do the maths myself.',
-    why:'Switches on <b>unit price</b> rather than brand · fortnightly shop · buys for more than one family' },
-  { id:'bulk', n:'Castle Hill Bulk Buyers', sub:'132k · index 186', c:'#C07A2E', on:true,
-    score:28,
-    say:'I already have a membership somewhere else. Cheap isn’t the reason I’d switch — the range is. If you carry things I can’t get at the local shops, say that first.',
-    why:'Most already hold a <b>warehouse membership elsewhere</b> · fewest trips, biggest baskets · premium and entertaining lines' }
+  { id:'stockup', n:'Marsden Park Stock-Ups', sub:'186k · index 169', c:'#7A4C82', on:true },
+  { id:'value',   n:'Parramatta Value Families', sub:'248k · index 218', c:'#2F8F63', on:true },
+  { id:'bulk',    n:'Castle Hill Bulk Buyers', sub:'132k · index 186', c:'#C07A2E', on:true }
 ];
 
-var SYNTH = {
-  read:'The line leans on <b>frequency and price</b> — and only one of the three shops that way. Marsden Park plans a monthly trip around scale, and Castle Hill is a switching argument about range, not cost. “Every day” actively works against both.',
-  rewrites:[
-    { id:'stockup', c:'#7A4C82', who:'For Marsden Park Stock-Ups',
-      line:'One trip. One month sorted. Worth the drive.', note:'Leads on scale and the planned trip, not price' },
-    { id:'value', c:'#2F8F63', who:'For Parramatta Value Families',
-      line:'Compare the unit price. Then compare the trolley.', note:'Gives them the maths they already do' },
-    { id:'bulk', c:'#C07A2E', who:'For Castle Hill Bulk Buyers',
-      line:'The things your local shop doesn’t stock.', note:'A range argument — the reason a member switches' }
-  ]
+/* what the reader might want to know, and how each twin answers it */
+var ANSWERS = {
+  copy: {
+    label:'Reading it against their trip planning, price sensitivity and what each already buys',
+    scored:true,
+    stockup:{ score:42,
+      say:'“Every day” isn’t how I shop. I go once a month, I plan it on the Thursday, and I drive 25 minutes with the back seats down. Tell me what fits in the boot, not what’s cheap today.',
+      why:'<b>Median trip 14 km</b> · 57% of visits on a weekend · chained to Bunnings and IKEA' },
+    value:{ score:71,
+      say:'Price talks, but “save big” doesn’t tell me anything. Show me the unit price against what I pay now. I’m buying for two households and I’ll do the maths myself.',
+      why:'Switches on <b>unit price</b> rather than brand · fortnightly shop · buys for more than one family' },
+    bulk:{ score:28,
+      say:'I already have a membership somewhere else. Cheap isn’t the reason I’d switch — the range is. If you carry things I can’t get at the local shops, say that first.',
+      why:'Most already hold a <b>warehouse membership elsewhere</b> · fewest trips, biggest baskets' },
+    read:'The line leans on <b>frequency and price</b> — and only one of the three shops that way. Marsden Park plans a monthly trip around scale, and Castle Hill is a switching argument about range, not cost.',
+    rewrites:[
+      { id:'stockup', who:'For Marsden Park Stock-Ups', line:'One trip. One month sorted. Worth the drive.', note:'Leads on scale and the planned trip, not price' },
+      { id:'value',   who:'For Parramatta Value Families', line:'Compare the unit price. Then compare the trolley.', note:'Gives them the maths they already do' },
+      { id:'bulk',    who:'For Castle Hill Bulk Buyers', line:'The things your local shop doesn’t stock.', note:'A range argument — the reason a member switches' }
+    ]
+  },
+
+  demographics: {
+    label:'Answering from household composition, income and where they live',
+    stockup:{ say:'Two adults, three kids, a four-bedroom place in one of the new estates off Richmond Road. Two cars, because out here you need them. Most of what we earn goes on the mortgage and the children.',
+      why:'<b>66% are four-person households or larger</b> · North-West growth corridor · two-car households index 1.9×' },
+    value:{ say:'There are six of us under one roof — my parents, us, and the two kids. We shop as one household even though we are really two. The income looks fine on paper; per person it is not.',
+      why:'<b>2.8× more likely</b> to shop for more than one household · multi-generational · Parramatta–Granville spine' },
+    bulk:{ say:'Two of us now the children have gone, but I still buy like there are five. Big house, established street, and we have people over a lot.',
+      why:'Established families · <b>fewest trips, biggest baskets</b> · premium and entertaining lines' },
+    read:'Three different shapes of household buying at the same scale for <b>three different reasons</b> — a growing family, a shared roof, and entertaining. Only the first is about to get bigger.'
+  },
+
+  routine: {
+    label:'Answering from observed trip timing and frequency',
+    stockup:{ say:'Weekdays are school, work and the drive. The big shop is Saturday morning — drop-off, a coffee, Bunnings, and we are at Costco by eleven.',
+      why:'<b>38% run the same Saturday chain</b> · arrival window 10–11am · 57% of visits on a weekend' },
+    value:{ say:'Fortnightly, usually a Thursday evening or a Sunday once everyone has eaten. Whoever has the car that day does the run for both families.',
+      why:'Fortnightly rhythm · short drive or on foot · <b>68% return within 60 days</b>' },
+    bulk:{ say:'Once every six weeks or so, always with a list. I would rather do one enormous run than five small ones.',
+      why:'Fewest trips of the three · largest average basket · plans around entertaining' },
+    read:'The trip is <b>planned in all three cases</b>, but on different clocks — weekly rhythm for one, fortnightly for another, seasonal for the third. Media weight should follow the clock, not the calendar.'
+  },
+
+  motivation: {
+    label:'Answering on what would actually move them',
+    stockup:{ say:'Fitting the whole month into one trip. If I have to come back in a fortnight, it did not work and I will not bother again.',
+      why:'Basket <b>3.4× the metro household</b> · one planned trip per month · travels 14 km for it' },
+    value:{ say:'Unit price, stated plainly. And if my sister says it is worth it, that counts for more than any advertisement you can buy.',
+      why:'Switches on unit price · <b>referral outperforms paid media</b> in this cluster' },
+    bulk:{ say:'Range. I would move for things I cannot get locally — not for a few dollars off something I already buy.',
+      why:'Already holds a membership elsewhere · premium and entertaining lines · switching is a range argument' },
+    read:'Three different levers: <b>scale, unit price and range</b>. A single national message will win one of them and lose the other two.'
+  },
+
+  channel: {
+    label:'Answering on where they would actually see you',
+    stockup:{ say:'On the road. I am on the M7 or Richmond Road twice a day, every day. I have not opened a catalogue in years.',
+      why:'Passes the corridor twice daily · <b>roadside OOH indexes highest</b> of any channel here' },
+    value:{ say:'WhatsApp, honestly — that is where things get passed around. And the screens around the Parramatta interchange, I am through there constantly.',
+      why:'Referral and community networks · digital OOH at the interchange · multicultural radio' },
+    bulk:{ say:'Nothing that looks like a discount flyer. Email me something specific and I will read it; the rest I ignore.',
+      why:'Low response to price-led creative · responds to range and event messaging' },
+    read:'Two of the three are reached <b>on the way</b>, not at home. The third is reached by someone they trust rather than by media at all.'
+  },
+
+  objection: {
+    label:'Answering on what would stop them',
+    stockup:{ say:'The drive, if the trip does not pay for itself. And a membership fee I cannot see the value of before I have paid it.',
+      why:'25-minute drive each way · <b>value must be legible before the first trip</b>' },
+    value:{ say:'Bulk I have nowhere to put. And anything where the unit price is not actually better once I work it out.',
+      why:'Storage-constrained · calculates unit price · <b>61% cross-shop discount grocers</b>' },
+    bulk:{ say:'I already pay for one membership. Two feels absurd unless one of them is clearly better.',
+      why:'Existing warehouse membership is <b>the single biggest barrier</b> in this cluster' },
+    read:'The barriers are not shared. One is about <b>proof before purchase</b>, one about storage, one about paying twice — and each needs answering separately.'
+  },
+
+  general: {
+    label:'Answering in their own words',
+    stockup:{ say:'Ask me about the trip and I can tell you a lot — when I go, how far, what else I do on the way. That is the part of my life this is really about.',
+      why:'Strongest signal: <b>trip length, timing and chaining</b>' },
+    value:{ say:'Ask me about price or about who I am buying for. Those two things explain nearly everything about how I shop.',
+      why:'Strongest signal: <b>unit price sensitivity and household size</b>' },
+    bulk:{ say:'Ask me what I cannot get locally. That is the only thing that would make me change where I shop.',
+      why:'Strongest signal: <b>range and existing membership</b>' },
+    read:'Try asking about their <b>household, their week, what would move them, where they see advertising</b>, or paste a line of copy to test.'
+  }
 };
 
-var STARTERS = [
-  'Save big at Costco. Unbeatable prices, every day.',
-  'Which of these three would respond to a membership trial offer?',
-  'Rewrite this for a roadside billboard on the M7.'
+/* the prompt library — a starting point, not a menu */
+var PROMPTS = [
+  { g:'Test creative', items:[
+    { t:'Save big at Costco. Unbeatable prices, every day.', hint:'a line to react to' },
+    { t:'Rewrite this for a roadside billboard on the M7.' }
+  ]},
+  { g:'Understand them', items:[
+    { t:'Who are you, in your own words?' },
+    { t:'What does a typical week look like?' }
+  ]},
+  { g:'Dig deeper', items:[
+    { t:'What would make you switch from where you shop now?' },
+    { t:'Where would I actually reach you?' },
+    { t:'What would stop you joining?' }
+  ]}
 ];
+
+/* Routing the question, crudely on purpose — a real one would use the model.
+   Order matters: a statement is a line of copy, a question is about them. */
+function classify(text){
+  var t = text.toLowerCase().trim();
+  var asks = /\?/.test(t) || /^(what|who|where|why|how|when|which|do|does|did|are|is|would|could|can|tell me|describe)\b/.test(t);
+
+  // explicit, whatever the shape
+  if (/^["“']/.test(text.trim()) || /\b(copy|tagline|slogan|headline|rewrite|creative|this line|this ad)\b/.test(t)) return 'copy';
+  // a statement rather than a question is something to react to
+  if (!asks) return 'copy';
+
+  if (/\b(who are you|household|income|demographic|how old|age|family|kids|children|where do you live)\b/.test(t)) return 'demographics';
+  if (/\b(typical (day|week)|your (week|weekend|day)|weekend|routine|how often|when do you|a day in|shopping trip)\b/.test(t)) return 'routine';
+  if (/\b(switch|motivat|make you|convince|move you|why would you|what would you)\b/.test(t)) return 'motivation';
+  if (/\b(reach|media|channel|see (an )?ad|advertis|billboard|radio|social|catalogue)\b/.test(t)) return 'channel';
+  if (/\b(stop|barrier|objection|put you off|worry|concern|hesitat|why wouldn)\b/.test(t)) return 'objection';
+  return 'general';
+}
 
 /* ── state ───────────────────────────────────────────────────────────────── */
 var mode = 'lumos', audiencesReady = true;
@@ -250,42 +362,60 @@ function paintMode(){
 
 /* ── the twin exchange ───────────────────────────────────────────────────── */
 function askTwins(text){
+  var kind = classify(text);
+  var A = ANSWERS[kind] || ANSWERS.general;
   add('<div class="user"><span>' + text + '</span></div>', 20);
-  var t0 = 260;
   add('<div class="sys"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
       '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>' +
-      '<p>Reading it against <b>' + active().length + ' twins</b> — trip planning, price sensitivity and what each already buys.</p></div>', t0);
+      '<p>' + A.label + ' — across <b>' + active().length + ' twins</b>.</p></div>', 260);
 
   active().forEach(function(t, i){
+    var a = A[t.id]; if (!a) return;
     setTimeout(function(){
+      var scored = A.scored && typeof a.score === 'number';
       var el = add('<div class="reply">' +
         '<div class="rh"><span class="av" style="background:' + t.c + '">' + initials(t.n) + '</span>' +
         '<span><span class="nm">' + t.n + '</span><span class="sub">' + t.sub + '</span></span>' +
-        '<span class="score"><b style="color:' + t.c + '">' + t.score + '</b><span>Resonance</span></span></div>' +
-        '<div class="meter"><i data-w="' + t.score + '" style="background:' + t.c + '"></i></div>' +
-        '<q>' + t.say + '</q>' +
-        '<div class="why">' + t.why + '</div></div>', 20);
-      setTimeout(function(){ var m = el.querySelector('.meter i'); if (m) m.style.width = t.score + '%'; }, 120);
+        (scored ? '<span class="score"><b style="color:' + t.c + '">' + a.score + '</b><span>Resonance</span></span>' : '') +
+        '</div>' +
+        (scored ? '<div class="meter"><i style="background:' + t.c + '"></i></div>' : '') +
+        '<q>' + a.say + '</q>' +
+        '<div class="why">' + a.why + '</div></div>', 20);
+      if (scored) setTimeout(function(){
+        var m = el.querySelector('.meter i'); if (m) m.style.width = a.score + '%';
+      }, 120);
     }, 900 + i * 850);
   });
 
   setTimeout(function(){
-    add('<div class="synth"><div class="k">What Lumos makes of it</div><p>' + SYNTH.read + '</p>' +
-      SYNTH.rewrites.filter(function(r){ return TWINS.filter(function(t){ return t.id === r.id; })[0].on; })
-      .map(function(r){
-        return '<div class="rw"><span class="dot" style="background:' + r.c + '"></span><div>' +
+    var html = '<div class="synth"><div class="k">What Lumos makes of it</div><p>' + A.read + '</p>';
+    if (A.rewrites) {
+      html += A.rewrites.filter(function(r){
+        return TWINS.filter(function(t){ return t.id === r.id; })[0].on;
+      }).map(function(r){
+        var c = TWINS.filter(function(t){ return t.id === r.id; })[0].c;
+        return '<div class="rw"><span class="dot" style="background:' + c + '"></span><div>' +
           '<div class="who">' + r.who + '</div><q>' + r.line + '</q>' +
           '<div class="note">' + r.note + '</div></div></div>';
-      }).join('') + '</div>', 40);
-    add('<div class="sugg">' + STARTERS.slice(1).map(function(s){
-      return '<button data-s="' + s.replace(/"/g,'&quot;') + '">' + s + '</button>';
-    }).join('') + '</div>', 240);
-    bindStarters();
+      }).join('');
+    }
+    add(html + '</div>', 40);
+    promptLibrary('Ask them something else', 240);
   }, 900 + active().length * 850 + 500);
 }
 
-function bindStarters(){
-  thread.querySelectorAll('.sugg button').forEach(function(b){
+/* the library is always one click away, and never the only way in */
+function promptLibrary(title, delay){
+  var el = add('<div class="lib"><div class="lib-h">' + title + '</div>' +
+    PROMPTS.map(function(g){
+      return '<div class="lib-g"><div class="lib-k">' + g.g + '</div><div class="lib-r">' +
+        g.items.map(function(it){
+          return '<button data-s="' + it.t.replace(/"/g,'&quot;') + '">' + it.t +
+            (it.hint ? '<span class="lib-hint">' + it.hint + '</span>' : '') + '</button>';
+        }).join('') + '</div></div>';
+    }).join('') +
+    '<div class="lib-f">Or ask anything — they answer from their own behaviour.</div></div>', delay || 40);
+  el.querySelectorAll('button').forEach(function(b){
     b.onclick = function(){ input.value = b.dataset.s; input.focus(); };
   });
 }
@@ -310,8 +440,8 @@ seg.addEventListener('click', function(e){
   if (mode === 'twin') {
     add('<div class="sys"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
         '<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0"/><circle cx="17.5" cy="9" r="2.4"/></svg></span>' +
-        '<p>You’re now talking to the <b>three digital twins</b> Lumos built. They answer from their own behaviour — paste a line of copy and each will tell you how it lands.</p></div>', 30);
-    input.value = STARTERS[0];
+        '<p>You’re now talking to the <b>three digital twins</b> Lumos built. Ask them anything — about their households, their week, what would move them, or paste a line of copy to test.</p></div>', 30);
+    promptLibrary('Try asking', 220);
   } else {
     add('<div class="sys" style="border-color:var(--line2)"><span class="ic" style="background:var(--lilac3)">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="#6B3C72" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>' +
