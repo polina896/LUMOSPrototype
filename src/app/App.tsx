@@ -10,6 +10,7 @@ import AudienceProfileViewer from './components/AudienceProfileViewer';
 import CompareFlow, { type SavedAudience } from './components/CompareFlow';
 import CreateAudienceFlow from './components/CreateAudienceFlow';
 import LumosMapStage, { type RegionPick } from './components/LumosMapStage';
+import AudienceUniverse from './components/AudienceUniverse';
 import type { ChatRegionPick } from './components/ChatPanel';
 import type { ModuleRef } from './components/ModuleAsk';
 import type { AudienceId } from './audienceData';
@@ -185,6 +186,8 @@ export default function App() {
   // Six charts do not fit a 380px rail — once the evidence lands the chat takes
   // the room and the map drops to roughly a third, still driven from the charts.
   const evidenceOpen = hypothesis === 'validated' || chatMode === 'twin';
+  // before there is a map, the same slot shows the universe being searched
+  const searching = screen === 'planning' || screen === 'clarifying' || screen === 'insights';
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
@@ -242,7 +245,7 @@ export default function App() {
           <div className={`relative flex min-h-0 transition-[width] duration-500 ease-out ${
             navHidden && segmentsIdentified ? 'w-1/2 flex-shrink-0'
               : segmentsIdentified ? (evidenceOpen ? 'flex-1 min-w-0' : 'w-[380px] flex-shrink-0')
-              : 'flex-1'
+              : 'flex-1 min-w-0'
           }`}>
             <button
               onClick={() => setNavHidden((v) => !v)}
@@ -280,6 +283,13 @@ export default function App() {
               wide={navHidden || evidenceOpen}
             />
           </div>
+
+          {/* The universe being searched — the same slot the map will take */}
+          {searching && (
+            <div className="w-[42%] flex-shrink-0 min-w-0 border-l border-[#d3d3d0]">
+              <AudienceUniverse />
+            </div>
+          )}
 
           {/* LumosMap center stage — appears once segments resolve */}
           {segmentsIdentified && !showDataExplorer && (

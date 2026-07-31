@@ -811,7 +811,7 @@ export default function ChatPanel({
 
                   {/* Market summary message */}
                   {(showMarketMessage || isAtOrAfter(screen, 'profiles')) && (
-                    <AIMessage text="Got it — so this is a media planning question, not a demographic profile. Here's the market picture. Bulk and warehouse-club shopping across Western Sydney indexes 38% above the Greater Sydney average, driven by larger households and a drive-to-shop habit. Spend is highly concentrated — the top 25% of big-basket households account for 68% of category value. And North-West growth-corridor households travel 2.4× further than the metro average for a single shop. Three clusters stand out — I'll build the Digital Twin now." />
+                    <AIMessage text="Here's the market picture. Bulk and warehouse-club shopping across Western Sydney indexes 38% above the Greater Sydney average, driven by larger households and a drive-to-shop habit. Spend is highly concentrated — the top 25% of big-basket households account for 68% of category value. And North-West growth-corridor households travel 2.4× further than the metro average for a single shop. Three clusters stand out — I'll build the Digital Twin now." />
                   )}
 
                   {/* 3 stat insight cards — staggered */}
