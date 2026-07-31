@@ -73,17 +73,7 @@
   .ac .see{display:block;margin-top:9px;font-family:var(--disp);font-size:11px;font-weight:700;color:var(--plum2);opacity:0;transition:.15s}
   .ac:hover .see,.ac.focus .see{opacity:1}
 
-  .path{background:#fff;border:1px solid var(--line2);border-radius:18px;padding:22px 24px;margin-bottom:16px}
-  .path h2{font-family:var(--disp);font-size:16px;font-weight:800;margin-bottom:14px;letter-spacing:-.01em}
-  .steps{display:flex;flex-direction:column;gap:0}
-  .step{display:flex;gap:13px;padding-bottom:15px;position:relative}
-  .step:last-child{padding-bottom:0}
-  .step:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:2px;width:1.5px;background:var(--line)}
-  .step .n{width:25px;height:25px;border-radius:50%;background:var(--lilac3);border:1px solid var(--line2);display:grid;place-items:center;flex:0 0 auto;
            font-family:var(--disp);font-size:11px;font-weight:800;color:var(--plum2);z-index:1}
-  .step b{display:block;font-family:var(--disp);font-size:13px;font-weight:700;margin-bottom:3px}
-  .step p{font-size:12.5px;color:var(--ink2);line-height:1.6}
-  .step p b{display:inline;font-family:inherit;font-size:inherit;color:var(--plum)}
   h2.sec{font-family:var(--disp);font-size:15px;font-weight:800;margin:22px 2px 12px}
   h2.sec span{font-weight:600;color:var(--muted);font-size:12.5px;margin-left:8px}
 
@@ -194,10 +184,6 @@
       <div class="acards" id="acards"></div>
     </div>
 
-    <div class="path">
-      <h2>How we got here</h2>
-      <div class="steps" id="steps"></div>
-    </div>
 
     <div class="hyp">
       <div class="k">Hypothesis tested</div>
@@ -456,13 +442,6 @@ var AUDIENCES = [
   { id:'bulk',    seg:'bulk',    c:'#C07A2E', n:'Castle Hill Bulk Buyers', meta:'132k households · index 186',
     p:'Established families buying premium and entertaining lines. Fewest trips, biggest baskets — and most already hold a warehouse membership somewhere else.' }
 ];
-var STEPS = [
-  { t:'The question', p:'Costco is launching in Western Sydney. The brief was not who the customers are in the abstract, but <b>where to reach them</b> — a media planning question.' },
-  { t:'Three clusters emerged', p:'The signal separated into three audiences with distinct shopping behaviour. Marsden Park Stock-Ups was the strongest and the highest value.' },
-  { t:'One catchment was opened', p:'Marsden Park · Riverstone holds <b>45,000</b> of this audience — 12% of the total, ranked #4 of 8 regions, indexing 169 against national.' },
-  { t:'Something did not fit', p:'Its shoppers travelled much further than a grocery audience should. A median of <b>14 km</b> against a metro average of 8.4 km, weighted to weekends.' },
-  { t:'So a hypothesis was formed', p:'That the distance was not a cost they tolerated but a sign of how they shop — a destination trip. Six signals were then tested against a like-for-like baseline.' }
-];
 
 document.getElementById('acards').innerHTML = AUDIENCES.map(function(a){
   return '<button class="ac' + (a.focus ? ' focus' : '') + '" data-a="' + a.id + '">' +
@@ -480,9 +459,6 @@ document.querySelectorAll('.ac').forEach(function(el){
     paintViews();
   };
 });
-document.getElementById('steps').innerHTML = STEPS.map(function(s, i){
-  return '<div class="step"><span class="n">' + (i+1) + '</span><div><b>' + s.t + '</b><p>' + s.p + '</p></div></div>';
-}).join('');
 
 var grid=document.getElementById('evgrid');
 EVIDENCE.forEach(function(ev,i){
