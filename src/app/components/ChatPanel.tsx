@@ -343,12 +343,52 @@ export default function ChatPanel({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new content appears
+  // Keep the newest turn at the TOP of the view, never the bottom, so a long
+  // answer starts where the reader starts. Watching the DOM rather than state
+  // means this covers every kind of turn — a catchment reply, a follow-up, the
+  // hypothesis, six evidence charts — without each one having to opt in.
+  const pinnedTurn = useRef<Element | null>(null);
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [visibleMessages, insightVisibleCount, profilesLoaded, deepDiveLoaded, showInsightsCTA, showProfilesCTA, showDeepDiveCTA, showClarifyCard, showMarketMessage, statCardCount, showAudienceCard, clarifyStep, clarifyAnswers, regionPicks.length, hypothesis, evidenceOnMap, nextTurn]);
+    const c = scrollRef.current;
+    if (!c) return;
+    let timer: number | undefined;
+
+    // An answer lands in pieces, and each piece moves the geometry, so hold the
+    // anchor briefly rather than scrolling once and hoping.
+    const pin = (el: Element) => {
+      window.clearInterval(timer);
+      const until = Date.now() + 2500;
+      const step = () => {
+        const top = el.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 12;
+        c.scrollTo({ top, behavior: 'auto' });
+        if (Date.now() > until) window.clearInterval(timer);
+      };
+      step();
+      timer = window.setInterval(step, 100);
+    };
+
+    const check = () => {
+      const turns = c.querySelectorAll('[data-turn="user"]');
+      const last = turns[turns.length - 1];
+      if (last && last !== pinnedTurn.current) { pinnedTurn.current = last; pin(last); }
+    };
+    check();
+    const mo = new MutationObserver(check);
+    mo.observe(c, { childList: true, subtree: true });
+
+    // the moment the reader takes over, stop moving the page under them
+    const release = () => window.clearInterval(timer);
+    c.addEventListener('wheel', release, { passive: true });
+    c.addEventListener('touchmove', release, { passive: true });
+
+    return () => {
+      mo.disconnect();
+      window.clearInterval(timer);
+      c.removeEventListener('wheel', release);
+      c.removeEventListener('touchmove', release);
+    };
+    // the thread only exists once we leave the blank state, so re-attach then
+  }, [screen === 'blank']);
 
   // ── Effects per screen ──────────────────────────────────────────────────────
 
@@ -1024,6 +1064,10 @@ export default function ChatPanel({
                 </div>
               )}
 
+              {/* Lets the newest turn scroll to the top even when its answer is
+                  shorter than the viewport. Without it the scroll clamps and the
+                  reader lands mid-answer. */}
+              <div aria-hidden className="h-[62vh] flex-shrink-0" />
             </div>
           </div>
 
@@ -1054,7 +1098,7 @@ export default function ChatPanel({
 
 function UserMessage({ text }: { text: string }) {
   return (
-    <div className="flex justify-end mb-6">
+    <div data-turn="user" className="flex justify-end mb-6">
       <div className="max-w-[85%] bg-[#e7e7e7] rounded-tl-xl rounded-tr-xl rounded-bl-xl px-4 py-3">
         <p className="font-['Jua',sans-serif] text-[14px] text-black opacity-70 leading-relaxed">{text}</p>
       </div>
@@ -1423,11 +1467,8 @@ function RegionSummary({ pick, onExplore }: { pick: ChatRegionPick; onExplore?: 
   useEffect(() => {
     setThinking(true);
     setExplored([]); setAnswered(null);
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     const t = window.setTimeout(() => {
       setThinking(false);
-      // the answer is taller than the thinking beat — follow it down
-      window.setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
     }, 850);
     return () => window.clearTimeout(t);
   }, [pick.key]);
