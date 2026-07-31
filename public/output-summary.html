@@ -56,6 +56,34 @@
   .findings li .dot{width:16px;height:16px;border-radius:50%;background:#1F7A4C;display:grid;place-items:center;flex:0 0 auto;margin-top:2px}
   .findings li .dot svg{width:9px;height:9px;stroke:#fff}
 
+  /* the audiences, and the path the analysis actually took */
+  .auds{background:#fff;border:1px solid var(--line2);border-radius:18px;padding:22px 24px;margin-bottom:16px}
+  .auds h2{font-family:var(--disp);font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-.01em}
+  .auds .lede{font-size:13.5px;color:var(--ink2);line-height:1.6;margin-bottom:16px;max-width:64ch}
+  .acards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+  @media (max-width:900px){ .acards{grid-template-columns:1fr} }
+  .ac{position:relative;text-align:left;border:1px solid var(--line2);border-radius:14px;padding:14px 15px 13px;background:#fff;cursor:pointer;transition:.16s}
+  .ac:hover{border-color:var(--violet);box-shadow:0 3px 14px rgba(74,42,110,.09)}
+  .ac.focus{border-color:var(--plum2);background:#FCFAFE}
+  .ac .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+  .ac .nm{font-family:var(--disp);font-size:13.5px;font-weight:700;vertical-align:middle}
+  .ac .meta{font-family:var(--disp);font-size:11px;font-weight:700;color:var(--muted);margin:7px 0 8px}
+  .ac p{font-size:12px;color:var(--ink2);line-height:1.55}
+  .ac .tag{position:absolute;top:12px;right:12px;font-family:var(--disp);font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--lilac);color:var(--plum2);padding:3px 7px;border-radius:5px}
+  .ac .see{display:block;margin-top:9px;font-family:var(--disp);font-size:11px;font-weight:700;color:var(--plum2);opacity:0;transition:.15s}
+  .ac:hover .see,.ac.focus .see{opacity:1}
+
+  .path{background:#fff;border:1px solid var(--line2);border-radius:18px;padding:22px 24px;margin-bottom:16px}
+  .path h2{font-family:var(--disp);font-size:16px;font-weight:800;margin-bottom:14px;letter-spacing:-.01em}
+  .steps{display:flex;flex-direction:column;gap:0}
+  .step{display:flex;gap:13px;padding-bottom:15px;position:relative}
+  .step:last-child{padding-bottom:0}
+  .step:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:2px;width:1.5px;background:var(--line)}
+  .step .n{width:25px;height:25px;border-radius:50%;background:var(--lilac3);border:1px solid var(--line2);display:grid;place-items:center;flex:0 0 auto;
+           font-family:var(--disp);font-size:11px;font-weight:800;color:var(--plum2);z-index:1}
+  .step b{display:block;font-family:var(--disp);font-size:13px;font-weight:700;margin-bottom:3px}
+  .step p{font-size:12.5px;color:var(--ink2);line-height:1.6}
+  .step p b{display:inline;font-family:inherit;font-size:inherit;color:var(--plum)}
   h2.sec{font-family:var(--disp);font-size:15px;font-weight:800;margin:22px 2px 12px}
   h2.sec span{font-weight:600;color:var(--muted);font-size:12.5px;margin-left:8px}
 
@@ -127,14 +155,6 @@
   .tt.show{opacity:1}
   .tt em{display:block;font-style:normal;font-weight:600;color:#C9BEF0;font-size:10.5px;margin-top:2px}
 
-  .next{background:#fff;border:1px solid var(--line2);border-radius:16px;padding:18px 20px;margin-top:18px}
-  .next h2{font-family:var(--disp);font-size:14px;font-weight:800;margin-bottom:12px}
-  .next .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  @media (max-width:720px){ .next .row{grid-template-columns:1fr} }
-  .next a{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1px solid var(--line2);border-radius:11px;text-decoration:none;color:var(--ink);font-family:var(--chat);font-size:13.5px;transition:.15s}
-  .next a:hover{border-color:var(--violet);background:var(--lilac3)}
-  .next a .ic{width:24px;height:24px;border-radius:7px;background:var(--lilac3);display:grid;place-items:center;flex:0 0 auto}
-  .next a .ic svg{width:13px;height:13px;color:var(--plum2)}
   .foot{max-width:1320px;margin:0 auto;padding:0 26px 40px;font-size:11.5px;color:var(--muted2)}
 </style>
 
@@ -168,6 +188,17 @@
       </div>
     </div>
 
+    <div class="auds">
+      <h2>The three audiences</h2>
+      <p class="lede">Location and transaction signal across Greater Sydney separated into three clusters. They shop the same category in very different ways — this analysis follows the strongest.</p>
+      <div class="acards" id="acards"></div>
+    </div>
+
+    <div class="path">
+      <h2>How we got here</h2>
+      <div class="steps" id="steps"></div>
+    </div>
+
     <div class="hyp">
       <div class="k">Hypothesis tested</div>
       <p>Costco’s strongest customers aren’t concentrated around the store — they’re willing to travel 20–30 km because they exhibit <b>destination shopping behaviour</b>.</p>
@@ -182,15 +213,6 @@
     <h2 class="sec">The evidence<span>Click any chart to put it on the map</span></h2>
     <div class="evgrid" id="evgrid"></div>
 
-    <div class="next">
-      <h2>Where this goes next</h2>
-      <div class="row">
-        <a href="#" data-next="ooh"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="11" rx="1.5"/><path d="M8 20h8M12 15v5"/></svg></span>Recommend billboard locations</a>
-        <a href="#" data-next="aud"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0"/><circle cx="17.5" cy="9" r="2.4"/></svg></span>Build a media audience</a>
-        <a href="#" data-next="comp"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4 4-4"/><path d="M3 12h12"/><path d="M17 8l4 4-4 4"/><path d="M21 12H9"/></svg></span>Compare against Sam’s Club</a>
-        <a href="#" data-next="export"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></span>Export an executive summary</a>
-      </div>
-    </div>
   </div>
 
   <div class="mapcol">
@@ -424,6 +446,44 @@ document.getElementById('findings').innerHTML = FINDINGS.map(function(t){
   return '<li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'+t+'</li>';
 }).join('');
 
+/* The audiences, and the reasoning behind picking one — so a reader arrives at
+   the hypothesis the same way the analyst did rather than being handed it. */
+var AUDIENCES = [
+  { id:'stockup', seg:'stockup', c:'#7A4C82', n:'Marsden Park Stock-Ups', meta:'186k households · index 169',
+    focus:true, p:'Affluent families with larger households in the North-West growth corridor. One enormous planned shop, made by car, chained to Bunnings and IKEA on a Saturday morning.' },
+  { id:'value',   seg:'value',   c:'#2F8F63', n:'Parramatta Value Families', meta:'248k households · index 218',
+    p:'Multi-generational households buying for more than one family at a time. Fortnightly, on foot or a short drive, and they switch on unit price rather than brand.' },
+  { id:'bulk',    seg:'bulk',    c:'#C07A2E', n:'Castle Hill Bulk Buyers', meta:'132k households · index 186',
+    p:'Established families buying premium and entertaining lines. Fewest trips, biggest baskets — and most already hold a warehouse membership somewhere else.' }
+];
+var STEPS = [
+  { t:'The question', p:'Costco is launching in Western Sydney. The brief was not who the customers are in the abstract, but <b>where to reach them</b> — a media planning question.' },
+  { t:'Three clusters emerged', p:'The signal separated into three audiences with distinct shopping behaviour. Marsden Park Stock-Ups was the strongest and the highest value.' },
+  { t:'One catchment was opened', p:'Marsden Park · Riverstone holds <b>45,000</b> of this audience — 12% of the total, ranked #4 of 8 regions, indexing 169 against national.' },
+  { t:'Something did not fit', p:'Its shoppers travelled much further than a grocery audience should. A median of <b>14 km</b> against a metro average of 8.4 km, weighted to weekends.' },
+  { t:'So a hypothesis was formed', p:'That the distance was not a cost they tolerated but a sign of how they shop — a destination trip. Six signals were then tested against a like-for-like baseline.' }
+];
+
+document.getElementById('acards').innerHTML = AUDIENCES.map(function(a){
+  return '<button class="ac' + (a.focus ? ' focus' : '') + '" data-a="' + a.id + '">' +
+    (a.focus ? '<span class="tag">In focus</span>' : '') +
+    '<span class="dot" style="background:' + a.c + '"></span><span class="nm">' + a.n + '</span>' +
+    '<div class="meta">' + a.meta + '</div><p>' + a.p + '</p>' +
+    '<span class="see">Show on the map →</span></button>';
+}).join('');
+document.querySelectorAll('.ac').forEach(function(el){
+  el.onclick = function(){
+    var a = AUDIENCES.filter(function(x){ return x.id === el.dataset.a; })[0];
+    document.querySelectorAll('.ac').forEach(function(o){ o.classList.toggle('focus', o === el); });
+    lm.select(a.seg);
+    audience = 'aud-' + ({stockup:'stock', value:'value', bulk:'bulk'})[a.id];
+    paintViews();
+  };
+});
+document.getElementById('steps').innerHTML = STEPS.map(function(s, i){
+  return '<div class="step"><span class="n">' + (i+1) + '</span><div><b>' + s.t + '</b><p>' + s.p + '</p></div></div>';
+}).join('');
+
 var grid=document.getElementById('evgrid');
 EVIDENCE.forEach(function(ev,i){
   var card=document.createElement('div'); card.className='ev'; card.dataset.ev=ev.id;
@@ -440,9 +500,6 @@ EVIDENCE.forEach(function(ev,i){
 });
 
 
-document.querySelectorAll('[data-next]').forEach(function(a){
-  a.onclick=function(e){ e.preventDefault(); alert('Next step: '+a.textContent.trim()+'\n\n(Prototype — this would start the next analysis.)'); };
-});
 
 // the map column sizes from the page layout, so re-measure once it has settled
 // and whenever the column changes size
