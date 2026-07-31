@@ -42,7 +42,8 @@
 
   /* who is in the room — only in twin mode */
   .room{display:none;gap:8px;padding:11px 26px;border-bottom:1px solid var(--twin-line);background:#fff;flex:0 0 auto;overflow-x:auto}
-  .rail.twin .room{display:flex}
+  .rail.twin .room{display:flex;align-items:center}
+  .room-k{font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted2);flex:0 0 auto;margin-right:3px}
   .tw{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 7px;border:1px solid var(--line2);border-radius:99px;background:#fff;white-space:nowrap;cursor:pointer;transition:.15s}
   .tw:hover{border-color:var(--twin)}
   .tw.off{opacity:.42}
@@ -67,8 +68,9 @@
   .reply{border:1px solid var(--line2);background:#fff;border-radius:15px;padding:14px 16px 13px;margin-bottom:11px}
   .reply .rh{display:flex;align-items:center;gap:9px;margin-bottom:9px}
   .reply .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--disp);font-size:10.5px;font-weight:800;flex:0 0 auto}
-  .reply .nm{font-family:var(--disp);font-size:13px;font-weight:700;line-height:1.2}
-  .reply .sub{font-size:10.5px;color:var(--muted);line-height:1.2}
+  .reply .rh > span:not(.av):not(.score){min-width:0}
+  .reply .nm{display:block;font-family:var(--disp);font-size:13px;font-weight:700;line-height:1.25}
+  .reply .sub{display:block;font-size:10.5px;color:var(--muted);line-height:1.25;margin-top:2px}
   .reply .score{margin-left:auto;text-align:right;flex:0 0 auto}
   .reply .score b{font-family:var(--disp);font-size:16px;font-weight:800;line-height:1}
   .reply .score span{display:block;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-top:2px}
@@ -79,15 +81,6 @@
   .reply .why b{color:var(--ink2)}
 
   /* Lumos' read across the room */
-  .synth{border:1px solid var(--twin-line);background:#fff;border-radius:15px;padding:15px 17px;margin-bottom:14px}
-  .synth .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--twin-deep);margin-bottom:8px}
-  .synth p{font-family:var(--chat);font-size:14px;line-height:1.65;color:var(--ink2);margin-bottom:11px}
-  .synth p b{color:var(--twin-deep)}
-  .rw{display:flex;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
-  .rw .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:5px}
-  .rw .who{font-family:var(--disp);font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.02em;margin-bottom:3px}
-  .rw q{font-family:var(--chat);font-size:14px;color:var(--ink);line-height:1.55;quotes:none}
-  .rw .note{font-size:11px;color:var(--muted);margin-top:3px}
 
   .sugg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
   .sugg button{border:1px solid var(--line2);background:#fff;border-radius:10px;padding:9px 13px;font-family:var(--chat);font-size:13px;color:var(--ink);cursor:pointer;transition:.15s;text-align:left}
@@ -197,12 +190,6 @@ var ANSWERS = {
     bulk:{ score:28,
       say:'I already have a membership somewhere else. Cheap isn’t the reason I’d switch — the range is. If you carry things I can’t get at the local shops, say that first.',
       why:'Most already hold a <b>warehouse membership elsewhere</b> · fewest trips, biggest baskets' },
-    read:'The line leans on <b>frequency and price</b> — and only one of the three shops that way. Marsden Park plans a monthly trip around scale, and Castle Hill is a switching argument about range, not cost.',
-    rewrites:[
-      { id:'stockup', who:'For Marsden Park Stock-Ups', line:'One trip. One month sorted. Worth the drive.', note:'Leads on scale and the planned trip, not price' },
-      { id:'value',   who:'For Parramatta Value Families', line:'Compare the unit price. Then compare the trolley.', note:'Gives them the maths they already do' },
-      { id:'bulk',    who:'For Castle Hill Bulk Buyers', line:'The things your local shop doesn’t stock.', note:'A range argument — the reason a member switches' }
-    ]
   },
 
   demographics: {
@@ -326,7 +313,7 @@ function initials(n){ return n.split(/\s+/).slice(0,2).map(function(w){return w[
 function active(){ return TWINS.filter(function(t){ return t.on; }); }
 
 function paintRoom(){
-  room.innerHTML = TWINS.map(function(t){
+  room.innerHTML = '<span class="room-k">Select</span>' + TWINS.map(function(t){
     return '<button class="tw' + (t.on ? '' : ' off') + '" data-t="' + t.id + '">' +
       '<span class="av" style="background:' + t.c + '">' + initials(t.n) + '</span>' +
       '<span><b>' + t.n + '</b><span>' + t.sub + '</span></span></button>';
@@ -335,7 +322,7 @@ function paintRoom(){
     b.onclick = function(){
       var t = TWINS.filter(function(x){ return x.id === b.dataset.t; })[0];
       if (t.on && active().length === 1) return;      // never empty the room
-      t.on = !t.on; paintRoom();
+      t.on = !t.on; paintRoom(); paintMode();   // the header counts who is listening
     };
   });
 }
@@ -388,20 +375,8 @@ function askTwins(text){
   });
 
   setTimeout(function(){
-    var html = '<div class="synth"><div class="k">What Lumos makes of it</div><p>' + A.read + '</p>';
-    if (A.rewrites) {
-      html += A.rewrites.filter(function(r){
-        return TWINS.filter(function(t){ return t.id === r.id; })[0].on;
-      }).map(function(r){
-        var c = TWINS.filter(function(t){ return t.id === r.id; })[0].c;
-        return '<div class="rw"><span class="dot" style="background:' + c + '"></span><div>' +
-          '<div class="who">' + r.who + '</div><q>' + r.line + '</q>' +
-          '<div class="note">' + r.note + '</div></div></div>';
-      }).join('');
-    }
-    add(html + '</div>', 40);
-    promptLibrary('Ask them something else', 240);
-  }, 900 + active().length * 850 + 500);
+    promptLibrary('Ask them something else', 40);
+  }, 900 + active().length * 850 + 400);
 }
 
 /* the library is always one click away, and never the only way in */
