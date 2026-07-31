@@ -87,8 +87,16 @@
   .mapcol .mh b{font-family:var(--disp);font-size:12.5px;font-weight:700}
   .mapcol .mh .hint{margin-left:auto;font-size:11px;color:var(--muted2)}
   #map{flex:1;min-height:0;position:relative}   /* .mapcol is the flex column */
+  /* The map carries no chrome on this page — every control lives below it,
+     so the geography is never covered. Zoom stays, since it acts on the map. */
+  .mapcol .lm-root .filterbar,
+  .mapcol .lm-root .audpanel,
+  .mapcol .lm-root .layers,
+  .mapcol .lm-root .timescale,
+  .mapcol .lm-root .leg{display:none!important}
+  .mapcol .lm-root .lm-xpanel{left:12px;bottom:12px}
   .leaflet-container{background:#E8E6EF;font-family:var(--body)}
-  .views{border-top:1px solid var(--line);background:#FCFBFD;padding:11px 13px;overflow-y:auto;max-height:238px;flex:0 0 auto}
+  .views{border-top:1px solid var(--line);background:#FCFBFD;padding:12px 13px;overflow-y:auto;max-height:300px;flex:0 0 auto}
   .vgrp{margin-bottom:10px}
   .vgrp:last-child{margin-bottom:0}
   .vgrp .k{font-family:var(--disp);font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
@@ -328,10 +336,14 @@ if (window.ResizeObserver) new ResizeObserver(function(){ lm.invalidateSize(); }
   .observe(document.querySelector('.mapcol'));
 
 var VIEWS = [
-  { g:'The audience', items:[
-    { id:'density',  t:'Audience density',        run:function(){ base(); } },
+  { g:'Audiences', items:[
+    { id:'aud-all',   t:'All three',                  run:function(){ lm.showAll(); } },
+    { id:'aud-stock', t:'Marsden Park Stock-Ups',     run:function(){ lm.select('stockup'); } },
+    { id:'aud-value', t:'Parramatta Value Families',  run:function(){ lm.select('value'); } },
+    { id:'aud-bulk',  t:'Castle Hill Bulk Buyers',    run:function(){ lm.select('bulk'); } },
   ]},
   { g:'Layers', items:[
+    { id:'density',  t:'Audience density',        run:function(){ base(); } },
     { id:'poi',      t:'Points of interest',      toggle:'poi' },
     { id:'media',    t:'Advertising locations',   toggle:'media' },
   ]},
@@ -362,11 +374,11 @@ function base(){
   paintViews();
 }
 
-var current = 'density', toggles = {};
+var current = 'density', audience = 'aud-all', toggles = {};
 function paintViews(){
   document.querySelectorAll('#views .chip').forEach(function(c){
     var id = c.dataset.v;
-    c.classList.toggle('on', id === current || !!toggles[id]);
+    c.classList.toggle('on', id === current || id === audience || !!toggles[id]);
   });
 }
 var viewsEl = document.getElementById('views');
@@ -380,6 +392,9 @@ VIEWS.forEach(function(g){ g.items.forEach(function(v){
     if (v.toggle) {                              // layers stack on whatever is shown
       toggles[v.id] = !toggles[v.id];
       lm.setLayerOn(v.toggle, toggles[v.id]);
+    } else if (v.id.indexOf('aud-') === 0) {     // which segments are drawn
+      audience = v.id;
+      v.run();
     } else {
       current = v.id;
       v.run();
