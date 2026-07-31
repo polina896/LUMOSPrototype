@@ -703,7 +703,26 @@ var ROADS={"-33.7135,150.8380>-33.7370,150.9440":"towlEkosw[_D}YhEuBl]sHxy@wBjZo
   }
   var XVIEWS={far:xFar,from:xFrom,before:xBefore,switch:xSwitch,
     when:xWhen, repeat:xRepeat, household:xHousehold,
-    ikea:function(rg){ xBrand(rg,'ikea'); }, bunnings:function(rg){ xBrand(rg,'bunnings'); }};
+    ikea:function(rg){ xBrand(rg,'ikea'); }, bunnings:function(rg){ xBrand(rg,'bunnings'); },
+    stores:function(rg){                      // every big-box destination, together
+      var anchor=catchOf(rg).anchor;
+      ['ikea','bunnings'].forEach(function(kind){
+        var b=BRANDS[kind];
+        b.at.forEach(function(c){
+          L.polyline(curve(c,anchor,0.14,24),{color:b.col,weight:2.2,opacity:.75,className:'lm-inflow'}).addTo(xLayer);
+          L.circleMarker(c,{radius:6.5,color:'#fff',weight:2.4,fillColor:b.col,fillOpacity:1})
+            .bindTooltip(tip(b.label,'Visited by this audience'),{className:'aud-tip',direction:'top'}).addTo(xLayer);
+          L.marker(c,{interactive:false,zIndexOffset:700,
+            icon:L.divIcon({html:'<div class="xbrandlab" style="background:'+b.col+'">'+b.label+'</div>',className:'',iconSize:[1,1],iconAnchor:[0,-17]})}).addTo(xLayer);
+        });
+      });
+      L.circleMarker(anchor,{radius:8,color:'#fff',weight:3,fillColor:'#4A2A6E',fillOpacity:1,interactive:false}).addTo(xLayer);
+      xpanel('<div class="xh">Stores they also visit</div>'
+        + xrow('<span class="xdot" style="background:#0058A3"></span>IKEA', bar(68,'#0058A3'), '41%')
+        + xrow('<span class="xdot" style="background:#0D5257"></span>Bunnings', bar(93,'#0D5257'), '56%')
+        + '<div class="xfoot">Visited in the last 90 days · metro is 12% and 19%</div>');
+      try{ map.flyTo([anchor[0]-0.03,anchor[1]+0.05],10,{duration:.6}); }catch(e){}
+    }};
   function renderExplore(){
     if(xLayer){ try{ map.removeLayer(xLayer); }catch(e){} xLayer=null; }
     var host=document.querySelector('.leg'); if(host) host.style.display=state.explore?'none':'';
@@ -954,6 +973,11 @@ var ROADS={"-33.7135,150.8380>-33.7370,150.9440":"towlEkosw[_D}YhEuBl]sHxy@wBjZo
         setLens: function(signal, when){ if(signal){ var mp={residential:'Residential',daytime:'Daytime',transaction:'Transaction'}; var s=mp[String(signal).toLowerCase()]||signal; try{ setHour(phaseHour(s)); }catch(e){} } },
         destroy: function(){ try{ if(map) map.remove(); }catch(e){} host.innerHTML=''; host.classList.remove('lm-root','lm-open'); },
         invalidateSize: function(){ try{ if(map) map.invalidateSize(); }catch(e){} },
+        focus: function(name){
+          var rg = name ? REGIONS.filter(function(r){ return r.name===name || r.name.indexOf(name)===0; })[0] : null;
+          if(rg) focusRegion(rg);
+          return !!rg;
+        },
         setExplore: function(kind){ setExplore(kind); },
         showHypothesis: function(text){ showHypothesis(text); },
         hideHypothesis: function(){ hideHypothesis(); },
