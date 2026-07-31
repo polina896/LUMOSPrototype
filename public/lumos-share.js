@@ -60,12 +60,7 @@
     "\n.ls-send:disabled{background:#D9D2E2;cursor:not-allowed}",
     "\n.ls-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,10px);background:#211A2E;color:#fff;border-radius:11px;padding:11px 18px;",
     "font-family:'Baloo 2',system-ui,sans-serif;font-size:13px;font-weight:700;box-shadow:0 12px 34px rgba(0,0,0,.3);opacity:0;transition:.25s;z-index:9100;pointer-events:none}",
-    "\n.ls-ribbon{display:flex;align-items:center;gap:10px;padding:9px 26px;background:#F1E9FF;border-bottom:1px solid #E0D4F5;font-family:'Nunito Sans',system-ui,sans-serif}",
-    "\n.ls-ribbon .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Baloo 2',system-ui,sans-serif;font-size:10px;font-weight:800;flex:0 0 auto}",
-    "\n.ls-ribbon b{font-family:'Baloo 2',system-ui,sans-serif;font-size:12.5px;color:#4A2A6E}",
-    "\n.ls-ribbon i{font-style:normal;font-size:11.5px;color:#6B5B85;display:block}",
-    "\n.ls-ribbon .badge{margin-left:auto;font-family:'Baloo 2',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6B3C72;background:#fff;border:1px solid #E0D4F5;padding:4px 10px;border-radius:99px}",
-    "\n.ls-curtain{position:fixed;left:0;right:0;bottom:0;height:78vh;z-index:8000;display:flex;justify-content:center;align-items:flex-end;padding-bottom:7vh;background:linear-gradient(180deg,rgba(247,246,249,0) 0%,rgba(247,246,249,.88) 26%,#F7F6F9 46%)}",
+    "\n.ls-curtain{position:fixed;left:0;right:0;bottom:0;height:58vh;z-index:8000;display:flex;justify-content:center;align-items:flex-end;padding-bottom:5vh;background:linear-gradient(180deg,rgba(247,246,249,0) 0%,rgba(247,246,249,.9) 34%,#F7F6F9 54%)}",
     "\n.ls-gate{width:min(430px,92vw);background:#fff;border:1px solid #E1D9EC;border-radius:18px;box-shadow:0 22px 60px rgba(33,26,46,.22);padding:24px 24px 20px;text-align:center;font-family:'Nunito Sans',system-ui,sans-serif}",
     "\n.ls-gate .lock{width:38px;height:38px;border-radius:12px;background:#F5F0FB;display:grid;place-items:center;margin:0 auto 12px}",
     "\n.ls-gate .lock svg{width:19px;height:19px;stroke:#6B3C72}",
@@ -261,16 +256,6 @@
   }
   var UNLOCK_KEY = 'lumos-shared-unlocked';
 
-  function ribbon(from, unlocked) {
-    var r = document.createElement('div');
-    r.className = 'ls-ribbon';
-    r.innerHTML = '<span class="av" style="background:' + hue(from) + '">' + initials(from) + '</span>' +
-      '<span><b>' + from + '</b> shared this with you<i>Costco — Western Sydney launch · prepared by Lumos</i></span>' +
-      '<span class="badge">' + (unlocked ? 'Full access' : 'Preview') + '</span>';
-    document.body.insertBefore(r, document.body.firstChild);
-    return r;
-  }
-
   function gate(opts) {
     opts = opts || {};
     injectOnce();
@@ -280,7 +265,6 @@
     var already = false;
     try { already = !!localStorage.getItem(UNLOCK_KEY); } catch (e) {}
 
-    var rib = ribbon(from, already);
     if (already) return;                                 // they have already left an email
 
     document.body.classList.add('ls-gated');
@@ -312,7 +296,6 @@
       curtain.style.transition = 'opacity .3s';
       curtain.style.opacity = '0';
       setTimeout(function () { curtain.remove(); }, 320);
-      rib.querySelector('.badge').textContent = 'Full access';
       toast('Unlocked — a copy is on its way to ' + v);
       if (opts.onUnlock) opts.onUnlock(v);
     };
