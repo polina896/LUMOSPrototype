@@ -85,7 +85,7 @@
   .mapcol .mh{display:flex;align-items:center;gap:9px;padding:12px 15px;border-bottom:1px solid var(--line)}
   .mapcol .mh b{font-family:var(--disp);font-size:12.5px;font-weight:700}
   .mapcol .mh .hint{margin-left:auto;font-size:11px;color:var(--muted2)}
-  #map{flex:1;min-height:0}
+  #map{position:absolute;inset:0}   /* the wrapper is position:relative, not a flex container */
   .leaflet-container{background:#E8E6EF;font-family:var(--body)}
   .chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:#FCFBFD}
   .chip{border:1px solid var(--line2);background:#fff;border-radius:99px;padding:5px 11px;font-family:var(--disp);font-size:11px;font-weight:700;color:var(--ink2);cursor:pointer;transition:.15s}
@@ -429,6 +429,13 @@ showOnMap=function(ev){
 document.querySelectorAll('[data-next]').forEach(function(a){
   a.onclick=function(e){ e.preventDefault(); alert('Next step: '+a.textContent.trim()+'\n\n(Prototype — this would start the next analysis.)'); };
 });
+
+// the map column sizes from the page layout, so re-measure once it has settled
+// and whenever the column changes size
+setTimeout(function(){ map.invalidateSize(); }, 0);
+window.addEventListener('load', function(){ map.invalidateSize(); });
+if (window.ResizeObserver) new ResizeObserver(function(){ map.invalidateSize(); })
+  .observe(document.querySelector('.mapcol'));
 
 LumosShare.mount(document.getElementById('shareBtn'), {
   kind:'summary', title:'Costco — Western Sydney launch · Audience findings'
