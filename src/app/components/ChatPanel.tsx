@@ -1921,20 +1921,43 @@ function TemplatePicker({ onSelect }: { onSelect: (id: string) => void }) {
   );
 }
 
-function ProfilesCampaignCTA({ onProceed }: { onProceed: () => void }) {
+// The map is the point of the product, and a wall of text does not tell anyone
+// to touch it. This says what to click and what comes back when you do.
+const MAP_MOVES = [
+  { t: 'Click a catchment', d: 'Marsden Park, Parramatta or Castle Hill — I\u2019ll break down who lives there and what they spend.' },
+  { t: 'Follow the travel lines', d: 'The exact roads they drive to shop — where out-of-home would sit in front of them.' },
+  { t: 'Switch the layers below', d: 'Density by signal, competitor stores, retail and media points across the catchment.' },
+];
+
+function ProfilesCampaignCTA({ onProceed: _onProceed }: { onProceed: () => void }) {
   return (
     <div className="mb-6">
-      <AIMessage text="If you're happy with these, I can create a campaign recommendation off the back of these audiences." />
-      <div className="flex gap-3 mt-3">
-        <button
-          onClick={onProceed}
-          className="px-5 py-2.5 bg-[#732d93] text-white rounded-xl font-['Jua',sans-serif] text-[13px] hover:bg-[#5c2375] transition-colors"
-        >
-          Create campaign recommendations →
-        </button>
-        <button className="px-5 py-2.5 bg-white border border-[#ddd] text-[#555] rounded-xl font-['Jua',sans-serif] text-[13px] hover:bg-gray-50 transition-colors">
-          Refine audiences
-        </button>
+      <AIMessage text="They’re on the map now — have a look at them there. Click into any catchment and I’ll pick up the thread here in the chat." />
+      <div className="mt-3 rounded-2xl border border-[#e0d4ff] bg-gradient-to-br from-[#faf7ff] to-white p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="grid h-6 w-6 place-items-center rounded-lg bg-[#f1e9ff]">
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-[#732d93]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z" /><circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <span className="font-['Jua',sans-serif] text-[13px] text-[#1a1a1a]">Explore them on the map</span>
+          <span className="ml-auto flex items-center gap-1.5 font-['Jua',sans-serif] text-[11px] text-[#9b8ab0]">
+            over here
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 animate-[lumosNudge_1.4s_ease-in-out_infinite] text-[#732d93]" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {MAP_MOVES.map((m) => (
+            <div key={m.t} className="flex gap-2.5">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#b89fc4]" />
+              <p className="font-['Jua',sans-serif] text-[12px] leading-[1.55] text-[#555]">
+                <span className="text-[#1a1a1a]">{m.t}</span> — {m.d}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

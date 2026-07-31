@@ -188,6 +188,20 @@ export default function App() {
   const evidenceOpen = hypothesis === 'validated' || chatMode === 'twin';
   // before there is a map, the same slot shows the universe being searched
   const searching = screen === 'planning' || screen === 'clarifying' || screen === 'insights';
+  // and when the segments land, the universe locks onto them and dissolves into
+  // the map — which has been mounting underneath the whole time, so its tiles
+  // are already in by the time it is uncovered.
+  const [handoff, setHandoff] = useState<'idle' | 'resolve' | 'fade' | 'done'>('idle');
+  useEffect(() => {
+    if (!segmentsIdentified) { setHandoff('idle'); return; }
+    if (handoff !== 'idle') return;
+    setHandoff('resolve');
+    const a = window.setTimeout(() => setHandoff('fade'), 1400);
+    const b = window.setTimeout(() => setHandoff('done'), 2500);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+  }, [segmentsIdentified]);
+  const covering = handoff === 'resolve' || handoff === 'fade';
+  const stageOpen = searching || (segmentsIdentified && !showDataExplorer);
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
@@ -284,27 +298,34 @@ export default function App() {
             />
           </div>
 
-          {/* The universe being searched — the same slot the map will take */}
-          {searching && (
-            <div className="w-[42%] flex-shrink-0 min-w-0 border-l border-[#d3d3d0]">
-              <AudienceUniverse />
-            </div>
-          )}
-
-          {/* LumosMap center stage — appears once segments resolve */}
-          {segmentsIdentified && !showDataExplorer && (
-            <div className={`min-w-0 border-l border-[#d3d3d0] bg-[#EDEBF2] transition-[width] duration-500 ease-out ${
-              navHidden ? 'w-1/2 flex-shrink-0' : evidenceOpen ? 'w-[40%] flex-shrink-0' : 'flex-1'
+          {/* The stage: the universe first, then the map it resolves into */}
+          {stageOpen && (
+            <div className={`relative min-w-0 border-l border-[#d3d3d0] bg-[#2E0A47] transition-[width] duration-700 ease-out ${
+              !segmentsIdentified ? 'w-[42%] flex-shrink-0'
+                : navHidden ? 'w-1/2 flex-shrink-0' : evidenceOpen ? 'w-[40%] flex-shrink-0' : 'flex-1'
             }`}>
-              <LumosMapStage
-                selectedAudienceId={selectedAudienceId}
-                onSelectAudience={setSelectedAudienceId}
-                onPickRegion={handlePickRegion}
-                layerRequest={layerRequest}
-                exploreRequest={exploreRequest}
-                hypothesisPending={hypothesis === 'pending'}
-                onOpenHypothesis={() => setHypothesis('open')}
-              />
+              {segmentsIdentified && !showDataExplorer && (
+                <div className={`h-full bg-[#EDEBF2] transition-opacity duration-[900ms] ease-out ${
+                  handoff === 'resolve' ? 'opacity-0' : 'opacity-100'
+                }`}>
+                  <LumosMapStage
+                    selectedAudienceId={selectedAudienceId}
+                    onSelectAudience={setSelectedAudienceId}
+                    onPickRegion={handlePickRegion}
+                    layerRequest={layerRequest}
+                    exploreRequest={exploreRequest}
+                    hypothesisPending={hypothesis === 'pending'}
+                    onOpenHypothesis={() => setHypothesis('open')}
+                  />
+                </div>
+              )}
+              {(searching || covering) && (
+                <div className={`absolute inset-0 z-20 transition-[opacity,transform] duration-[1000ms] ease-out ${
+                  handoff === 'fade' ? 'pointer-events-none opacity-0 scale-[1.06]' : 'opacity-100 scale-100'
+                }`}>
+                  <AudienceUniverse resolving={covering} />
+                </div>
+              )}
             </div>
           )}
         </>

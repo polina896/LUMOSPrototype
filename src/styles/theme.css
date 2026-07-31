@@ -205,3 +205,10 @@
 }
 .lumos-open-pulse { animation: lumos-open-pulse 2s ease-out infinite; }
 .lumos-open-pulse:hover { animation: none; }
+
+/* A small arrow that keeps leaning toward the map, so "explore it over there"
+   points somewhere rather than sitting still. */
+@keyframes lumosNudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(3px); }
+}
