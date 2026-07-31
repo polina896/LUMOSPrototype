@@ -87,7 +87,7 @@
   .fig-b{padding:0 15px 13px}
   .fig-cap{padding:9px 15px;background:#FCFBFD;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.5}
   .fig-cap b{color:var(--ink2)}
-  .fig.map .fig-b{padding:0;height:340px;position:relative}
+  .fig.map .fig-b{padding:0;height:480px;position:relative}
   .fig.map #docmap{position:absolute;inset:0}
 
   .cards3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin:14px 0}
@@ -343,7 +343,7 @@ var FIGURES = {
         // the document carries a figure, not a control panel
         var css=document.createElement('style');
         css.textContent='.fig.map .lm-root .filterbar,.fig.map .lm-root .audpanel,.fig.map .lm-root .layers,'+
-          '.fig.map .lm-root .timescale,.fig.map .lm-root .leg{display:none!important}';
+          '.fig.map .lm-root .timescale,.fig.map .lm-root .leg,.fig.map .lm-root .infocard{display:none!important}';
         document.head.appendChild(css);
       } catch(e){}
     }, 60);
