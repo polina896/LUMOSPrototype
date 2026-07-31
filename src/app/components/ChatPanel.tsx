@@ -305,6 +305,7 @@ export default function ChatPanel({
   const [nextTurn, setNextTurn] = useState<string | null>(null);
   // Validation is the one moment Lumos is genuinely testing something, so it
   // reasons first and then builds the case a chart at a time.
+  const [opened, setOpened] = useState<{ label: string; url: string }[]>([]);
   const [validateThinking, setValidateThinking] = useState(true);
   const [evidenceShown, setEvidenceShown] = useState(0);
   useEffect(() => {
@@ -1072,7 +1073,9 @@ export default function ChatPanel({
                   {evidenceShown >= 6 && (
                     <div className="lumos-reply-in">
                       <KeyFindings />
-                      <AIMessage text="Would you like me to:" />
+                      <OutputPaths onOpened={(label, url) => setOpened((prev) => [...prev, { label, url }])} />
+                      {opened.map((o, i) => <OpenedNote key={i} label={o.label} url={o.url} />)}
+                      <AIMessage text="Or take it further — would you like me to:" />
                     </div>
                   )}
                   <div className={`grid grid-cols-1 xl:grid-cols-2 gap-2.5 mb-5 ${evidenceShown >= 6 ? 'lumos-reply-in' : 'hidden'}`}>
@@ -1422,6 +1425,80 @@ const SEGMENT_COLOR: Record<string, string> = {
   value: '#2F8F63',
   bulk: '#C07A2E',
 };
+
+// ── Output ────────────────────────────────────────────────────────────────────
+// The analysis ends by being packaged. Both routes open in their own tab so the
+// conversation behind them is never lost.
+
+function OutputPaths({ onOpened }: { onOpened: (label: string, url: string) => void }) {
+  const [pickTemplate, setPickTemplate] = useState(false);
+
+  const open = (url: string, label: string) => {
+    window.open(url, '_blank', 'noopener');
+    onOpened(label, url);
+  };
+
+  return (
+    <div className="my-5">
+      <AIMessage text="That’s the case made. I can package it two ways — both open in their own tab, so you can keep this conversation going." />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 mb-4">
+        <button
+          onClick={() => open('/output-summary.html', 'Findings page')}
+          className="relative text-left rounded-2xl border border-[#e1d9ec] bg-white p-[18px] transition-all hover:border-[#7c4fc7] hover:shadow-[0_4px_18px_rgba(74,42,110,0.10)]"
+        >
+          <span className="absolute top-3.5 right-3.5 rounded-[5px] bg-[#efe8f8] px-1.5 py-[3px] font-['Geist',sans-serif] text-[9px] font-extrabold uppercase tracking-wider text-[#6b3c72]">Interactive</span>
+          <span className="mb-3 grid h-[34px] w-[34px] place-items-center rounded-[11px] bg-[#f5f0fb]">
+            <svg viewBox="0 0 24 24" className="h-[17px] w-[17px] text-[#6b3c72]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z" /><circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <b className="block font-['Geist',sans-serif] text-[15px] font-bold mb-1.5">Summarise into a shareable page</b>
+          <p className="font-['Nunito_Sans',sans-serif] text-[12.5px] leading-relaxed text-[#7e7490]">One page with the findings, the evidence charts and the live map — every chart still clickable. Best for someone who wants to poke at it.</p>
+          <span className="mt-3 inline-flex items-center gap-1.5 font-['Geist',sans-serif] text-[12px] font-bold text-[#6b3c72]">Build the page →</span>
+        </button>
+
+        <button
+          onClick={() => setPickTemplate(true)}
+          className={`relative text-left rounded-2xl border bg-white p-[18px] transition-all hover:border-[#7c4fc7] hover:shadow-[0_4px_18px_rgba(74,42,110,0.10)] ${pickTemplate ? 'border-[#6b3c72]' : 'border-[#e1d9ec]'}`}
+        >
+          <span className="absolute top-3.5 right-3.5 rounded-[5px] bg-[#efe8f8] px-1.5 py-[3px] font-['Geist',sans-serif] text-[9px] font-extrabold uppercase tracking-wider text-[#6b3c72]">Document</span>
+          <span className="mb-3 grid h-[34px] w-[34px] place-items-center rounded-[11px] bg-[#f5f0fb]">
+            <svg viewBox="0 0 24 24" className="h-[17px] w-[17px] text-[#6b3c72]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8M16 17H8" />
+            </svg>
+          </span>
+          <b className="block font-['Geist',sans-serif] text-[15px] font-bold mb-1.5">Generate a templated output</b>
+          <p className="font-['Nunito_Sans',sans-serif] text-[12.5px] leading-relaxed text-[#7e7490]">A structured document — brief, insight report, conquest plan or launch playbook. Best for people who want the conclusion, not the tool.</p>
+          <span className="mt-3 inline-flex items-center gap-1.5 font-['Geist',sans-serif] text-[12px] font-bold text-[#6b3c72]">Pick a template →</span>
+        </button>
+      </div>
+
+      {pickTemplate && (
+        <div className="lumos-reply-in">
+          <TemplatePicker onSelect={(id) => {
+            const t = OUTPUT_TEMPLATES.find((x) => x.id === id);
+            open(`/output-report.html?t=${id}`, t?.title ?? 'Document');
+          }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OpenedNote({ label, url }: { label: string; url: string }) {
+  return (
+    <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-[#BFE3CE] bg-[#F0FAF4] px-3.5 py-3 lumos-reply-in">
+      <span className="grid h-5 w-5 flex-shrink-0 place-items-center rounded-full bg-[#1F7A4C]">
+        <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+      </span>
+      <span className="min-w-0">
+        <b className="block font-['Geist',sans-serif] text-[13px] text-[#123D28]">{label} opened in a new tab</b>
+        <span className="font-['Nunito_Sans',sans-serif] text-[11.5px] text-[#245239]">Share it from the button in the top right of that tab.</span>
+      </span>
+      <a href={url} target="_blank" rel="noopener" className="ml-auto flex-shrink-0 font-['Geist',sans-serif] text-[12px] font-bold text-[#1F7A4C] hover:underline">Open again ↗</a>
+    </div>
+  );
+}
 
 // ── Hypothesis ────────────────────────────────────────────────────────────────
 // The one thing Lumos says unprompted. It never enters the thread on its own:
