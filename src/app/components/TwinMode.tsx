@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // ── Digital twin mode ─────────────────────────────────────────────────────────
 // A second way to interact with the audiences: instead of asking Lumos about
@@ -160,13 +160,36 @@ export function TwinExchange({ question, room }: { question: string; room: strin
   const A = ANSWERS[kind] || ANSWERS.general;
   const here = TWINS.filter((t) => room.includes(t.id));
 
+  // A beat before they answer. Three people reading the same line and reacting
+  // differently takes a moment — landing it instantly reads as canned.
+  const [thinking, setThinking] = useState(true);
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const timers: number[] = [window.setTimeout(() => setThinking(false), 1500)];
+    here.forEach((_, i) => timers.push(window.setTimeout(() => setShown(i + 1), 1500 + i * 320)));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
     <div className="lumos-reply-in">
       <div className="flex justify-end mb-4">
         <span className="max-w-[82%] rounded-xl rounded-br-none border border-[#c7e4ec] bg-white px-3.5 py-2.5 font-['Jua',sans-serif] text-[14px] leading-relaxed text-[#0B3B47]">{question}</span>
       </div>
 
-      <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-dashed border-[#c7e4ec] bg-white px-3.5 py-2.5">
+      {thinking && (
+        <div className="mb-5 flex items-center gap-2.5">
+          <div className="flex gap-1">
+            {[0, 150, 300].map((d) => (
+              <div key={d} className="h-2 w-2 animate-bounce rounded-full bg-[#0E7490]" style={{ animationDelay: `${d}ms` }} />
+            ))}
+          </div>
+          <span className="font-['Jua',sans-serif] text-[14px] italic text-[#7e9aa3]">
+            Putting it to {here.length === 1 ? here[0].n : `${here.length} twins`} — reading it against how each of them actually shops…
+          </span>
+        </div>
+      )}
+
+      <div className={`mb-4 flex items-center gap-2.5 rounded-xl border border-dashed border-[#c7e4ec] bg-white px-3.5 py-2.5 ${thinking ? 'hidden' : 'lumos-reply-in'}`}>
         <span className="grid h-[22px] w-[22px] flex-shrink-0 place-items-center rounded-[7px] bg-[#F0F9FB]">
           <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="#0E7490" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
         </span>
@@ -175,12 +198,12 @@ export function TwinExchange({ question, room }: { question: string; room: strin
         </p>
       </div>
 
-      {here.map((t) => {
+      {here.slice(0, shown).map((t) => {
         const a = (A as unknown as Record<string, Answer>)[t.id];
         if (!a) return null;
         const scored = A.scored && typeof a.score === 'number';
         return (
-          <div key={t.id} className="mb-3 rounded-[15px] border border-[#e1d9ec] bg-white px-4 pb-3 pt-3.5">
+          <div key={t.id} className="lumos-reply-in mb-3 rounded-[15px] border border-[#e1d9ec] bg-white px-4 pb-3 pt-3.5">
             <div className="mb-2.5 flex items-center gap-2.5">
               <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-full font-['Geist',sans-serif] text-[10.5px] font-extrabold text-white" style={{ background: t.c }}>
                 {initials(t.n)}

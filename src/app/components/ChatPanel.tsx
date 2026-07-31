@@ -721,6 +721,10 @@ export default function ChatPanel({
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 flex flex-col">
             <div className={`w-full my-auto pb-8 space-y-0 ${hypothesis === 'validated' ? 'max-w-none' : 'max-w-[700px]'}`}>
 
+              {/* The analysis lives in Ask Lumos. Twin mode is its own conversation,
+                  so the thread behind it steps out of the way rather than being
+                  scrolled past. */}
+              <div className={chatMode === 'twin' ? 'hidden' : ''}>
               {/* ── Brief user message ── */}
               {entryMode === 'brief' && (
                 <UserMessage text="I'm launching Costco in Western Sydney and want to understand who our ideal customers are, so we know where to advertise." />
@@ -1113,7 +1117,9 @@ export default function ChatPanel({
                 </>
               )}
 
-              {/* Talking to the twins — appended as its own run of the conversation */}
+              </div>
+
+              {/* Talking to the twins — its own conversation, not a continuation */}
               {chatMode === 'twin' && (
                 <div className="lumos-reply-in">
                   <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-dashed border-[#c7e4ec] bg-white px-3.5 py-2.5">

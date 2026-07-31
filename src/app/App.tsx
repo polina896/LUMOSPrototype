@@ -92,6 +92,8 @@ export default function App() {
   const [evidenceOnMap, setEvidenceOnMap] = useState<string | null>(null);
   // twin mode needs the same room the evidence does — three replies side by side
   const [chatMode, setChatMode] = useState<'lumos' | 'twin'>('lumos');
+  // hiding the nav gives the analysis the whole screen, split evenly
+  const [navHidden, setNavHidden] = useState(false);
   // The hypothesis is drawn from the distance and origin answers, so it surfaces
   // once the user has actually seen two of them — never on a timer alone.
   const [hypothesis, setHypothesis] = useState<'idle' | 'pending' | 'open' | 'validated' | 'dismissed'>('idle');
@@ -186,7 +188,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
-      <Sidebar
+      {!navHidden && <Sidebar
         showDataExplorer={showDataExplorer}
         onToggleDataExplorer={() => { setShowDataExplorer((v) => !v); setShowAudiences(false); setShowDocuments(false); setCompareActive(false); setCreateAudienceActive(false); closeDeepDive(); }}
         showAudiences={showAudiences}
@@ -204,7 +206,7 @@ export default function App() {
         recentAnalyses={recentAnalyses}
         activeAnalysisId={activeAnalysisId}
         onSelectAnalysis={(id) => setActiveAnalysisId(id)}
-      />
+      />}
 
       {/* Main content area */}
       {createAudienceActive ? (
@@ -237,9 +239,20 @@ export default function App() {
       ) : (
         <>
           {/* Chat — full width until segments are identified, then a slim left rail */}
-          <div className={`flex min-h-0 transition-[width] duration-500 ease-out ${
-            segmentsIdentified ? (evidenceOpen ? 'flex-1 min-w-0' : 'w-[380px] flex-shrink-0') : 'flex-1'
+          <div className={`relative flex min-h-0 transition-[width] duration-500 ease-out ${
+            navHidden && segmentsIdentified ? 'w-1/2 flex-shrink-0'
+              : segmentsIdentified ? (evidenceOpen ? 'flex-1 min-w-0' : 'w-[380px] flex-shrink-0')
+              : 'flex-1'
           }`}>
+            <button
+              onClick={() => setNavHidden((v) => !v)}
+              title={navHidden ? 'Show navigation' : 'Hide navigation'}
+              className={`absolute top-1/2 z-40 grid h-9 w-6 -translate-y-1/2 place-items-center rounded-md border border-[#e1d9ec] bg-white text-[#7e7490] shadow-sm transition-all hover:border-[#7c4fc7] hover:text-[#6b3c72] ${navHidden ? 'left-1.5' : '-left-3'}`}
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {navHidden ? <path d="M9 6l6 6-6 6" /> : <path d="M15 6l-6 6 6 6" />}
+              </svg>
+            </button>
             <ChatPanel
               screen={screen}
               setScreen={setScreen}
@@ -270,7 +283,7 @@ export default function App() {
           {/* LumosMap center stage — appears once segments resolve */}
           {segmentsIdentified && !showDataExplorer && (
             <div className={`min-w-0 border-l border-[#d3d3d0] bg-[#EDEBF2] transition-[width] duration-500 ease-out ${
-              evidenceOpen ? 'w-[40%] flex-shrink-0' : 'flex-1'
+              navHidden ? 'w-1/2 flex-shrink-0' : evidenceOpen ? 'w-[40%] flex-shrink-0' : 'flex-1'
             }`}>
               <LumosMapStage
                 selectedAudienceId={selectedAudienceId}
