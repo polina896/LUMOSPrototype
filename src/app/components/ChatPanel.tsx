@@ -215,6 +215,8 @@ interface ChatPanelProps {
   evidenceOnMap?: string | null;
   onEvidenceShowOnMap?: (id: string) => void;
   onChatModeChange?: (mode: 'lumos' | 'twin') => void;
+  // the panel is wide — let the content use it rather than sitting in a column
+  wide?: boolean;
 }
 
 // A catchment the user clicked on the map. The chat answers it in a sentence
@@ -303,6 +305,7 @@ export default function ChatPanel({
   evidenceOnMap = null,
   onEvidenceShowOnMap,
   onChatModeChange,
+  wide = false,
 }: ChatPanelProps) {
   // which next step the reader picked once the evidence is in
   const [nextTurn, setNextTurn] = useState<string | null>(null);
@@ -719,7 +722,7 @@ export default function ChatPanel({
       {screen !== 'blank' && (
         <div className="flex-1 flex flex-col min-h-0">
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 flex flex-col">
-            <div className={`w-full my-auto pb-8 space-y-0 ${hypothesis === 'validated' ? 'max-w-none' : 'max-w-[700px]'}`}>
+            <div className={`w-full my-auto pb-8 space-y-0 ${wide || hypothesis === 'validated' ? 'max-w-none' : 'max-w-[700px]'}`}>
 
               {/* The analysis lives in Ask Lumos. Twin mode is its own conversation,
                   so the thread behind it steps out of the way rather than being
@@ -1158,7 +1161,7 @@ export default function ChatPanel({
 
           {/* Input bar */}
           <div className={`px-8 py-5 border-t transition-colors ${chatMode === 'twin' ? 'border-[#c7e4ec] bg-[#F0F9FB]' : 'border-gray-200'}`}>
-            <div className={hypothesis === 'validated' ? '' : 'max-w-[700px]'}>
+            <div className={wide || hypothesis === 'validated' ? '' : 'max-w-[700px]'}>
               {chatMode === 'twin' && <TwinRoom room={twinRoom} onToggle={(id) => setTwinRoom((prev) => (
                 prev.includes(id) ? (prev.length > 1 ? prev.filter((x) => x !== id) : prev) : [...prev, id]
               ))} />}

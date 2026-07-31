@@ -277,6 +277,7 @@ export default function App() {
               evidenceOnMap={evidenceOnMap}
               onEvidenceShowOnMap={(id) => { setEvidenceOnMap(id); requestExplore(id); }}
               onChatModeChange={setChatMode}
+              wide={navHidden || evidenceOpen}
             />
           </div>
 
