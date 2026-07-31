@@ -1658,12 +1658,13 @@ function RegionSummary({ pick, onExplore }: { pick: ChatRegionPick; onExplore?: 
   // Land the reply the way a live answer arrives: the source chip first, a
   // beat of thinking, then the words.
   const [thinking, setThinking] = useState(true);
-  const [explored, setExplored] = useState<ExploreId[]>([]);
-  const [answered, setAnswered] = useState<ExploreId | null>(null);
+  // Answers accumulate in the order they were asked, and the questions follow
+  // them down — so having read one, the others are still in front of you.
+  const [asked, setAsked] = useState<ExploreId[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setThinking(true);
-    setExplored([]); setAnswered(null);
+    setAsked([]);
     const t = window.setTimeout(() => {
       setThinking(false);
     }, 850);
@@ -1718,23 +1719,30 @@ function RegionSummary({ pick, onExplore }: { pick: ChatRegionPick; onExplore?: 
           <div className="space-y-2">
             <AIMessage text="Interesting. These customers travel significantly further than average." />
             <p className="font-['Jua',sans-serif] text-[15px] text-[#140934] leading-relaxed pb-1">Would you like to understand:</p>
-            {EXPLORATIONS.map((item) => (
+
+            {asked.map((id) => {
+              const e = EXPLORATIONS.find((x) => x.id === id)!;
+              return (
+                <div key={id} className="pb-1 lumos-reply-in">
+                  <UserMessage text={e.q} />
+                  <AIMessage text={e.a} />
+                </div>
+              );
+            })}
+
+            {asked.length > 0 && asked.length < EXPLORATIONS.length && (
+              <p className="font-['Jua',sans-serif] text-[14px] text-[#7e7490] leading-relaxed pt-1 pb-0.5">There’s more here — you can also ask:</p>
+            )}
+            {EXPLORATIONS.filter((item) => !asked.includes(item.id)).map((item) => (
               <ExploreButton
                 key={item.id}
                 item={item}
-                active={explored.includes(item.id)}
-                onPick={() => {
-                  if (!explored.includes(item.id)) setExplored((prev) => [...prev, item.id]);
-                  setAnswered(item.id);
-                  onExplore?.(item.id);
-                }}
+                active={false}
+                onPick={() => { setAsked((prev) => [...prev, item.id]); onExplore?.(item.id); }}
               />
             ))}
-            {answered && (
-              <div className="pt-3 lumos-reply-in">
-                <UserMessage text={EXPLORATIONS.find((e) => e.id === answered)!.q} />
-                <AIMessage text={EXPLORATIONS.find((e) => e.id === answered)!.a} />
-              </div>
+            {asked.length === EXPLORATIONS.length && (
+              <p className="font-['Jua',sans-serif] text-[14px] text-[#7e7490] leading-relaxed pt-1">That’s all four — ask me anything else about them below.</p>
             )}
           </div>
         </div>
