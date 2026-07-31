@@ -90,6 +90,8 @@ export default function App() {
   const [exploreRequest, setExploreRequest] = useState<{ kind: string; n: number } | null>(null);
   // which validation chart is currently on the map
   const [evidenceOnMap, setEvidenceOnMap] = useState<string | null>(null);
+  // twin mode needs the same room the evidence does — three replies side by side
+  const [chatMode, setChatMode] = useState<'lumos' | 'twin'>('lumos');
   // The hypothesis is drawn from the distance and origin answers, so it surfaces
   // once the user has actually seen two of them — never on a timer alone.
   const [hypothesis, setHypothesis] = useState<'idle' | 'pending' | 'open' | 'validated' | 'dismissed'>('idle');
@@ -180,7 +182,7 @@ export default function App() {
   const segmentsIdentified = screen === 'profiles' || screen === 'deep-dive';
   // Six charts do not fit a 380px rail — once the evidence lands the chat takes
   // the room and the map drops to roughly a third, still driven from the charts.
-  const evidenceOpen = hypothesis === 'validated';
+  const evidenceOpen = hypothesis === 'validated' || chatMode === 'twin';
 
   return (
     <div className="flex h-screen bg-[#fafaf9] overflow-hidden">
@@ -261,6 +263,7 @@ export default function App() {
               onValidateHypothesis={() => setHypothesis('validated')}
               evidenceOnMap={evidenceOnMap}
               onEvidenceShowOnMap={(id) => { setEvidenceOnMap(id); requestExplore(id); }}
+              onChatModeChange={setChatMode}
             />
           </div>
 

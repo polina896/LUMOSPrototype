@@ -16,6 +16,7 @@ import { AUDIENCES } from '../audienceData';
 import type { AudienceId } from '../audienceData';
 import AudienceListCard from './AudienceListCard';
 import { EvidenceGrid, KeyFindings, NEXT_TURNS } from './EvidenceCharts';
+import { TWINS, TwinRoom, TwinExchange, PromptLibrary, TwinComposer } from './TwinMode';
 
 // ─── Audience library ─────────────────────────────────────────────────────────
 
@@ -213,6 +214,7 @@ interface ChatPanelProps {
   onValidateHypothesis?: () => void;
   evidenceOnMap?: string | null;
   onEvidenceShowOnMap?: (id: string) => void;
+  onChatModeChange?: (mode: 'lumos' | 'twin') => void;
 }
 
 // A catchment the user clicked on the map. The chat answers it in a sentence
@@ -300,12 +302,20 @@ export default function ChatPanel({
   onValidateHypothesis,
   evidenceOnMap = null,
   onEvidenceShowOnMap,
+  onChatModeChange,
 }: ChatPanelProps) {
   // which next step the reader picked once the evidence is in
   const [nextTurn, setNextTurn] = useState<string | null>(null);
   // Validation is the one moment Lumos is genuinely testing something, so it
   // reasons first and then builds the case a chart at a time.
   const [opened, setOpened] = useState<{ label: string; url: string }[]>([]);
+  // Talking to the audiences rather than about them — a second mode, available
+  // once they exist, that changes the footing without becoming another product.
+  const [chatMode, setChatMode] = useState<'lumos' | 'twin'>('lumos');
+  const [twinRoom, setTwinRoom] = useState<string[]>(TWINS.map((t) => t.id));
+  const [twinTurns, setTwinTurns] = useState<{ q: string; room: string[] }[]>([]);
+  const [twinSeed, setTwinSeed] = useState('');
+  const twinsAvailable = isAtOrAfter(screen, 'profiles');
   const [validateThinking, setValidateThinking] = useState(true);
   const [evidenceShown, setEvidenceShown] = useState(0);
   useEffect(() => {
@@ -592,7 +602,7 @@ export default function ChatPanel({
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className={`flex-1 flex flex-col transition-colors ${chatMode === 'twin' ? 'bg-[#F0F9FB]' : 'bg-white'}`}>
 
       {/* ════════ BLANK STATE ════════ */}
       {screen === 'blank' && (
@@ -1103,6 +1113,25 @@ export default function ChatPanel({
                 </>
               )}
 
+              {/* Talking to the twins — appended as its own run of the conversation */}
+              {chatMode === 'twin' && (
+                <div className="lumos-reply-in">
+                  <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-dashed border-[#c7e4ec] bg-white px-3.5 py-2.5">
+                    <span className="grid h-[22px] w-[22px] flex-shrink-0 place-items-center rounded-[7px] bg-[#F0F9FB]">
+                      <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="#0E7490" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3.2" /><path d="M3 20a6 6 0 0112 0" /><circle cx="17.5" cy="9" r="2.4" /></svg>
+                    </span>
+                    <p className="font-['Nunito_Sans',sans-serif] text-[12.5px] leading-relaxed text-[#4a3e5c]">
+                      You’re now talking to the <b className="text-[#0B5A70]">three digital twins</b> Lumos built. Ask them anything — about their households, their week, what would move them, or paste a line of copy to test.
+                    </p>
+                  </div>
+                  {twinTurns.map((t, i) => <TwinExchange key={i} question={t.q} room={t.room} />)}
+                  <PromptLibrary
+                    title={twinTurns.length ? 'Ask them something else' : 'Try asking'}
+                    onPick={(t) => setTwinSeed(t)}
+                  />
+                </div>
+              )}
+
               {/* Clarify widget — flows inline with the conversation it belongs to */}
               {screen === 'clarifying' && showClarifyCard && !clarifySubmitted && (
                 <div className="pt-1">
@@ -1122,20 +1151,55 @@ export default function ChatPanel({
           </div>
 
           {/* Input bar */}
-          <div className="px-8 py-5 border-t border-gray-200">
+          <div className={`px-8 py-5 border-t transition-colors ${chatMode === 'twin' ? 'border-[#c7e4ec] bg-[#F0F9FB]' : 'border-gray-200'}`}>
             <div className={hypothesis === 'validated' ? '' : 'max-w-[700px]'}>
+              {chatMode === 'twin' && <TwinRoom room={twinRoom} onToggle={(id) => setTwinRoom((prev) => (
+                prev.includes(id) ? (prev.length > 1 ? prev.filter((x) => x !== id) : prev) : [...prev, id]
+              ))} />}
+
+              <div className="mb-2.5 flex items-center gap-2">
+                <div className="inline-flex gap-[3px] rounded-xl border border-[#e1d9ec] bg-[#f4f2f7] p-[3px]">
+                  {([['lumos', 'Ask Lumos'], ['twin', 'Ask the twins']] as const).map(([m, label]) => (
+                    <button
+                      key={m}
+                      disabled={m === 'twin' && !twinsAvailable}
+                      onClick={() => { setChatMode(m); onChatModeChange?.(m); }}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-['Geist',sans-serif] text-[12px] font-bold transition-all disabled:cursor-not-allowed disabled:opacity-45 ${
+                        chatMode === m
+                          ? `bg-white shadow-sm ${m === 'twin' ? 'text-[#0B5A70]' : 'text-[#6b3c72]'}`
+                          : 'text-[#7e7490]'
+                      }`}
+                    >
+                      {m === 'lumos' ? (
+                        <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z" /></svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3.2" /><path d="M3 20a6 6 0 0112 0" /><circle cx="17.5" cy="9" r="2.4" /></svg>
+                      )}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {!twinsAvailable && (
+                  <span className="font-['Nunito_Sans',sans-serif] text-[11.5px] text-[#a79fb6]">Available once audiences are identified</span>
+                )}
+              </div>
+
               {hypothesis === 'pending' && (
                 <HypothesisDock
                   onOpen={() => onOpenHypothesis?.()}
                   onDismiss={() => onDismissHypothesis?.()}
                 />
               )}
-              <InputBar
-                placeholder="Reply to Lumos"
-                contextRefs={chatContext}
-                onRemoveContext={onRemoveChatContext}
-                onClearContext={onClearChatContext}
-              />
+              {chatMode === 'twin' ? (
+                <TwinComposer key={twinSeed} seed={twinSeed} onSend={(q) => { setTwinSeed(''); setTwinTurns((prev) => [...prev, { q, room: twinRoom }]); }} />
+              ) : (
+                <InputBar
+                  placeholder="Reply to Lumos"
+                  contextRefs={chatContext}
+                  onRemoveContext={onRemoveChatContext}
+                  onClearContext={onClearChatContext}
+                />
+              )}
             </div>
           </div>
         </div>
