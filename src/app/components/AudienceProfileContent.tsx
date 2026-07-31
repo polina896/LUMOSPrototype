@@ -27,7 +27,7 @@ export function GlobalFilterBar() {
     <div className="flex items-center gap-2 flex-wrap">
       <FilterPill label="Date" value="Jan–Mar 2026" />
       <FilterPill label="Geography" value="Greater Sydney" />
-      <FilterPill label="Indexed vs" value="National average" />
+      <FilterPill label="Indexed vs" value="Greater Sydney average" />
       <FilterPill label="Compare" value="vs previous quarter" />
       <div className="ml-auto flex items-center gap-px border border-[#e5e5e2] rounded-[8px] overflow-hidden bg-white">
         {['Index', '%', 'Count'].map((t) => (
@@ -40,7 +40,8 @@ export function GlobalFilterBar() {
 
 // ── AI Takeaway hero ────────────────────────────────────────────────────────
 
-function TakeawayHero() {
+function TakeawayHero({ audience }: { audience?: string }) {
+  const who = audience ?? 'These households';
   return (
     <div className="rounded-[14px] border border-[#bebde7] relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #f7f1ff 0%, #fbfaff 100%)' }}>
       <div className="p-5 flex flex-col gap-3">
@@ -55,30 +56,31 @@ function TakeawayHero() {
 
         {/* Headline */}
         <p className="font-['Jua',sans-serif] text-[20px] text-[#1a1a1a] leading-[26px] font-normal">
-          Affluent mid-career professionals who over-index across premium automotive, financial services and aspirational lifestyle brands.
+          Large, car-owning households who shop in bulk, plan the trip, and will drive past three supermarkets to buy on unit price.
         </p>
 
         {/* Body copy */}
         <p className="font-['Jua',sans-serif] text-[13px] text-[#6b6b6b] leading-[20.8px] font-normal">
-          Urban Upgrade Drivers over-index highest on{' '}
-          <span className="text-[#1a1a1a]">premium vehicle brands (2.1×)</span> and{' '}
-          <span className="text-[#1a1a1a]">financial services (1.8×)</span>, with an average household income of{' '}
-          <span className="text-[#1a1a1a]">$148k</span> and 72% of spend in-person. They skew{' '}
-          <span className="text-[#1a1a1a]">professional (1.6×)</span> and slightly male (58%), and concentrate in the{' '}
-          <span className="text-[#1a1a1a]">$120–200k</span> household band. Their strongest brand affinities are{' '}
-          <span className="text-[#1a1a1a]">CarousellAuto (2.4×)</span>,{' '}
-          <span className="text-[#1a1a1a]">BMW (2.0×)</span> and{' '}
-          <span className="text-[#1a1a1a]">Mercedes-Benz (1.9×)</span>.
+          {who} over-index highest on{' '}
+          <span className="text-[#1a1a1a]">bulk grocery &amp; pantry (2.6×)</span> and{' '}
+          <span className="text-[#1a1a1a]">household consumables (2.3×)</span>, with an average household income of{' '}
+          <span className="text-[#1a1a1a]">$131k</span> and 88% of spend in-store. Households run{' '}
+          <span className="text-[#1a1a1a]">3.8 people (1.7×)</span> and{' '}
+          <span className="text-[#1a1a1a]">74% own their home</span>, concentrated in the{' '}
+          <span className="text-[#1a1a1a]">$120–200k</span> band. Their strongest brand affinities are{' '}
+          <span className="text-[#1a1a1a]">Bunnings (2.4×)</span>,{' '}
+          <span className="text-[#1a1a1a]">IKEA (2.1×)</span> and{' '}
+          <span className="text-[#1a1a1a]">Aldi (1.9×)</span> — all big-format, all drive-to.
         </p>
 
         {/* Dashed divider + stats row */}
         <div className="border-t border-dashed border-[#bebde7] pt-4">
           <div className="flex items-start justify-between gap-4">
             {[
-              { value: '387k', label: 'People' },
-              { value: '2.1×', label: 'Index vs national' },
-              { value: '$148k', label: 'Avg HHI' },
-              { value: '2.4×', label: 'Auto interest' },
+              { value: '387k', label: 'Households' },
+              { value: '2.6×', label: 'Index vs Sydney' },
+              { value: '$131k', label: 'Avg HHI' },
+              { value: '$312', label: 'Avg basket' },
             ].map((s) => (
               <div key={s.label} className="flex flex-col gap-0.5">
                 <span className="font-['Jua',sans-serif] text-[18px] text-[#6b3c72] leading-[27px] font-normal">{s.value}</span>
@@ -124,7 +126,7 @@ export default function AudienceProfileContent({
   return (
     <div className="flex flex-col gap-[14px]">
       <GlobalFilterBar />
-      <TakeawayHero />
+      <TakeawayHero audience={audience} />
       {/* Companion map — colours by who lives there; income & lifestage rows two-way link to it. */}
       <ProfileMapHero audience={audience} onAskGraph={onAskGraph} />
       <ProfileAreaDossier audience={audience} onAskGraph={onAskGraph} />

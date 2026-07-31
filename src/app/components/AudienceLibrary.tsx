@@ -398,7 +398,7 @@ export default function AudienceLibrary({ onSelectAudience, onCreateAudience, sa
           {/* Slim app bar */}
           <div className="flex items-center justify-between px-[18px] py-[11px] border-b border-[#F2F0EC]">
             <div className="flex items-center gap-2 text-[13.5px] font-medium text-[#262329]">
-              <span className="w-[22px] h-[22px] rounded-[6px] bg-[#1D9E75] text-white text-[10px] font-bold flex items-center justify-center flex-none">MM</span>
+              <span className="w-[22px] h-[22px] rounded-[6px] bg-[#E31837] text-white text-[10px] font-bold flex items-center justify-center flex-none">CA</span>
               Costco Australia
               <span className="text-[#A6A2AA] text-[10px]">▾</span>
             </div>

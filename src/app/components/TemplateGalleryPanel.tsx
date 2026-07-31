@@ -91,7 +91,7 @@ const MY_TEMPLATES: Template[] = [
   },
   {
     id: 'm2',
-    title: 'EV Segment Playbook',
+    title: 'Unit-Price Switcher Playbook',
     description: 'Activation playbook for value-seeking household segments with unit-price messaging angles.',
     sections: 3,
     icon: <Layers className="w-4 h-4 text-[#6b3c72]" />,

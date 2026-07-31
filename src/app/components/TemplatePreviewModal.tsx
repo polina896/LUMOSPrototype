@@ -32,9 +32,9 @@ function AudienceStrategyPreview() {
         <p className="font-['Jua',sans-serif] text-[9px] uppercase tracking-[0.8px] text-[#9a9a9a] mb-2">Top Audiences by Reach</p>
         <div className="flex flex-col gap-2">
           {[
-            { label: 'Affluent Professionals', pct: 35, color: '#2d7a4f', bg: '#e8f4ec' },
-            { label: 'Tech-savvy Families',    pct: 28, color: '#3457a6', bg: '#eaf0fb' },
-            { label: 'Expat Executives',       pct: 22, color: '#a05c10', bg: '#fef3e2' },
+            { label: 'Marsden Park Stock-Ups',  pct: 35, color: '#2d7a4f', bg: '#e8f4ec' },
+            { label: 'Parramatta Value Families', pct: 28, color: '#3457a6', bg: '#eaf0fb' },
+            { label: 'Castle Hill Bulk Buyers',  pct: 22, color: '#a05c10', bg: '#fef3e2' },
           ].map((a) => (
             <div key={a.label} className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full shrink-0" style={{ background: a.color }} />
@@ -53,8 +53,8 @@ function AudienceStrategyPreview() {
         <p className="font-['Jua',sans-serif] text-[9px] uppercase tracking-[0.8px] text-[#9a9a9a] mb-2">Growth Audiences</p>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { name: 'Young Entrepreneurs', growth: '+28% YoY', note: 'New wealth, tech sector' },
-            { name: 'Sustainability Millennials', growth: '+41% YoY', note: 'EV interest, D15–16' },
+            { name: 'New-Build Movers', growth: '+38% YoY', note: 'North-West growth corridor' },
+            { name: 'Unit-Price Switchers', growth: '+24% YoY', note: 'Aldi cross-shoppers, metro-wide' },
           ].map((g) => (
             <div key={g.name} className="bg-[#fafaf9] border border-[#e5e5e2] rounded-lg p-2.5">
               <p className="font-['Jua',sans-serif] text-[11px] text-[#1a1a1a] mb-0.5">{g.name}</p>
@@ -69,9 +69,9 @@ function AudienceStrategyPreview() {
       <div>
         <p className="font-['Jua',sans-serif] text-[9px] uppercase tracking-[0.8px] text-[#9a9a9a] mb-2">Campaign Recommendations</p>
         <div className="bg-[#fafaf9] border border-[#e5e5e2] rounded-lg p-3 flex flex-col gap-1.5">
-          <p className="font-['Jua',sans-serif] text-[11px] text-[#6b3c72]">Affluent Professionals</p>
-          <p className="font-['Jua',sans-serif] text-[11px] text-[#333] leading-[16px]">Msg: Engineering meets legacy — for those who've earned the right to expect both.</p>
-          <p className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a]">Channels: OOH D9–11 (40%), Digital (30%), Events (20%), Press (10%)</p>
+          <p className="font-['Jua',sans-serif] text-[11px] text-[#6b3c72]">Marsden Park Stock-Ups</p>
+          <p className="font-['Jua',sans-serif] text-[11px] text-[#333] leading-[16px]">Msg: One trip, month sorted — now open where you already drive.</p>
+          <p className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a]">Channels: Roadside OOH M7 (45%), BVOD (25%), Social (20%), Catalogue (10%)</p>
         </div>
       </div>
     </div>
@@ -80,9 +80,9 @@ function AudienceStrategyPreview() {
 
 function MessagingMatrixPreview() {
   const rows = [
-    { segment: 'Affluent Professionals', angle: 'Engineering meets legacy', proof: 'Award-winning performance credentials', tone: 'Authoritative, aspirational' },
-    { segment: 'Parramatta Value Families', angle: 'Better by the unit',     proof: 'Unit-price comparison vs. rivals',    tone: 'Direct, practical' },
-    { segment: 'Family SUV Upgraders',   angle: 'Every journey, considered', proof: '5-star safety, 7-seat versatility',   tone: 'Warm, reassuring' },
+    { segment: 'Marsden Park Stock-Ups',  angle: 'One trip, month sorted',  proof: '74-min dwell, 2.6× on the M7 corridor', tone: 'Plain, matter-of-fact' },
+    { segment: 'Parramatta Value Families', angle: 'Better by the unit',     proof: 'Unit-price comparison vs. the majors',  tone: 'Direct, practical' },
+    { segment: 'Castle Hill Bulk Buyers', angle: 'Your club, closer',        proof: '20 minutes closer than Auburn',         tone: 'Warm, assured' },
   ];
   return (
     <div className="flex flex-col gap-3">

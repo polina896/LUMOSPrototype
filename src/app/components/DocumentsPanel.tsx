@@ -12,15 +12,16 @@ const DOC_TYPE_TO_KEY: Record<string, DocKey> = {
 };
 
 const TAG_PALETTES: Record<string, { bg: string; text: string }> = {
-  'Affluent Professionals':    { bg: '#e8f4ec', text: '#1e7a42' },
-  'Tech-savvy Families':       { bg: '#eaf0fb', text: '#2455a0' },
-  'Expat Executives':          { bg: '#fef3e2', text: '#995500' },
-  'Urban Upgrade Drivers':     { bg: '#f1e9ff', text: '#6b3c72' },
-  'Weekend Lifestyle Drivers': { bg: '#e8f4ec', text: '#1e7a42' },
-  'Premium Sedan Intenders':   { bg: '#eaf0fb', text: '#2455a0' },
-  'EV Early Adopters':         { bg: '#e8f8f4', text: '#1a7a5e' },
-  'EV Upgrade Shoppers':       { bg: '#e8f8f4', text: '#1a7a5e' },
-  'Green Commuters':           { bg: '#e8f4ec', text: '#1e7a42' },
+  'Marsden Park Stock-Ups':          { bg: '#f1e9ff', text: '#6b3c72' },
+  'Parramatta Value Families':       { bg: '#e8f4ec', text: '#1e7a42' },
+  'Castle Hill Bulk Buyers':         { bg: '#fef3e2', text: '#995500' },
+  'New-Build Movers — North-West':   { bg: '#eaf0fb', text: '#2455a0' },
+  'Existing Warehouse-Club Members': { bg: '#e8f8f4', text: '#1a7a5e' },
+  'Café & Small Business Buyers':    { bg: '#fdeef0', text: '#a03050' },
+  'Unit-Price Switchers':            { bg: '#eaf0fb', text: '#2455a0' },
+  'Large Family Shoppers':           { bg: '#e8f4ec', text: '#1e7a42' },
+  'Lapsed Members — 90+ days':       { bg: '#f4f2ef', text: '#6b6257' },
+  'Multi-Generational Households':   { bg: '#fdeef0', text: '#a03050' },
 };
 
 interface DocRow {
@@ -52,8 +53,8 @@ const DOC_GROUPS: DocGroup[] = [
     icon: <BarChart2 className="w-3.5 h-3.5" />,
     docs: [
       { id: 'd1', name: 'Costco Western Sydney — Audience Strategy',      tags: ['Marsden Park Stock-Ups', 'Parramatta Value Families', 'Castle Hill Bulk Buyers'], type: 'Audience Strategy', timestamp: 'Today, 10:18 pm' },
-      { id: 'd2', name: 'Urban Upgrade Drivers — Audience Deep Dive',     tags: ['Urban Upgrade Drivers', 'Weekend Lifestyle Drivers'],                type: 'Audience Strategy', timestamp: '3 days ago' },
-      { id: 'd3', name: 'Premium Sedan Intenders — Profile Report',        tags: ['Premium Sedan Intenders', 'EV Early Adopters'],                      type: 'Audience Strategy', timestamp: '5 days ago' },
+      { id: 'd2', name: 'Marsden Park Stock-Ups — Audience Deep Dive',     tags: ['Marsden Park Stock-Ups', 'New-Build Movers — North-West'],           type: 'Audience Strategy', timestamp: '3 days ago' },
+      { id: 'd3', name: 'Warehouse-Club Members — Profile Report',         tags: ['Existing Warehouse-Club Members', 'Unit-Price Switchers'],           type: 'Audience Strategy', timestamp: '5 days ago' },
     ],
   },
   {
@@ -61,7 +62,7 @@ const DOC_GROUPS: DocGroup[] = [
     icon: <MessageSquare className="w-3.5 h-3.5" />,
     docs: [
       { id: 'd4', name: 'Costco — Launch Messaging Matrix',               tags: ['Marsden Park Stock-Ups', 'Castle Hill Bulk Buyers'],                 type: 'Messaging Matrix', timestamp: 'Today, 10:22 pm' },
-      { id: 'd5', name: 'EV Upgrade Shoppers — Messaging Guide',          tags: ['EV Upgrade Shoppers', 'Green Commuters'],                            type: 'Messaging Matrix', timestamp: '2 days ago' },
+      { id: 'd5', name: 'Unit-Price Switchers — Messaging Guide',          tags: ['Unit-Price Switchers', 'Parramatta Value Families'],                 type: 'Messaging Matrix', timestamp: '2 days ago' },
     ],
   },
   {
@@ -69,6 +70,8 @@ const DOC_GROUPS: DocGroup[] = [
     icon: <FileText className="w-3.5 h-3.5" />,
     docs: [
       { id: 'd6', name: 'Costco Opening Quarter — Campaign Brief',        tags: ['Marsden Park Stock-Ups', 'Parramatta Value Families', 'Castle Hill Bulk Buyers'], type: 'Campaign Brief',   timestamp: '2 days ago' },
+      { id: 'd8', name: 'Membership Win-Back — Campaign Brief',           tags: ['Lapsed Members — 90+ days'],                                          type: 'Campaign Brief',   timestamp: '6 days ago' },
+      { id: 'd9', name: 'Small Business & Café Trade — Campaign Brief',   tags: ['Café & Small Business Buyers'],                                       type: 'Campaign Brief',   timestamp: '1 week ago' },
     ],
   },
   {
@@ -76,6 +79,7 @@ const DOC_GROUPS: DocGroup[] = [
     icon: <Map className="w-3.5 h-3.5" />,
     docs: [
       { id: 'd7', name: 'Western Sydney Bulk Grocery — Media Plan',       tags: ['Marsden Park Stock-Ups', 'Castle Hill Bulk Buyers'],                 type: 'Media Plan',       timestamp: 'Today, 10:24 pm' },
+      { id: 'd10', name: 'M7 & Richmond Rd Corridor — OOH Plan',          tags: ['Marsden Park Stock-Ups', 'New-Build Movers — North-West'],            type: 'Media Plan',       timestamp: '4 days ago' },
     ],
   },
 ];

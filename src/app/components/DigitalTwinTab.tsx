@@ -396,7 +396,7 @@ export default function DigitalTwinTab() {
             <div className="m-auto text-center py-7 text-[#9a9a9a]">
               <div className="font-['Jua',sans-serif] text-[15px] text-[#6b6b6b] mb-[5px]">Ask {firstName} anything</div>
               <div className="text-[11px]">
-                {firstName} answers in character, grounded on the Upgrade-Ready Professionals segment
+                {firstName} answers in character, grounded on the Stock-Up Parents segment
               </div>
             </div>
           ) : (
@@ -603,7 +603,7 @@ export default function DigitalTwinTab() {
                     { k: 'Competitor / POI', v: 'Woolworths, Coles supermarkets', i: '1.6×' },
                     { k: 'Peak daypart', v: 'Weekday 7–9pm', i: '2.3×' },
                     { k: 'Channel affinity', v: 'CTV evenings · M7 roadside OOH', i: '1.7×' },
-                    { k: 'Vehicle budget', v: 'S$180k', i: '—' },
+                    { k: 'Avg basket', v: '$312 · fortnightly', i: '3.4×' },
                   ].map((a, i, arr) => (
                     <div key={a.k} className={`flex items-baseline gap-[10px] text-[12px] py-[9px] ${i < arr.length - 1 ? 'border-b border-[#e5e5e2]' : ''}`}>
                       <span className="text-[#6b6b6b] shrink-0 w-[118px]">{a.k}</span>
@@ -615,7 +615,7 @@ export default function DigitalTwinTab() {
                   <div className="flex gap-2 mt-[14px] text-[11px] text-[#6b6b6b] bg-[#fafaf8] border border-[#e5e5e2] rounded-[9px] px-3 py-[10px]">
                     <Info className="w-[13px] h-[13px] text-[#6b3c72] shrink-0 mt-[2px]" />
                     <span>
-                      Represents <b className="text-[#1a1a1a]">Upgrade-Ready Professionals</b> — 34% of the audience (~132k). Editing name &amp; bio
+                      Represents <b className="text-[#1a1a1a]">Stock-Up Parents</b> — 34% of the audience (~132k). Editing name &amp; bio
                       changes how Sana presents; the <b className="text-[#1a1a1a]">data comes from the segment</b>.
                     </span>
                   </div>

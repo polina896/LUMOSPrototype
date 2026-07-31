@@ -48,7 +48,6 @@ const AUD_DAY_FACTOR: Record<string, Record<string, number>> = {
   'parramatta-value-families': { Mon: 0.95, Tue: 0.98, Wed: 1.0, Thu: 1.0, Fri: 0.9,  Sat: 1.18, Sun: 1.05 },
   'marsden-park-stockups':     { Mon: 0.88, Tue: 0.9,  Wed: 0.95, Thu: 1.05, Fri: 1.12, Sat: 1.3, Sun: 1.0 },
   'castle-hill-bulk-buyers':   { Mon: 0.9,  Tue: 0.92, Wed: 0.95, Thu: 0.95, Fri: 1.0, Sat: 1.25, Sun: 1.12 },
-  'urban-upgrade-drivers':   { Mon: 0.85, Tue: 0.88, Wed: 0.9, Thu: 0.9,  Fri: 0.95, Sat: 1.32, Sun: 1.16 },
 };
 const DEFAULT_DAY_FACTOR = { Mon: 1, Tue: 1, Wed: 1, Thu: 1, Fri: 1, Sat: 1.05, Sun: 0.95 };
 

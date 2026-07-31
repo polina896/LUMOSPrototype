@@ -22,13 +22,13 @@ const MODULE_LABEL = MOBILITY_MAP_TITLE;
 const SIGNALS: Signal[] = ['Residential', 'Daytime', 'Transaction'];
 const DAYS: DayType[] = ['Weekday', 'Weekend'];
 
-// Rail → planning-area lookup for the click-to-fly top-postcode rows.
+// Rail → suburb lookup for the click-to-fly top-postcode rows.
 const POSTCODES: { key: string; code: string; area: string; town: string; pct: number; val: string; hot?: boolean }[] = [
-  { key: 'buona', code: '259xxx', area: 'QUEENSTOWN', town: 'Buona Vista', pct: 100, val: '3.8×', hot: true },
-  { key: 'bishan', code: '308xxx', area: 'BISHAN', town: 'Bishan', pct: 89, val: '3.4×', hot: true },
-  { key: 'tampines', code: '529xxx', area: 'TAMPINES', town: 'Tampines', pct: 82, val: '3.1×' },
-  { key: 'woodlands', code: '738xxx', area: 'WOODLANDS', town: 'Woodlands', pct: 74, val: '2.8×' },
-  { key: 'amk', code: '520xxx', area: 'ANG MO KIO', town: 'Ang Mo Kio', pct: 68, val: '2.6×' },
+  { key: 'marsden', code: '2765', area: 'MARSDEN PARK', town: 'Marsden Park', pct: 100, val: '3.8×', hot: true },
+  { key: 'schofields', code: '2762', area: 'SCHOFIELDS', town: 'Schofields', pct: 92, val: '3.5×', hot: true },
+  { key: 'riverstone', code: '2765', area: 'RIVERSTONE', town: 'Riverstone', pct: 87, val: '3.3×' },
+  { key: 'castlehill', code: '2154', area: 'CASTLE HILL', town: 'Castle Hill', pct: 82, val: '3.1×' },
+  { key: 'blacktown', code: '2148', area: 'BLACKTOWN', town: 'Blacktown', pct: 79, val: '3.0×' },
 ];
 
 const SPARK = (
@@ -36,6 +36,10 @@ const SPARK = (
     <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" />
   </svg>
 );
+
+// Where the audience actually lives — Penrith across to the harbour, Hornsby
+// down to Campbelltown.
+const SYDNEY_BOUNDS: L.LatLngBoundsExpression = [[-34.09, 150.62], [-33.58, 151.30]];
 
 export default function MobilityMapHero({
   audience = 'this audience',
@@ -66,7 +70,7 @@ export default function MobilityMapHero({
       zoomControl: false,
       scrollWheelZoom: false, // never trap page scroll on the 600px hero
       attributionControl: false,
-    }).setView([1.3421, 103.8298], 11);
+    }).setView([-33.82, 150.95], 10);
     mapRef.current = map;
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -94,10 +98,13 @@ export default function MobilityMapHero({
 
     // Fit only once the container has its real size — otherwise fitBounds
     // computes a zoom/centre against a mis-sized box and Sydney ends up
-    // shoved to one edge. invalidateSize first, then frame the island.
+    // shoved to one edge. invalidateSize first, then frame the basin.
     const fit = () => {
       map.invalidateSize();
-      map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+      // Frame the populated basin, not the full geometry — the suburb set runs
+      // out to the Blue Mountains and Wollongong, and fitting all of it pushes
+      // Western Sydney into a corner.
+      map.fitBounds(SYDNEY_BOUNDS, { padding: [12, 12] });
     };
     fit();
     const t = window.setTimeout(fit, 60);
@@ -234,7 +241,7 @@ export default function MobilityMapHero({
             Takeaway · where they are
           </div>
           <div className="h">Five residential towns carry most of the audience — home, work and play split across three zones.</div>
-          <div className="b">Homes cluster in <b>Buona Vista, Bishan, Tampines, Woodlands and Ang Mo Kio</b>. Daytime pulls to the <b>CBD &amp; one-north</b>, while weekend spend spreads to <b>Orchard &amp; lifestyle malls</b>.</div>
+          <div className="b">Homes cluster in <b>Marsden Park, Schofields, Riverstone, Castle Hill and Blacktown</b>. Daytime pulls to <b>Parramatta &amp; the Wetherill Park industrial belt</b>, while weekend spend concentrates on <b>Rouse Hill, Castle Towers &amp; the Home Hub</b>.</div>
         </div>
 
         <div className="rail-sec">
@@ -261,8 +268,8 @@ export default function MobilityMapHero({
             </span>
           </div>
           <div className="stat-2">
-            <div className="stat"><div className="l">Median travel</div><div className="v">14.2<small>km</small></div></div>
-            <div className="stat"><div className="l">90th pct</div><div className="v">52<small>km</small></div></div>
+            <div className="stat"><div className="l">Median travel</div><div className="v">18.6<small>km</small></div></div>
+            <div className="stat"><div className="l">90th pct</div><div className="v">61<small>km</small></div></div>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ import { useMyView } from '../MyView';
 import type { ModuleRef } from '../ModuleAsk';
 
 // ── Audience Profile companion map ───────────────────────────────────────────
-// The Mobility choropleth engine, re-lensed for "who lives here": planning areas
+// The Mobility choropleth engine, re-lensed for "who lives here": suburbs
 // colour by audience concentration and every income band / lifestage segment on
 // the rail two-way links to the map — hover a row, its suburbs light up and the
 // place readout swaps to a band summary. Per request the map's "Where they live ·
@@ -42,6 +42,10 @@ const ICONS = {
 type Readout =
   | { kind: 'area'; name: string }
   | { kind: 'band'; row: LinkRow };
+
+// Where the audience actually lives — Penrith across to the harbour, Hornsby
+// down to Campbelltown.
+const SYDNEY_BOUNDS: L.LatLngBoundsExpression = [[-34.09, 150.62], [-33.58, 151.30]];
 
 export default function ProfileMapHero({
   audience = 'this audience',
@@ -72,7 +76,7 @@ export default function ProfileMapHero({
       zoomControl: false,
       scrollWheelZoom: false, // never trap page scroll on the hero
       attributionControl: false,
-    }).setView([1.3421, 103.8298], 11);
+    }).setView([-33.82, 150.95], 10);
     mapRef.current = map;
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -108,10 +112,13 @@ export default function ProfileMapHero({
     }).addTo(map);
     geoRef.current = geoLayer;
 
-    // Frame the island only once the container has its real size.
+    // Frame the basin only once the container has its real size.
     const fit = () => {
       map.invalidateSize();
-      map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+      // Frame the populated basin, not the full geometry — the suburb set runs
+      // out to the Blue Mountains and Wollongong, and fitting all of it pushes
+      // Western Sydney into a corner.
+      map.fitBounds(SYDNEY_BOUNDS, { padding: [12, 12] });
     };
     fit();
     const t = window.setTimeout(fit, 60);

@@ -31,12 +31,12 @@ function BarRow({ label, pct, val, hot }: { label: string; pct: number; val: str
 // ── Visuals ───────────────────────────────────────────────────────────────────
 
 function Catchment() {
-  const bands = [['0–5km', 18], ['5–15km', 42], ['15–30km', 28], ['30km+', 12]] as const;
+  const bands = [['0–5km', 11], ['5–15km', 34], ['15–30km', 38], ['30km+', 17]] as const;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-4">
-        <div><div className="font-['Jua',sans-serif] text-[20px] text-[#1a1a1a] leading-none">14.2km</div><div className={LABEL}>Median travel</div></div>
-        <div><div className="font-['Jua',sans-serif] text-[20px] text-[#6b3c72] leading-none">52km</div><div className={LABEL}>90th pct</div></div>
+        <div><div className="font-['Jua',sans-serif] text-[20px] text-[#1a1a1a] leading-none">18.6km</div><div className={LABEL}>Median travel</div></div>
+        <div><div className="font-['Jua',sans-serif] text-[20px] text-[#6b3c72] leading-none">61km</div><div className={LABEL}>90th pct</div></div>
       </div>
       <div className="flex rounded-md overflow-hidden h-5 w-full">
         {bands.map(([lab, w], i) => (
@@ -48,7 +48,7 @@ function Catchment() {
           <span key={lab} className="flex items-center gap-1.5 font-['Jua',sans-serif] text-[11px] text-[#6b6b6b]"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: ['#d9c9e0', '#b89fc4', '#8a5f92', '#6b3c72'][i] }} />{lab}</span>
         ))}
       </div>
-      <div className="pt-2 border-t border-dashed border-[#e5e5e2]"><span className={NOTE}>Half travel <b className="text-[#1a1a1a]">5–15km</b> · a <b className="text-[#1a1a1a]">12%</b> long-haul tail drives 30km+ to reach premium dealers.</span></div>
+      <div className="pt-2 border-t border-dashed border-[#e5e5e2]"><span className={NOTE}>Most travel <b className="text-[#1a1a1a]">15–30km</b> · a <b className="text-[#1a1a1a]">17%</b> long-haul tail drives 30km+ for a single bulk shop.</span></div>
     </div>
   );
 }
@@ -56,11 +56,11 @@ function Catchment() {
 function Competitor() {
   return (
     <div className="flex flex-col gap-3">
-      <BarRow label="CarouselAuto" pct={100} val="38%" hot />
-      <BarRow label="AutoHub SG" pct={63} val="24%" />
-      <BarRow label="DriveCity" pct={50} val="19%" />
-      <BarRow label="MotorMile" pct={32} val="12%" />
-      <span className={NOTE}>Share of rival-venue visits, last 3 mo · CarouselAuto leads.</span>
+      <BarRow label="Aldi" pct={100} val="34%" hot />
+      <BarRow label="Woolworths" pct={79} val="27%" />
+      <BarRow label="Coles" pct={64} val="22%" />
+      <BarRow label="Costco Auburn" pct={50} val="17%" />
+      <span className={NOTE}>Share of rival-store visits, last 3 mo · Aldi leads on unit price.</span>
     </div>
   );
 }
@@ -82,7 +82,7 @@ function Frequency() {
           </div>
         ))}
       </div>
-      <div className="pt-2 border-t border-dashed border-[#e5e5e2]"><span className={NOTE}>Median gap between visits <b className="text-[#1a1a1a]">11 days</b>.</span></div>
+      <div className="pt-2 border-t border-dashed border-[#e5e5e2]"><span className={NOTE}>Median gap between visits <b className="text-[#1a1a1a]">14 days</b>.</span></div>
     </div>
   );
 }
@@ -90,11 +90,11 @@ function Frequency() {
 function ReachBySite() {
   return (
     <div className="flex flex-col gap-3">
-      <BarRow label="Orchard Rd Digital" pct={100} val="1.9×" hot />
-      <BarRow label="Marina One" pct={82} val="1.6×" />
-      <BarRow label="Tampines Hub" pct={64} val="1.3×" />
-      <BarRow label="Bishan MRT" pct={50} val="1.1×" />
-      <span className={NOTE}>Top LUMOS panels by audience index · best panel <b className="text-[#1a1a1a]">1.9×</b>.</span>
+      <BarRow label="M7 · Richmond Rd gantry" pct={100} val="2.2×" hot />
+      <BarRow label="Rouse Hill Town Centre" pct={84} val="1.8×" />
+      <BarRow label="Great Western Hwy · Blacktown" pct={68} val="1.5×" />
+      <BarRow label="Windsor Rd · Kellyville" pct={52} val="1.2×" />
+      <span className={NOTE}>Top LUMOS panels by audience index · best panel <b className="text-[#1a1a1a]">2.2×</b>.</span>
     </div>
   );
 }

@@ -10,9 +10,9 @@ import { valueFor, titleCase } from '../mobility/mobilityData';
 // Re-exported so the hero can import geometry/label helpers from one place.
 export { titleCase };
 
-// The readout rests on the audience's 2nd home postcode (Bishan), matching the
-// wireframe's default state.
-export const DEFAULT_READOUT_AREA = 'BISHAN';
+// The readout rests on the audience's top home suburb — the North-West growth
+// corridor is where the strongest cluster lives.
+export const DEFAULT_READOUT_AREA = 'MARSDEN PARK';
 
 // Concentration = residential-weekday audience index, reused from the shared engine.
 export function concentrationFor(name: string): number {
@@ -25,34 +25,37 @@ export type AreaProfile = {
 };
 
 export const AREA_PROFILE: Record<string, AreaProfile> = {
-  QUEENSTOWN:     { rank: '1st home postcode', shareN: 8.1, shareIdx: 2.6, homeN: 1.9,  incomeN: 172, seg: 'Est. Professionals',     retail: 'one-north · Rochester',   poi: 'one-north biz park' },
-  BISHAN:         { rank: '2nd home postcode', shareN: 7.4, shareIdx: 2.3, homeN: 2.1,  incomeN: 168, seg: 'Est. Professionals',     retail: 'Junction 8 · Cold Storage', poi: 'Bishan-AMK Park' },
-  TAMPINES:       { rank: '3rd home postcode', shareN: 6.0, shareIdx: 1.7, homeN: 0.98, incomeN: 118, seg: 'Aspirational Climbers',  retail: 'Tampines Mall · NTUC',    poi: 'Our Tampines Hub' },
-  WOODLANDS:      { rank: '4th home postcode', shareN: 5.4, shareIdx: 1.5, homeN: 0.72, incomeN: 96,  seg: 'Growing Families',       retail: 'Causeway Point',          poi: 'Woodlands Waterfront' },
-  'ANG MO KIO':   { rank: '5th home postcode', shareN: 4.0, shareIdx: 1.6, homeN: 0.86, incomeN: 104, seg: 'Aspirational Climbers',  retail: 'AMK Hub',                 poi: 'Bishan-AMK Park' },
-  NOVENA:         { rank: '6th home postcode', shareN: 3.6, shareIdx: 2.2, homeN: 2.4,  incomeN: 196, seg: 'Est. Professionals',     retail: 'Velocity · United Sq',    poi: 'Health City Novena' },
-  TANGLIN:        { rank: '8th home postcode', shareN: 4.2, shareIdx: 3.1, homeN: 3.4,  incomeN: 240, seg: 'Affluent Establishment', retail: 'Tanglin Mall · Dempsey',  poi: 'Botanic Gardens' },
-  NEWTON:         { rank: 'Prime district',    shareN: 3.4, shareIdx: 2.9, homeN: 3.2,  incomeN: 228, seg: 'Affluent Establishment', retail: 'Orchard belt',            poi: 'Newton Food Centre' },
-  'RIVER VALLEY': { rank: 'Prime district',    shareN: 3.0, shareIdx: 2.7, homeN: 2.9,  incomeN: 210, seg: 'Affluent Establishment', retail: 'Great World',             poi: 'Robertson Quay' },
-  'BUKIT MERAH':  { rank: 'Inner-city',        shareN: 3.8, shareIdx: 1.9, homeN: 1.3,  incomeN: 132, seg: 'Est. Professionals',     retail: 'Tiong Bahru Plaza',       poi: 'Tiong Bahru' },
-  SERANGOON:      { rank: 'Mature estate',     shareN: 3.2, shareIdx: 1.8, homeN: 1.1,  incomeN: 126, seg: 'Aspirational Climbers',  retail: 'NEX',                     poi: 'NEX' },
-  BEDOK:          { rank: 'Mature estate',     shareN: 3.0, shareIdx: 1.5, homeN: 0.90, incomeN: 108, seg: 'Aspirational Climbers',  retail: 'Bedok Mall',              poi: 'East Coast Park' },
-  CLEMENTI:       { rank: 'Mature estate',     shareN: 2.6, shareIdx: 1.6, homeN: 1.2,  incomeN: 130, seg: 'Est. Professionals',     retail: 'Clementi Mall',           poi: 'West Coast Park' },
-  PUNGGOL:        { rank: 'North-east',        shareN: 2.4, shareIdx: 1.4, homeN: 0.68, incomeN: 98,  seg: 'Growing Families',       retail: 'Waterway Point',          poi: 'Punggol Waterway' },
-  SENGKANG:       { rank: 'North-east',        shareN: 2.2, shareIdx: 1.4, homeN: 0.66, incomeN: 95,  seg: 'Growing Families',       retail: 'Compass One',             poi: 'Sengkang Riverside' },
-  'JURONG EAST':  { rank: 'Regional centre',   shareN: 2.0, shareIdx: 1.3, homeN: 0.95, incomeN: 110, seg: 'Aspirational Climbers',  retail: 'JEM · Westgate',          poi: 'Jurong Lake Gardens' },
-  YISHUN:         { rank: 'Outer town',        shareN: 1.8, shareIdx: 1.2, homeN: 0.62, incomeN: 92,  seg: 'Growing Families',       retail: 'Northpoint City',         poi: 'Yishun Pond' },
+  'MARSDEN PARK':   { rank: '1st home suburb',   shareN: 8.4, shareIdx: 2.8, homeN: 1.12, incomeN: 138, seg: 'Stock-Up Households',   retail: 'Marsden Park Home Hub',  poi: 'IKEA Marsden Park' },
+  SCHOFIELDS:       { rank: '2nd home suburb',   shareN: 7.1, shareIdx: 2.5, homeN: 1.24, incomeN: 142, seg: 'Stock-Up Households',   retail: 'Schofields Village',     poi: 'Schofields station' },
+  'ROUSE HILL':     { rank: '3rd home suburb',   shareN: 6.3, shareIdx: 2.4, homeN: 1.38, incomeN: 151, seg: 'Bulk Buyers',           retail: 'Rouse Hill Town Centre', poi: 'Rouse Hill Town Centre' },
+  RIVERSTONE:       { rank: '4th home suburb',   shareN: 5.6, shareIdx: 2.3, homeN: 1.02, incomeN: 126, seg: 'Stock-Up Households',   retail: 'Riverstone village',     poi: 'Riverstone station' },
+  'THE PONDS':      { rank: '5th home suburb',   shareN: 4.8, shareIdx: 2.2, homeN: 1.31, incomeN: 148, seg: 'Stock-Up Households',   retail: 'The Ponds Shopping Ctr', poi: 'The Ponds' },
+  'BOX HILL':       { rank: 'Growth corridor',   shareN: 3.9, shareIdx: 2.1, homeN: 1.18, incomeN: 134, seg: 'New-Build Movers',      retail: 'Box Hill village',       poi: 'Box Hill' },
+  BLACKTOWN:        { rank: 'Regional centre',   shareN: 6.8, shareIdx: 2.1, homeN: 0.86, incomeN: 104, seg: 'Value Families',        retail: 'Westpoint Blacktown',    poi: 'Blacktown station' },
+  PARRAMATTA:       { rank: 'Regional centre',   shareN: 7.9, shareIdx: 2.0, homeN: 0.94, incomeN: 112, seg: 'Value Families',        retail: 'Westfield Parramatta',   poi: 'Parramatta Square' },
+  GRANVILLE:        { rank: 'Value belt',        shareN: 5.2, shareIdx: 2.1, homeN: 0.79, incomeN: 92,  seg: 'Value Families',        retail: 'Granville Town Centre',  poi: 'Granville station' },
+  MERRYLANDS:       { rank: 'Value belt',        shareN: 5.0, shareIdx: 2.0, homeN: 0.82, incomeN: 95,  seg: 'Value Families',        retail: 'Stockland Merrylands',   poi: 'Merrylands station' },
+  AUBURN:           { rank: 'Value belt',        shareN: 4.4, shareIdx: 1.9, homeN: 0.81, incomeN: 89,  seg: 'Value Families',        retail: 'Auburn Central',         poi: 'Costco Auburn' },
+  'CASTLE HILL':    { rank: 'Hills District',    shareN: 5.9, shareIdx: 2.6, homeN: 1.84, incomeN: 186, seg: 'Bulk Buyers',          retail: 'Castle Towers',          poi: 'Castle Hill Metro' },
+  'BAULKHAM HILLS': { rank: 'Hills District',    shareN: 4.6, shareIdx: 2.3, homeN: 1.66, incomeN: 172, seg: 'Bulk Buyers',          retail: 'Stockland Baulkham Hills', poi: 'Bella Vista' },
+  KELLYVILLE:       { rank: 'Hills District',    shareN: 4.9, shareIdx: 2.4, homeN: 1.58, incomeN: 168, seg: 'Bulk Buyers',          retail: 'Kellyville Village',     poi: 'Kellyville Metro' },
+  'QUAKERS HILL':   { rank: 'North-West',        shareN: 3.6, shareIdx: 1.9, homeN: 0.98, incomeN: 118, seg: 'Large Families',        retail: 'Quakers Court',          poi: 'Quakers Hill station' },
+  PENRITH:          { rank: 'Outer West',        shareN: 3.4, shareIdx: 1.7, homeN: 0.76, incomeN: 98,  seg: 'Value Families',        retail: 'Westfield Penrith',      poi: 'Penrith Panthers' },
+  LIVERPOOL:        { rank: 'South-West',        shareN: 3.8, shareIdx: 1.8, homeN: 0.80, incomeN: 96,  seg: 'Value Families',        retail: 'Westfield Liverpool',    poi: 'Liverpool station' },
+  'ORAN PARK':      { rank: 'South-West growth', shareN: 3.1, shareIdx: 2.0, homeN: 1.06, incomeN: 132, seg: 'New-Build Movers',      retail: 'Oran Park Podium',       poi: 'Oran Park Town' },
+  CAMPBELLTOWN:     { rank: 'Macarthur',         shareN: 2.9, shareIdx: 1.6, homeN: 0.72, incomeN: 90,  seg: 'Large Families',        retail: 'Macarthur Square',       poi: 'Campbelltown station' },
+  FAIRFIELD:        { rank: 'South-West',        shareN: 3.0, shareIdx: 1.7, homeN: 0.77, incomeN: 88,  seg: 'Multi-Generational',    retail: 'Neeta City',             poi: 'Fairfield station' },
 };
 
-// Fallback profile for any planning area without a hand-set dossier entry.
+// Fallback profile for any suburb without a hand-set dossier entry.
 export function pget(name: string): AreaProfile {
   const hit = AREA_PROFILE[name];
   if (hit) return hit;
   const c = concentrationFor(name);
   return {
-    rank: 'Planning area', shareN: +(c * 1.1).toFixed(1), shareIdx: +c.toFixed(1),
-    homeN: +(0.55 + c * 0.5).toFixed(2), incomeN: Math.round(70 + c * 40),
-    seg: c > 2.2 ? 'Est. Professionals' : c > 1.5 ? 'Aspirational Climbers' : 'Growing Families',
+    rank: 'Greater Sydney suburb', shareN: +(c * 1.1).toFixed(1), shareIdx: +c.toFixed(1),
+    homeN: +(0.62 + c * 0.34).toFixed(2), incomeN: Math.round(72 + c * 26),
+    seg: c > 2.2 ? 'Stock-Up Households' : c > 1.5 ? 'Value Families' : 'Occasional Bulk',
     retail: 'Neighbourhood centre', poi: '—',
   };
 }
@@ -77,17 +80,17 @@ export type LinkRow = {
 };
 
 export const INCOME_BANDS: LinkRow[] = [
-  { band: '$200k+ households',   label: '$200k+',   areas: ['NEWTON', 'TANGLIN', 'RIVER VALLEY', 'NOVENA'],             home: '$3.1M', summary: 'Prime districts — Newton, Tanglin, River Valley & Novena', pct: 70, val: '1.4×', color: '#7A4C82' },
-  { band: '$120–200k households', label: '$120–200k', areas: ['BISHAN', 'QUEENSTOWN', 'BUKIT MERAH', 'NOVENA', 'CLEMENTI'], home: '$2.0M', summary: 'The audience core — Bishan, Queenstown & Bukit Merah', pct: 92, val: '1.5×', color: '#6B3C72', hot: true },
-  { band: '$80–120k households',  label: '$80–120k',  areas: ['TAMPINES', 'ANG MO KIO', 'SERANGOON', 'BEDOK'],           home: '$0.95M', summary: 'Mature HDB towns — Tampines, Ang Mo Kio & Serangoon', pct: 58, val: '0.9×', color: '#A278A9' },
-  { band: '<$80k households',     label: '<$80k',     areas: ['WOODLANDS', 'YISHUN', 'JURONG EAST', 'PUNGGOL', 'SENGKANG'], home: '$0.70M', summary: 'Outer towns — Woodlands, Yishun & Sengkang', pct: 34, val: '0.6×', color: '#C6A9CA' },
+  { band: '$200k+ households',    label: '$200k+',    areas: ['CASTLE HILL', 'BAULKHAM HILLS', 'KELLYVILLE', 'WEST PENNANT HILLS'],   home: '$1.9M',  summary: 'The Hills — Castle Hill, Baulkham Hills & Kellyville', pct: 62, val: '1.3×', color: '#7A4C82' },
+  { band: '$120–200k households', label: '$120–200k', areas: ['MARSDEN PARK', 'SCHOFIELDS', 'THE PONDS', 'ROUSE HILL', 'BOX HILL'],   home: '$1.2M',  summary: 'The audience core — the North-West growth corridor', pct: 94, val: '1.6×', color: '#6B3C72', hot: true },
+  { band: '$80–120k households',  label: '$80–120k',  areas: ['BLACKTOWN', 'PARRAMATTA', 'QUAKERS HILL', 'PENRITH', 'LIVERPOOL'],     home: '$0.88M', summary: 'Regional centres — Blacktown, Parramatta & Penrith', pct: 71, val: '1.2×', color: '#A278A9' },
+  { band: '<$80k households',     label: '<$80k',     areas: ['GRANVILLE', 'MERRYLANDS', 'AUBURN', 'FAIRFIELD', 'CAMPBELLTOWN'],      home: '$0.76M', summary: 'The value belt — Granville, Merrylands & Auburn', pct: 48, val: '0.8×', color: '#C6A9CA' },
 ];
 
 export const LIFESTAGE: LinkRow[] = [
-  { band: 'Established Professionals', label: 'Established Professionals', areas: ['QUEENSTOWN', 'BISHAN', 'NOVENA', 'BUKIT MERAH', 'CLEMENTI', 'TANGLIN'], home: '$2.1M', summary: 'Concentrated on the Queenstown–Bishan–Novena belt', pct: 31, color: '#5A2E62' },
-  { band: 'Aspirational Climbers',     label: 'Aspirational Climbers',     areas: ['TAMPINES', 'ANG MO KIO', 'SERANGOON', 'BEDOK', 'JURONG EAST'],        home: '$0.98M', summary: 'Mature HDB towns — Tampines, AMK, Serangoon', pct: 27, color: '#7A4C82' },
-  { band: 'Growing Families',          label: 'Growing Families',          areas: ['PUNGGOL', 'SENGKANG', 'WOODLANDS', 'YISHUN'],                          home: '$0.70M', summary: 'Newer north-east estates — Punggol, Sengkang, Woodlands', pct: 19, color: '#A278A9' },
-  { band: 'Other segments',            label: 'Other',                     areas: ['GEYLANG', 'KALLANG', 'MARINE PARADE', 'HOUGANG'],                      home: '$1.1M', summary: 'Spread across mixed inner-east estates', pct: 23, color: '#C6A9CA', light: true },
+  { band: 'Large Growing Families', label: 'Large Growing Families', areas: ['MARSDEN PARK', 'SCHOFIELDS', 'THE PONDS', 'BOX HILL', 'ORAN PARK', 'RIVERSTONE'], home: '$1.2M',  summary: 'New-build estates across the North-West and South-West corridors', pct: 34, color: '#5A2E62' },
+  { band: 'Established Families',   label: 'Established Families',   areas: ['CASTLE HILL', 'BAULKHAM HILLS', 'KELLYVILLE', 'QUAKERS HILL'],                     home: '$1.7M',  summary: 'The Hills — bigger homes, fewer but larger shops', pct: 28, color: '#7A4C82' },
+  { band: 'Multi-Generational',     label: 'Multi-Generational',     areas: ['GRANVILLE', 'MERRYLANDS', 'AUBURN', 'FAIRFIELD'],                                  home: '$0.79M', summary: 'The value belt — three generations, one weekly shop', pct: 21, color: '#A278A9' },
+  { band: 'Other segments',         label: 'Other',                  areas: ['PENRITH', 'CAMPBELLTOWN', 'LIVERPOOL', 'BLACKTOWN'],                               home: '$0.84M', summary: 'Spread across the outer regional centres', pct: 17, color: '#C6A9CA', light: true },
 ];
 
-export const DOSSIER_ORDER = ['QUEENSTOWN', 'BISHAN', 'TAMPINES', 'WOODLANDS', 'ANG MO KIO', 'NOVENA'];
+export const DOSSIER_ORDER = ['MARSDEN PARK', 'SCHOFIELDS', 'ROUSE HILL', 'CASTLE HILL', 'PARRAMATTA', 'BLACKTOWN'];

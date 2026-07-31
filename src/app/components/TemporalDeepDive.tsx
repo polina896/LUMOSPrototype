@@ -10,7 +10,7 @@ import { AskPill, type ModuleRef } from './ModuleAsk';
 // Density hour × day heatmap are preserved as fixed anchors, and the seasonal /
 // daypart analysis below becomes an editable deck of blocks (seedTemporalBlocks).
 
-const AUD_ID = 'urban-upgrade-drivers';
+const AUD_ID = 'marsden-park-stockups';
 
 // Stable id for the density anchor so it can be pinned to My View.
 export const TEMPORAL_DENSITY_ID = 'tmp-density';
@@ -57,10 +57,10 @@ export function PeakDaysDaypartsCard({ audience = 'this audience', onAskGraph }:
 // ── Summary strip (hero) ──────────────────────────────────────────────────────
 function SummaryStrip() {
   const stats = [
-    { label: 'Peak window', value: 'Sat 10am–1pm' },
-    { label: 'Peak index', value: '2.1×' },
+    { label: 'Peak window', value: 'Sat 9–11am' },
+    { label: 'Peak index', value: '2.4×' },
     { label: 'Weekly reach YoY', value: '418k', badge: '▲ +14%' },
-    { label: 'Motor Show lift', value: '+52%' },
+    { label: 'Pre-Christmas lift', value: '+61%' },
   ];
   return (
     <div className="rounded-[14px] border border-[#e7dff0] bg-gradient-to-b from-[#f6f0fb] to-[#fbf8fe] px-5 py-4">

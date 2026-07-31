@@ -16,7 +16,7 @@ export const KEY_SECTIONS: Record<string, string[]> = {
   't8': ['Growth Opportunity Overview', 'Segment Index Scores', 'Activation Priorities', 'End'],
   't9': ['Channel Recommendations', 'Reach Estimates', 'Cost Guidance', 'End'],
   'm1': ['Launch Objectives', 'Western Sydney Cluster Matrix', 'Channel Plan', 'Drive-to-Store Strategy', 'End'],
-  'm2': ['EV Intender Profile', 'Green Plan Messaging', 'Digital Activation', 'End'],
+  'm2': ['Unit-Price Switcher Profile', 'Value Messaging Angles', 'Digital Activation', 'End'],
 };
 
 export const DESCRIPTIONS: Record<string, string> = {

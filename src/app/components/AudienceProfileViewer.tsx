@@ -124,7 +124,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
   }, [decks]);
 
   // Short name for the panel's answer scope (strip the " — Western Sydney" suffix).
-  const askName = (props.audienceName ?? 'Urban Upgrade Drivers').split(' — ')[0];
+  const askName = (props.audienceName ?? 'Marsden Park Stock-Ups').split(' — ')[0];
 
   // Which deck a block id lives in (scope only ever targets the active tab today).
   const findDeck = (id: string): DeckKey | null =>
@@ -252,7 +252,7 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
       if (len < 20 || len > 700) continue;
       const cands = [...node.querySelectorAll('p,span,h1,h2,h3')]
         .map((n) => ({ t: (n.textContent || '').trim(), fs: parseFloat(getComputedStyle(n).fontSize) || 0 }))
-        .filter((o) => o.t.length > 3 && o.t.length < 46 && !CONTROL_LABELS.has(o.t) && !/^[\d$]/.test(o.t) && !/Urban Upgrade Drivers/.test(o.t));
+        .filter((o) => o.t.length > 3 && o.t.length < 46 && !CONTROL_LABELS.has(o.t) && !/^[\d$]/.test(o.t) && !/Marsden Park Stock-Ups/.test(o.t));
       if (cands.length) { cands.sort((a, b) => b.fs - a.fs); title = cands[0].t; break; }
     }
     if (!title) return;
@@ -414,10 +414,10 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
           <div className="flex flex-col gap-[12px] items-start pb-[14px] pt-[15px] px-[17px]">
             <div className="flex items-stretch w-full rounded-[10px] border border-[#e5e5e2] overflow-hidden">
               {[
-                { label: 'Audience size', value: '387k', badge: '▲ +8% vs Q4', badgeColor: '#2f7d4f', badgeBg: '#e7f3ec' },
-                { label: 'Index vs national', value: '2.1×', badge: '▲ +0.3×', badgeColor: '#2f7d4f', badgeBg: '#e7f3ec' },
-                { label: 'Peak day & hour', value: 'Sat', sub: '10–12pm', badge: '2.1×', badgeColor: '#6b3c72', badgeBg: '#f1e9ff' },
-                { label: 'Distinctive', value: '62%', badge: 'own 3yr+', badgeColor: '#6b3c72', badgeBg: '#f1e9ff' },
+                { label: 'Households', value: '387k', badge: '▲ +12% vs Q4', badgeColor: '#2f7d4f', badgeBg: '#e7f3ec' },
+                { label: 'Index vs Sydney', value: '2.6×', badge: '▲ +0.4×', badgeColor: '#2f7d4f', badgeBg: '#e7f3ec' },
+                { label: 'Peak day & hour', value: 'Sat', sub: '9–11am', badge: '2.4×', badgeColor: '#6b3c72', badgeBg: '#f1e9ff' },
+                { label: 'Distinctive', value: '74%', badge: 'own their home', badgeColor: '#6b3c72', badgeBg: '#f1e9ff' },
               ].map((m, i, arr) => (
                 <div key={m.label} className={`flex-1 flex flex-col gap-[3px] px-[16px] py-[14px] relative ${i < arr.length - 1 ? 'border-r border-[#e5e5e2]' : ''}`}>
                   <span className="font-['Jua',sans-serif] text-[10px] text-[#9a9a9a] uppercase tracking-[0.6px]">{m.label}</span>
@@ -434,9 +434,9 @@ export default function AudienceProfileViewer(props: AudienceProfileViewerProps)
             {defsOpen && (
               <div className="flex flex-wrap gap-[7px] w-full pt-[12px] border-t border-dashed border-[#e5e5e2]">
                 {[
-                  { label: 'Filters:', value: ' In-market auto intenders · showroom & dealer dwell' },
+                  { label: 'Filters:', value: ' Big-basket grocery buyers · warehouse & large-format dwell' },
                   { label: 'Sources:', value: ' LUMOS panels · GWI · Telco · Card & loyalty' },
-                  { label: 'Window:', value: ' Mar–May 2026 · rolling 90d' },
+                  { label: 'Window:', value: ' Jan–Mar 2026 · rolling 90d' },
                   { label: 'Geo:', value: ' Greater Sydney' },
                   { label: 'Confidence:', value: ' ±2.1% @ 95% CI' },
                 ].map((c) => (
