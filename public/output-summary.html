@@ -1,0 +1,437 @@
+<meta charset="utf-8">
+<title>Costco Western Sydney — Audience findings</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="lumos-share.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&family=Jua&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --plum:#4A2A6E; --plum2:#6B3C72; --violet:#7C4FC7; --deep:#4E2A54;
+    --ink:#1A1A1A; --ink2:#4A3E5C; --muted:#7E7490; --muted2:#A79FB6;
+    --line:#EBE5F1; --line2:#E1D9EC; --lilac:#EFE8F8; --lilac3:#F5F0FB;
+    --amber:#B45309; --amberbg:#FEF6E7; --amberline:#F0D9A8;
+    --acc:#6B3C72; --ctx:#8A8494;
+    --s1:#EFE3F1; --s2:#D6B9DA; --s3:#B084B8; --s4:#7A4C82; --s5:#4E2A54;
+    --surface:#fff; --grid:#EDEAF2;
+    --disp:"Baloo 2",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif; --chat:"Jua",system-ui,sans-serif;
+  }
+  body{font-family:var(--body);color:var(--ink);background:#F7F6F9}
+
+  /* ── page chrome ───────────────────────────────────────────────────────── */
+  .top{position:sticky;top:0;z-index:700;display:flex;align-items:center;gap:14px;padding:13px 26px;
+       background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .mark{width:26px;height:26px;border-radius:8px;background:var(--plum2);display:grid;place-items:center;flex:0 0 auto}
+  .mark svg{width:14px;height:14px;fill:#fff}
+  .top .t{font-family:var(--disp);font-size:14.5px;font-weight:700;line-height:1.2}
+  .top .s{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .faces{display:flex}
+  .faces span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;
+              font-family:var(--disp);font-size:10px;font-weight:800;border:2px solid #fff;margin-left:-7px}
+  .faces span:first-child{margin-left:0}
+
+  .wrap{max-width:1320px;margin:0 auto;padding:26px 26px 70px;display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:24px;align-items:start}
+  @media (max-width:1080px){ .wrap{grid-template-columns:1fr} .mapcol{position:static!important;height:420px!important} }
+
+  .hero{background:#fff;border:1px solid var(--line2);border-radius:18px;padding:24px 26px;margin-bottom:16px}
+  .eyebrow{font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+  .hero h1{font-family:var(--disp);font-size:26px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.2}
+  .hero p{font-size:14.5px;color:var(--ink2);line-height:1.65;max-width:64ch}
+  .stats{display:flex;gap:26px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .stat b{display:block;font-family:var(--disp);font-size:23px;font-weight:800;color:var(--plum);line-height:1}
+  .stat span{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+
+  .hyp{background:var(--amberbg);border:1px solid var(--amberline);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  .hyp .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--amber);margin-bottom:7px}
+  .hyp p{font-family:var(--chat);font-size:15px;line-height:1.6;color:#3a2a12}
+  .hyp .verdict{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:5px 11px;border-radius:99px;background:#E9F7EF;border:1px solid #BFE3CE;
+                font-family:var(--disp);font-size:11.5px;font-weight:800;color:#1F7A4C}
+
+  .findings{background:#F0FAF4;border:1px solid #BFE3CE;border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  .findings h2{font-family:var(--disp);font-size:15px;font-weight:800;color:#1F7A4C;margin-bottom:12px}
+  .findings ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .findings li{display:flex;align-items:flex-start;gap:10px;font-family:var(--chat);font-size:14px;line-height:1.5;color:#123D28}
+  .findings li .dot{width:16px;height:16px;border-radius:50%;background:#1F7A4C;display:grid;place-items:center;flex:0 0 auto;margin-top:2px}
+  .findings li .dot svg{width:9px;height:9px;stroke:#fff}
+
+  h2.sec{font-family:var(--disp);font-size:15px;font-weight:800;margin:22px 2px 12px}
+  h2.sec span{font-weight:600;color:var(--muted);font-size:12.5px;margin-left:8px}
+
+  .evgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  @media (max-width:720px){ .evgrid{grid-template-columns:1fr} }
+  .ev{border:1px solid var(--line2);border-radius:14px;background:#fff;padding:14px 15px 12px;display:flex;flex-direction:column}
+  .ev.on{border-color:var(--plum2);box-shadow:0 2px 12px rgba(74,42,110,.13)}
+  .ev-h{display:flex;align-items:flex-start;gap:9px;margin-bottom:2px}
+  .ev-t{font-family:var(--disp);font-size:13px;font-weight:700;line-height:1.3}
+  .ev-n{margin-left:auto;font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--lilac);color:var(--plum2);white-space:nowrap;flex:0 0 auto}
+  .ev-sub{font-size:11px;color:var(--muted);margin-bottom:9px}
+  .chart{width:100%}
+  .ev-read{font-family:var(--chat);font-size:12.5px;color:var(--ink2);line-height:1.5;margin-top:9px;margin-bottom:11px}
+  .ev-read b{color:var(--plum)}
+  .ev-f{display:flex;align-items:center;gap:9px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+  .showmap{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;border:1px solid var(--line2);background:#fff;font-family:var(--disp);font-size:11.5px;font-weight:700;color:var(--plum2);cursor:pointer;transition:.15s}
+  .showmap:hover{border-color:var(--violet);background:var(--lilac3)}
+  .showmap svg{width:12px;height:12px}
+  .ev.on .showmap{background:var(--plum2);border-color:var(--plum2);color:#fff}
+  .legend{display:flex;gap:12px;margin-left:auto;font-size:10.5px;color:var(--muted);font-weight:600}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .hero-fig{font-family:var(--disp);font-size:30px;font-weight:800;color:var(--plum);line-height:1}
+  .hero-fig small{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+
+  /* ── the map column ────────────────────────────────────────────────────── */
+  .mapcol{position:sticky;top:76px;height:calc(100vh - 104px);background:#fff;border:1px solid var(--line2);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+  .mapcol .mh{display:flex;align-items:center;gap:9px;padding:12px 15px;border-bottom:1px solid var(--line)}
+  .mapcol .mh b{font-family:var(--disp);font-size:12.5px;font-weight:700}
+  .mapcol .mh .hint{margin-left:auto;font-size:11px;color:var(--muted2)}
+  #map{flex:1;min-height:0}
+  .leaflet-container{background:#E8E6EF;font-family:var(--body)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:#FCFBFD}
+  .chip{border:1px solid var(--line2);background:#fff;border-radius:99px;padding:5px 11px;font-family:var(--disp);font-size:11px;font-weight:700;color:var(--ink2);cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--violet);color:var(--plum2)}
+  .chip.on{background:var(--plum2);border-color:var(--plum2);color:#fff}
+  .mfloat{position:absolute;z-index:600;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:13px;box-shadow:0 2px 8px rgba(33,26,46,.07),0 16px 40px rgba(74,42,110,.14)}
+  .mbanner{top:12px;left:50%;transform:translateX(-50%);padding:7px 13px;font-family:var(--disp);font-weight:700;font-size:11.5px;color:var(--plum);display:flex;align-items:center;gap:8px;white-space:nowrap;opacity:0;transition:.3s}
+  .mbanner.show{opacity:1}
+  .mbanner .dot{width:7px;height:7px;border-radius:50%;background:var(--violet)}
+  .mkey{left:12px;bottom:12px;padding:11px 13px;min-width:172px;opacity:0;transform:translateY(8px);transition:.35s cubic-bezier(.22,1,.36,1)}
+  .mkey.show{opacity:1;transform:none}
+  .mkey .k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+  .krow{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink2);font-weight:600;margin-bottom:5px}
+  .krow:last-child{margin-bottom:0}
+  .krow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+
+  /* map labels + tooltip */
+  .poilab,.ringlab{width:max-content;font-family:var(--disp);font-weight:800;white-space:nowrap;transform:translate(-50%,-50%)}
+  .poilab{font-size:10.5px;color:#fff;border-radius:7px;padding:2px 8px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .ringlab{font-size:10px;color:#fff;background:var(--deep);border-radius:99px;padding:3px 8px;box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+  @keyframes dashflow{to{stroke-dashoffset:-140}}
+  .flow{stroke-dasharray:8 10;animation:dashflow 2.4s linear infinite}
+  .tt{position:fixed;z-index:900;background:#211A2E;color:#fff;border-radius:9px;padding:7px 10px;font-family:var(--body);font-size:11.5px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+  .tt.show{opacity:1}
+  .tt em{display:block;font-style:normal;font-weight:600;color:#C9BEF0;font-size:10.5px;margin-top:2px}
+
+  .next{background:#fff;border:1px solid var(--line2);border-radius:16px;padding:18px 20px;margin-top:18px}
+  .next h2{font-family:var(--disp);font-size:14px;font-weight:800;margin-bottom:12px}
+  .next .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  @media (max-width:720px){ .next .row{grid-template-columns:1fr} }
+  .next a{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1px solid var(--line2);border-radius:11px;text-decoration:none;color:var(--ink);font-family:var(--chat);font-size:13.5px;transition:.15s}
+  .next a:hover{border-color:var(--violet);background:var(--lilac3)}
+  .next a .ic{width:24px;height:24px;border-radius:7px;background:var(--lilac3);display:grid;place-items:center;flex:0 0 auto}
+  .next a .ic svg{width:13px;height:13px;color:var(--plum2)}
+  .foot{max-width:1320px;margin:0 auto;padding:0 26px 40px;font-size:11.5px;color:var(--muted2)}
+</style>
+
+<div class="top">
+  <span class="mark"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z"/></svg></span>
+  <div>
+    <div class="t">Costco — Western Sydney launch</div>
+    <div class="s">Audience findings · prepared by Lumos · 29 July 2026</div>
+  </div>
+  <div class="right">
+    <div class="faces">
+      <span style="background:#6B3C72">PN</span>
+      <span style="background:#2F8F63">SW</span>
+      <span style="background:#C07A2E">DO</span>
+    </div>
+    <button id="shareBtn"></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div>
+    <div class="hero">
+      <div class="eyebrow">The question</div>
+      <h1>Who are Costco’s ideal customers in Western Sydney — and where do we reach them?</h1>
+      <p>Three audience clusters were built from location and transaction signal across Greater Sydney. The strongest is anchored on Marsden Park, and it behaves unlike a grocery audience: the trip is long, planned, repeated and chained to other big-box retail.</p>
+      <div class="stats">
+        <div class="stat"><b>566k</b><span>HOUSEHOLDS IN SCOPE</span></div>
+        <div class="stat"><b>14 km</b><span>MEDIAN TRIP · 1.7× METRO</span></div>
+        <div class="stat"><b>57%</b><span>VISITS ON A WEEKEND</span></div>
+        <div class="stat"><b>66%</b><span>TOP 5 ORIGIN SUBURBS</span></div>
+      </div>
+    </div>
+
+    <div class="hyp">
+      <div class="k">Hypothesis tested</div>
+      <p>Costco’s strongest customers aren’t concentrated around the store — they’re willing to travel 20–30 km because they exhibit <b>destination shopping behaviour</b>.</p>
+      <span class="verdict"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Supported — five of six signals</span>
+    </div>
+
+    <div class="findings">
+      <h2>Key findings</h2>
+      <ul id="findings"></ul>
+    </div>
+
+    <h2 class="sec">The evidence<span>Click any chart to put it on the map</span></h2>
+    <div class="evgrid" id="evgrid"></div>
+
+    <div class="next">
+      <h2>Where this goes next</h2>
+      <div class="row">
+        <a href="#" data-next="ooh"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="11" rx="1.5"/><path d="M8 20h8M12 15v5"/></svg></span>Recommend billboard locations</a>
+        <a href="#" data-next="aud"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0"/><circle cx="17.5" cy="9" r="2.4"/></svg></span>Build a media audience</a>
+        <a href="#" data-next="comp"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4 4-4"/><path d="M3 12h12"/><path d="M17 8l4 4-4 4"/><path d="M21 12H9"/></svg></span>Compare against Sam’s Club</a>
+        <a href="#" data-next="export"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></span>Export an executive summary</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mapcol">
+    <div class="mh"><b>Greater Sydney</b><span class="hint">Interactive · pan, zoom, hover</span></div>
+    <div style="position:relative;flex:1;min-height:0">
+      <div id="map"></div>
+      <div class="mfloat mbanner" id="banner"><span class="dot"></span><span id="bannerText"></span></div>
+      <div class="mfloat mkey" id="mkey"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+<div class="foot">Prepared from Lumos location and transaction signal · Marsden Park catchment · figures are indicative for prototype purposes.</div>
+<div class="tt" id="tt"></div>
+
+<script>
+/* ══ chart toolkit ═══════════════════════════════════════════════════════════
+   Emphasis is the default form: the audience carries the accent hue, the metro
+   baseline is the de-emphasis gray. Ordered scales use the one-hue ramp.       */
+const TT=document.getElementById('tt');
+function tipOn(el,html){
+  el.addEventListener('mousemove',e=>{ TT.innerHTML=html; TT.classList.add('show');
+    TT.style.left=Math.min(window.innerWidth-TT.offsetWidth-12,e.clientX+14)+'px';
+    TT.style.top=(e.clientY-TT.offsetHeight-12)+'px'; });
+  el.addEventListener('mouseleave',()=>TT.classList.remove('show'));
+}
+const SVGNS='http://www.w3.org/2000/svg';
+function el(n,a){ const x=document.createElementNS(SVGNS,n); for(const k in a) x.setAttribute(k,a[k]); return x; }
+// column with a 4px rounded cap, square at the baseline
+function colPath(x,y,w,h,r){
+  r=Math.min(r,w/2,h);
+  return `M${x},${y+h} L${x},${y+r} Q${x},${y} ${x+r},${y} L${x+w-r},${y} Q${x+w},${y} ${x+w},${y+r} L${x+w},${y+h} Z`;
+}
+function barPath(x,y,w,h,r){   // horizontal: rounded at the data end only
+  r=Math.min(r,h/2,w);
+  return `M${x},${y} L${x+w-r},${y} Q${x+w},${y} ${x+w},${y+r} L${x+w},${y+h-r} Q${x+w},${y+h} ${x+w-r},${y+h} L${x},${y+h} Z`;
+}
+// columns, with optional second series (grouped) — 2px surface gap, ≤24px thick
+function columns(host,{data,max,fmt,series,labelEvery}){
+  const W=host.clientWidth||300, H=118, padB=20, padT=16, n=data.length;
+  const svg=el('svg',{width:'100%',height:H,viewBox:`0 0 ${W} ${H}`,class:'chart'});
+  const plotH=H-padB-padT, band=W/n, two=!!series;
+  svg.appendChild(el('line',{x1:0,y1:H-padB,x2:W,y2:H-padB,stroke:'var(--grid)','stroke-width':1}));
+  data.forEach((d,i)=>{
+    const vals=two?[d.a,d.b]:[d.v];
+    const thick=Math.min(24,(band-10)/(two?2:1)-(two?2:0));
+    vals.forEach((v,k)=>{
+      const h=Math.max(2,(v/max)*plotH);
+      const gx=band*i+(band-(thick*(two?2:1)+(two?2:0)))/2+k*(thick+2);
+      const fill=two?(k===0?'var(--acc)':'var(--ctx)'):(d.fill||'var(--acc)');
+      const p=el('path',{d:colPath(gx,H-padB-h,thick,h,4),fill});
+      tipOn(p, `${d.label} · ${fmt(v)}<em>${two?(k===0?series[0]:series[1]):(d.note||'')}</em>`);
+      svg.appendChild(p);
+      if(d.tag && k===0){
+        const t=el('text',{x:gx+thick/2,y:H-padB-h-6,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:'#4A3E5C','font-family':'Baloo 2, sans-serif'});
+        t.textContent=fmt(v); svg.appendChild(t);
+      }
+    });
+    if(!labelEvery || i%labelEvery===0){
+      const lb=el('text',{x:band*i+band/2,y:H-6,'text-anchor':'middle','font-size':10,fill:'#7E7490','font-family':'Nunito, sans-serif','font-weight':600});
+      lb.textContent=d.label; svg.appendChild(lb);
+    }
+  });
+  host.appendChild(svg);
+}
+// two horizontal bars: the audience against the metro baseline
+function pairBars(host,{rows,max,fmt}){
+  const W=host.clientWidth||300, rowH=30, H=rows.length*rowH+6;
+  const svg=el('svg',{width:'100%',height:H,viewBox:`0 0 ${W} ${H}`,class:'chart'});
+  const labelW=74, barW=W-labelW-46;
+  rows.forEach((r,i)=>{
+    const y=i*rowH+4, h=16;
+    const lb=el('text',{x:0,y:y+h-3,'font-size':11,fill:'#4A3E5C','font-family':'Nunito, sans-serif','font-weight':700});
+    lb.textContent=r.label; svg.appendChild(lb);
+    svg.appendChild(el('rect',{x:labelW,y:y+1,width:barW,height:h-2,rx:4,fill:'#F4F1F7'}));
+    const w=Math.max(3,(r.v/max)*barW);
+    const p=el('path',{d:barPath(labelW,y,w,h,4),fill:r.ctx?'var(--ctx)':'var(--acc)'});
+    tipOn(p,`${r.label} · ${fmt(r.v)}<em>${r.note||''}</em>`); svg.appendChild(p);
+    const vt=el('text',{x:labelW+w+8,y:y+h-3,'font-size':11,'font-weight':700,fill:'#4A3E5C','font-family':'Baloo 2, sans-serif'});
+    vt.textContent=fmt(r.v); svg.appendChild(vt);
+  });
+  host.appendChild(svg);
+}
+
+
+/* ══ the evidence ════════════════════════════════════════════════════════════ */
+const RAMP=['var(--s2)','var(--s3)','var(--s4)','var(--s5)'];
+const EVIDENCE=[
+  { id:'far', t:'Distance travelled', sub:'Share of trips by distance band',
+    read:'Median <b>14 km</b> against a metro average of 8.4 km. Two thirds of trips start beyond 10 km.',
+    map:'Distance rings · median vs metro',
+    draw(host){ columns(host,{max:44,fmt:v=>v+'%',labelEvery:1,
+      data:[{label:'≤5 km',v:12,fill:RAMP[0]},{label:'5–10',v:24,fill:RAMP[1]},
+            {label:'10–15',v:24,fill:RAMP[2]},{label:'15+ km',v:40,fill:RAMP[3],tag:1}]}); },
+    legend:[['var(--s2)','Nearer'],['var(--s5)','Further']] },
+
+  { id:'when', t:'Weekday vs weekend', sub:'Share of visits by day',
+    read:'<b>57%</b> of visits fall on Saturday or Sunday — the metro grocery average is 41%. A planned outing, not a top-up.',
+    map:'Weekend density · Sat–Sun only',
+    draw(host){ columns(host,{max:36,fmt:v=>v+'%',labelEvery:1,
+      data:[{label:'Mon',v:7},{label:'Tue',v:7},{label:'Wed',v:8},{label:'Thu',v:9},{label:'Fri',v:12},
+            {label:'Sat',v:33,fill:'var(--acc)',tag:1,note:'weekend'},{label:'Sun',v:24,fill:'var(--acc)',note:'weekend'}]
+        .map(d=>({...d,fill:d.fill||'var(--ctx)'}))}); },
+    legend:[['var(--acc)','Weekend'],['var(--ctx)','Weekday']] },
+
+  { id:'repeat', t:'Repeat visitors', sub:'Return within 60 days',
+    read:'<b>68%</b> come back inside 60 days — 1.9× the category norm. They are not trying it once.',
+    hero:['68%','RETURN WITHIN 60 DAYS'],
+    map:'Density weighted to repeat households',
+    draw(host){ columns(host,{max:44,fmt:v=>v+'%',labelEvery:1,
+      data:[{label:'1 visit',v:32,fill:RAMP[0]},{label:'2–3',v:41,fill:RAMP[2],tag:1},{label:'4+',v:27,fill:RAMP[3]}]}); },
+    legend:[['var(--s2)','One-off'],['var(--s5)','Frequent']] },
+
+  { id:'household', t:'Household size', sub:'People per household',
+    read:'<b>66%</b> are four-person households or larger, against 29% across the metro. Explains the basket — not the distance.',
+    map:'Households of 4+ only',
+    draw(host){ columns(host,{max:44,fmt:v=>v+'%',series:['This audience','Metro average'],labelEvery:1,
+      data:[{label:'1',a:4,b:22},{label:'2',a:11,b:29},{label:'3',a:19,b:20},{label:'4',a:38,b:18},{label:'5+',a:28,b:11}]}); },
+    legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] },
+
+  { id:'ikea', t:'IKEA overlap', sub:'Visited an IKEA in the last 90 days',
+    read:'<b>3.4×</b> the metro rate. Destination retail begets destination retail.',
+    map:'IKEA stores · co-visitation',
+    draw(host){ pairBars(host,{max:60,fmt:v=>v+'%',rows:[
+      {label:'This audience',v:41,note:'index 341'},{label:'Metro average',v:12,ctx:1}]}); },
+    legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] },
+
+  { id:'bunnings', t:'Bunnings overlap', sub:'Visited a Bunnings in the last 90 days',
+    read:'<b>2.9×</b> the metro rate, and usually on the same trip — the chain runs hardware then grocery.',
+    map:'Bunnings stores · co-visitation',
+    draw(host){ pairBars(host,{max:60,fmt:v=>v+'%',rows:[
+      {label:'This audience',v:56,note:'index 292'},{label:'Metro average',v:19,ctx:1}]}); },
+    legend:[['var(--acc)','This audience'],['var(--ctx)','Metro average']] }
+];
+
+
+/* ══ map ═════════════════════════════════════════════════════════════════════ */
+const STORE=[-33.7080,150.8450];
+const ORIGINS=[
+  {n:'Schofields',c:[-33.7100,150.8730],km:4.2,pct:7},{n:'Riverstone',c:[-33.6790,150.8580],km:5.1,pct:6},
+  {n:'Box Hill',c:[-33.6650,150.8880],km:5.6,pct:5},{n:'Rouse Hill',c:[-33.6870,150.9200],km:7.6,pct:6},
+  {n:'Blacktown',c:[-33.7710,150.9060],km:8.9,pct:7},{n:'St Marys',c:[-33.7660,150.7750],km:9.8,pct:5},
+  {n:'Kellyville',c:[-33.7130,150.9560],km:11.2,pct:6},{n:'Windsor',c:[-33.6120,150.8210],km:11.9,pct:6},
+  {n:'Castle Hill',c:[-33.7320,151.0050],km:14.8,pct:14},{n:'Penrith',c:[-33.7510,150.6940],km:16.4,pct:20},
+  {n:'Richmond',c:[-33.5990,150.7510],km:18.2,pct:18}
+];
+const POIS={ ikea:[{n:'IKEA Marsden Park',c:[-33.7020,150.8390]},{n:'IKEA Rhodes',c:[-33.8300,151.0870]}],
+             bunnings:[{n:'Bunnings Rouse Hill',c:[-33.6900,150.9160]},{n:'Bunnings Penrith',c:[-33.7480,150.7000]},
+                       {n:'Bunnings Blacktown',c:[-33.7680,150.9000]},{n:'Bunnings Windsor',c:[-33.6180,150.8250]}] };
+const map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:true}).setView([-33.715,150.865],10.4);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,pane:'markerPane',opacity:.9}).addTo(map);
+function rnd(s){ return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
+function curve(a,b,bend,n){ const m=[(a[0]+b[0])/2,(a[1]+b[1])/2],dx=b[0]-a[0],dy=b[1]-a[1];
+  const cp=[m[0]-dy*bend,m[1]+dx*bend],o=[]; for(let i=0;i<=n;i++){const t=i/n,u=1-t;
+    o.push([u*u*a[0]+2*u*t*cp[0]+t*t*b[0],u*u*a[1]+2*u*t*cp[1]+t*t*b[1]]);} return o; }
+const base=L.layerGroup().addTo(map), fx=L.layerGroup().addTo(map);
+function drawBase(weight){
+  base.clearLayers();
+  ORIGINS.forEach((o,i)=>{
+    const rr=rnd(i*67+11), n=Math.round(o.pct*(weight?weight(o):1)*2.6);
+    for(let k=0;k<n;k++){ const a=rr()*Math.PI*2,d=Math.sqrt(rr())*0.017;
+      L.circleMarker([o.c[0]+Math.sin(a)*d*0.82,o.c[1]+Math.cos(a)*d],
+        {radius:3,stroke:false,fillColor:'#6B3C72',fillOpacity:.45,interactive:false}).addTo(base); }
+  });
+  L.circleMarker(STORE,{radius:8,color:'#fff',weight:3,fillColor:'#4A2A6E',fillOpacity:1,interactive:false}).addTo(base);
+}
+drawBase();
+const banner=document.getElementById('banner'),bannerText=document.getElementById('bannerText'),mkey=document.getElementById('mkey');
+function setKey(rows){ if(!rows){ mkey.classList.remove('show'); return; }
+  mkey.innerHTML='<div class="k">On the map</div>'+rows.map(r=>`<div class="krow"><i style="background:${r[0]}"></i>${r[1]}</div>`).join('');
+  mkey.classList.add('show'); }
+const MAPVIEWS={
+  when(){ drawBase(o=>1.5);       // weekend: the far origins swell, the near ones thin
+    ORIGINS.forEach(o=>{ if(o.km<8) return;
+      L.polyline(curve(o.c,STORE,0.12,26),{color:'#6B3C72',weight:1+o.pct*0.14,opacity:.75,className:'flow'}).addTo(fx); });
+    setKey([['#6B3C72','Weekend trips (Sat–Sun)'],['#B084B8','Origins beyond 8 km']]);
+    map.flyTo([-33.715,150.865],10.4,{duration:.6}); },
+  far(){ [5,10,15,20].forEach(km=>{
+      L.circle(STORE,{radius:km*1000,color:'#5A2E62',weight:1.2,opacity:.45,dashArray:'5 7',fill:false,interactive:false}).addTo(fx);
+      L.marker([STORE[0]+(km/111)*0.82,STORE[1]],{interactive:false,icon:L.divIcon({html:`<div class="ringlab">${km} km</div>`,className:'',iconSize:[1,1]})}).addTo(fx); });
+    L.circle(STORE,{radius:8400,color:'#0E7490',weight:2.2,opacity:.95,dashArray:'8 6',fill:false,interactive:false}).addTo(fx);
+    L.circle(STORE,{radius:14000,color:'#4E2A54',weight:2.8,opacity:.95,fillColor:'#6B3C72',fillOpacity:.05,interactive:false}).addTo(fx);
+    setKey([['#4E2A54','Median trip · 14 km'],['#0E7490','Metro average · 8.4 km']]);
+    map.flyTo(STORE,10.2,{duration:.6}); },
+  repeat(){ drawBase(o=>o.km>=10?1.7:0.5);
+    setKey([['#6B3C72','Households returning within 60 days']]);
+    map.flyTo([-33.715,150.865],10.4,{duration:.6}); },
+  ikea(){ poi('ikea','#0058A3','IKEA'); },
+  bunnings(){ poi('bunnings','#0D5257','Bunnings'); },
+  household(){ drawBase(o=>o.pct>=10?1.8:0.45);
+    setKey([['#6B3C72','Households of 4 or more']]);
+    map.flyTo([-33.715,150.865],10.4,{duration:.6}); }
+};
+function poi(kind,col,label){
+  POIS[kind].forEach(p=>{
+    L.polyline(curve(p.c,STORE,0.14,24),{color:col,weight:2.4,opacity:.75,className:'flow'}).addTo(fx);
+    L.circleMarker(p.c,{radius:7,color:'#fff',weight:2.5,fillColor:col,fillOpacity:1}).addTo(fx)
+      .bindTooltip(p.n,{direction:'top'});
+    L.marker(p.c,{interactive:false,icon:L.divIcon({html:`<div class="poilab" style="background:${col}">${label}</div>`,className:'',iconSize:[1,1],iconAnchor:[0,-18]})}).addTo(fx);
+  });
+  setKey([[col,label+' stores visited'],['#6B3C72','Costco Marsden Park']]);
+  map.flyTo([-33.740,150.900],10,{duration:.6});
+}
+function showOnMap(ev){
+  fx.clearLayers(); drawBase();
+  bannerText.textContent=ev.map; banner.classList.add('show');
+  (MAPVIEWS[ev.id]||function(){})();
+  document.querySelectorAll('.ev').forEach(c=>c.classList.toggle('on',c.dataset.ev===ev.id));
+}
+
+
+
+/* ── page assembly ───────────────────────────────────────────────────────── */
+var FINDINGS=[
+ 'Highest-value Costco customers are affluent families.',
+ 'They travel significantly further than average.',
+ 'Weekend visitation dominates.',
+ 'IKEA and Bunnings are the strongest overlap brands.',
+ 'North-West Sydney offers the highest concentration of lookalike customers.'
+];
+document.getElementById('findings').innerHTML = FINDINGS.map(function(t){
+  return '<li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'+t+'</li>';
+}).join('');
+
+var grid=document.getElementById('evgrid'), chips=document.getElementById('chips');
+EVIDENCE.forEach(function(ev,i){
+  var card=document.createElement('div'); card.className='ev'; card.dataset.ev=ev.id;
+  card.innerHTML='<div class="ev-h"><span class="ev-t">'+ev.t+'</span><span class="ev-n">Signal '+(i+1)+'</span></div>'+
+    '<div class="ev-sub">'+ev.sub+'</div>'+
+    (ev.hero?'<div class="hero-fig">'+ev.hero[0]+'<small>'+ev.hero[1]+'</small></div>':'')+
+    '<div class="chart-host"></div><div class="ev-read">'+ev.read+'</div>'+
+    '<div class="ev-f"><button class="showmap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.6"/></svg>Show on map</button>'+
+    '<span class="legend">'+ev.legend.map(function(l){return '<span><i style="background:'+l[0]+'"></i>'+l[1]+'</span>';}).join('')+'</span></div>';
+  grid.appendChild(card);
+  ev.draw(card.querySelector('.chart-host'));
+  card.querySelector('.showmap').onclick=function(){ showOnMap(ev); };
+
+  var chip=document.createElement('button'); chip.className='chip'; chip.textContent=ev.t;
+  chip.onclick=function(){ showOnMap(ev); };
+  chips.appendChild(chip);
+});
+
+var _show=showOnMap;
+showOnMap=function(ev){
+  _show(ev);
+  document.querySelectorAll('.chip').forEach(function(c,i){ c.classList.toggle('on', EVIDENCE[i].id===ev.id); });
+  document.querySelector('.mapcol').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+document.querySelectorAll('[data-next]').forEach(function(a){
+  a.onclick=function(e){ e.preventDefault(); alert('Next step: '+a.textContent.trim()+'\n\n(Prototype — this would start the next analysis.)'); };
+});
+
+LumosShare.mount(document.getElementById('shareBtn'), {
+  kind:'summary', title:'Costco — Western Sydney launch · Audience findings'
+});
+showOnMap(EVIDENCE[0]);
+</script>

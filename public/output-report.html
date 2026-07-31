@@ -1,0 +1,202 @@
+<meta charset="utf-8">
+<title>Costco Western Sydney — Document</title>
+<script src="lumos-share.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&family=Jua&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--plum:#4A2A6E;--plum2:#6B3C72;--violet:#7C4FC7;--ink:#1A1A1A;--ink2:#4A3E5C;
+        --muted:#7E7490;--muted2:#A79FB6;--line:#EBE5F1;--line2:#E1D9EC;--lilac:#EFE8F8;--lilac3:#F5F0FB;
+        --disp:"Baloo 2",system-ui,sans-serif;--body:"Nunito",system-ui,sans-serif;--chat:"Jua",system-ui,sans-serif}
+  body{font-family:var(--body);color:var(--ink);background:#F7F6F9}
+  .top{position:sticky;top:0;z-index:700;display:flex;align-items:center;gap:14px;padding:13px 26px;
+       background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .mark{width:26px;height:26px;border-radius:8px;background:var(--plum2);display:grid;place-items:center}
+  .mark svg{width:14px;height:14px;fill:#fff}
+  .top .t{font-family:var(--disp);font-size:14.5px;font-weight:700;line-height:1.2}
+  .top .s{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .ghost{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:10px;border:1px solid var(--line2);background:#fff;
+         font-family:var(--disp);font-size:13px;font-weight:700;color:var(--ink2);cursor:pointer;text-decoration:none}
+  .ghost:hover{border-color:var(--violet);color:var(--plum2)}
+  .ghost svg{width:14px;height:14px}
+
+  .sheet{max-width:900px;margin:26px auto 70px;background:#fff;border:1px solid var(--line2);border-radius:18px;overflow:hidden}
+  .band{padding:26px 40px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#FBFAFD,#fff)}
+  .band .k{font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+  .band h1{font-family:var(--disp);font-size:27px;font-weight:800;letter-spacing:-.02em;margin:7px 0 8px;line-height:1.18}
+  .band p{font-size:14px;color:var(--ink2);line-height:1.6;max-width:66ch}
+  .meta{display:flex;gap:22px;margin-top:16px;flex-wrap:wrap}
+  .meta div{font-size:11.5px;color:var(--muted)}
+  .meta b{display:block;font-family:var(--disp);font-size:13px;color:var(--ink);font-weight:700;margin-top:2px}
+
+  .doc{padding:8px 40px 34px}
+  .sec{padding:22px 0;border-bottom:1px solid var(--line)}
+  .sec:last-child{border-bottom:none}
+  .sec .n{font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--plum2);margin-bottom:8px}
+  .sec h2{font-family:var(--disp);font-size:18px;font-weight:800;margin-bottom:10px;letter-spacing:-.01em}
+  .sec p{font-family:var(--chat);font-size:14.5px;line-height:1.7;color:var(--ink2);margin-bottom:10px}
+  .sec p b{color:var(--plum)}
+  .sec ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin:4px 0 8px}
+  .sec li{display:flex;gap:10px;font-family:var(--chat);font-size:14px;line-height:1.55;color:var(--ink2)}
+  .sec li i{width:6px;height:6px;border-radius:50%;background:var(--plum2);flex:0 0 auto;margin-top:8px}
+  .pull{background:var(--lilac3);border-left:3px solid var(--plum2);border-radius:0 12px 12px 0;padding:14px 18px;margin:12px 0}
+  .pull b{font-family:var(--disp);font-size:20px;color:var(--plum);display:block;margin-bottom:3px}
+  .pull span{font-size:12.5px;color:var(--ink2)}
+  .tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  .tbl th{text-align:left;font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);padding:7px 10px;border-bottom:1px solid var(--line)}
+  .tbl td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--ink2)}
+  .tbl td:first-child{font-weight:700;color:var(--ink)}
+  .tbl tr:last-child td{border-bottom:none}
+  .figure{border:1px solid var(--line2);border-radius:13px;overflow:hidden;margin:12px 0}
+  .figure .cap{padding:9px 13px;background:#FCFBFD;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+  .figure img{display:block;width:100%}
+  .maplink{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid var(--line2);border-radius:12px;text-decoration:none;color:var(--ink);transition:.15s;background:#fff}
+  .maplink:hover{border-color:var(--violet);background:var(--lilac3)}
+  .maplink .ic{width:30px;height:30px;border-radius:9px;background:var(--lilac3);display:grid;place-items:center;flex:0 0 auto}
+  .maplink .ic svg{width:15px;height:15px;color:var(--plum2)}
+  .maplink b{font-family:var(--disp);font-size:13px;display:block}
+  .maplink span{font-size:11.5px;color:var(--muted)}
+  .maplink .go{margin-left:auto;font-family:var(--disp);font-size:12px;font-weight:700;color:var(--plum2)}
+</style>
+
+<div class="top">
+  <span class="mark"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z"/></svg></span>
+  <div><div class="t" id="docTitle">Document</div><div class="s" id="docMeta">Costco — Western Sydney launch</div></div>
+  <div class="right">
+    <a class="ghost" href="output-summary.html" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      Open findings page
+    </a>
+    <button id="shareBtn"></button>
+  </div>
+</div>
+
+<div class="sheet">
+  <div class="band">
+    <div class="k" id="bandKind">Document</div>
+    <h1 id="bandTitle"></h1>
+    <p id="bandIntro"></p>
+    <div class="meta">
+      <div>Prepared for<b>Costco Australia</b></div>
+      <div>Market<b>Western Sydney</b></div>
+      <div>Audience<b>Marsden Park Stock-Ups</b></div>
+      <div>Date<b>29 July 2026</b></div>
+    </div>
+  </div>
+  <div class="doc" id="doc"></div>
+</div>
+
+<script>
+/* Each template restructures the same findings — that is the whole point of
+   picking one. Sections are authored per template, not shuffled generically. */
+var FINDINGS_TABLE =
+  '<table class="tbl"><tr><th>Signal</th><th>This audience</th><th>Metro</th><th>Read</th></tr>' +
+  '<tr><td>Median trip</td><td>14 km</td><td>8.4 km</td><td>1.7× — travels for it</td></tr>' +
+  '<tr><td>Weekend share</td><td>57%</td><td>41%</td><td>Planned outing</td></tr>' +
+  '<tr><td>Return in 60 days</td><td>68%</td><td>36%</td><td>Habit, not trial</td></tr>' +
+  '<tr><td>IKEA overlap</td><td>41%</td><td>12%</td><td>3.4× — destination retail</td></tr>' +
+  '<tr><td>Bunnings overlap</td><td>56%</td><td>19%</td><td>2.9× — same trip</td></tr>' +
+  '<tr><td>Households of 4+</td><td>66%</td><td>29%</td><td>Explains basket, not distance</td></tr></table>';
+
+var MAPLINK =
+  '<a class="maplink" href="output-summary.html" target="_blank">' +
+  '<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.6"/></svg></span>' +
+  '<span><b>The catchment, live</b><span>Drive-time bands, inbound trips and co-visitation — interactive</span></span>' +
+  '<span class="go">Open →</span></a>';
+
+var TEMPLATES = {
+  'campaign-strategy': {
+    kind: 'Campaign Strategy Brief', icon: '📣',
+    title: 'Costco Western Sydney — Campaign Strategy Brief',
+    intro: 'How to reach the Marsden Park Stock-Ups cluster at launch: who they are, where they travel from, and the channels that intercept the trip rather than the household.',
+    sections: [
+      { n: 'Section 1', h: 'Audience overview & sizing', b:
+        '<p>The launch audience is <b>566k households</b> across Greater Sydney, concentrated in three clusters. Marsden Park Stock-Ups is the strongest at <b>186k households</b>, indexing 169 against national.</p>' + FINDINGS_TABLE },
+      { n: 'Section 2', h: 'Channel mix & media weighting', b:
+        '<p>Because two thirds of trips begin beyond 10 km, the trip is intercepted on the road, not at the letterbox.</p><ul>' +
+        '<li><i></i><b>Roadside OOH — 45%.</b> M7 and Richmond Road carry the inbound trip on Saturday mornings.</li>' +
+        '<li><i></i><b>Digital & social — 30%.</b> Thursday–Friday, when the weekend shop is decided.</li>' +
+        '<li><i></i><b>Drive-time radio — 15%.</b> Reaches the same corridor in the same window.</li>' +
+        '<li><i></i><b>Catalogue — 10%.</b> Retained only for the 10-minute band.</li></ul>' + MAPLINK },
+      { n: 'Section 3', h: 'Messaging angles by segment', b:
+        '<p><b>Marsden Park Stock-Ups</b> — one trip, one month sorted. Membership pays for itself in two shops.</p>' +
+        '<p><b>Parramatta Value Families</b> — unit price and pack size, with referral mechanics doing the heavy lifting.</p>' +
+        '<p><b>Castle Hill Bulk Buyers</b> — a switching argument, not a trial one. They already hold a membership elsewhere.</p>' },
+      { n: 'Section 4', h: 'Timing & seasonality', b:
+        '<div class="pull"><b>10–11am Saturday</b><span>The arrival window. 38% of trips run school drop-off → café → Bunnings → Costco, decided the night before.</span></div>' +
+        '<p>Weight media Thursday to Saturday, front-loaded to the start of each month and to back-to-school.</p>' },
+      { n: 'Section 5', h: 'Creative direction', b:
+        '<p>Show the scale of one trip — a full trolley and a full boot — rather than a product shot. Avoid small-basket convenience messaging; it undersells the proposition to a household that just drove 14 km.</p>' }
+    ]
+  },
+  'insight-report': {
+    kind: 'Executive Insight Report', icon: '📊',
+    title: 'Costco Western Sydney — Executive Insight Report',
+    intro: 'What the location and transaction signal says about the Western Sydney opportunity, and how large it is.',
+    sections: [
+      { n: 'Section 1', h: 'Executive summary', b:
+        '<p>Costco’s strongest Western Sydney customers are not the households nearest the store. They are affluent, larger families who <b>travel 20–30 km</b> because the trip is a destination in itself — planned, repeated, and chained to other big-box retail.</p>' +
+        '<div class="pull"><b>Supported</b><span>Five of six signals tested consistent with destination shopping. Household size explains basket, not distance.</span></div>' },
+      { n: 'Section 2', h: 'Audience profiles & index', b: FINDINGS_TABLE },
+      { n: 'Section 3', h: 'Geographic concentration', b:
+        '<p>Penrith, Richmond and Castle Hill send just over half of all trips — three outer centres with no warehouse club of their own.</p>' + MAPLINK },
+      { n: 'Section 4', h: 'Market opportunity sizing', b:
+        '<p>566k households sit inside the 30-minute band. At the observed 68% 60-day return rate, the addressable repeat base is roughly <b>385k households</b>.</p>' },
+      { n: 'Section 5', h: 'Strategic recommendations', b:
+        '<ul><li><i></i>Buy the corridor, not the postcode.</li><li><i></i>Treat Castle Hill as a switching play, not trial.</li>' +
+        '<li><i></i>Use IKEA and Bunnings co-visitation as the targeting spine.</li></ul>' }
+    ]
+  },
+  'conquest-plan': {
+    kind: 'Conquest Activation Plan', icon: '🎯',
+    title: 'Costco Western Sydney — Conquest Activation Plan',
+    intro: 'Where the volume comes from today, and which competitor households are most movable.',
+    sections: [
+      { n: 'Section 1', h: 'Competitive landscape', b:
+        '<table class="tbl"><tr><th>Retailer</th><th>Share of basket</th><th>Switching propensity</th></tr>' +
+        '<tr><td>Woolworths</td><td>34%</td><td>11%</td></tr><tr><td>Coles</td><td>28%</td><td>9%</td></tr>' +
+        '<tr><td>ALDI</td><td>24%</td><td>14%</td></tr><tr><td>BIG W</td><td>14%</td><td>6%</td></tr></table>' +
+        '<p>The mismatch is the opportunity: the largest share is not the largest prize.</p>' },
+      { n: 'Section 2', h: 'Switching opportunity', b:
+        '<div class="pull"><b>ALDI</b><span>Smaller share, highest propensity. These households already buy on unit price — the argument is won before it is made.</span></div>' + MAPLINK },
+      { n: 'Section 3', h: 'Conquest priorities', b:
+        '<ul><li><i></i><b>Priority 1 — ALDI switchers</b> inside the 20-minute band.</li>' +
+        '<li><i></i><b>Priority 2 — Woolworths</b> large-basket households in the North-West growth corridor.</li>' +
+        '<li><i></i><b>Priority 3 — existing club members</b> at Castle Hill, on convenience rather than price.</li></ul>' },
+      { n: 'Section 4', h: 'Activation tactics', b:
+        '<p>Unit-price comparison creative on roadside OOH along the M7. Membership trial offers weighted to the ALDI catchment. Referral mechanics in Parramatta, where word of mouth outperforms paid.</p>' }
+    ]
+  },
+  'launch-playbook': {
+    kind: 'Launch Playbook', icon: '🚀',
+    title: 'Costco Western Sydney — Launch Playbook',
+    intro: 'The sequenced plan from pre-launch to week eight, with the measures that tell you it is working.',
+    sections: [
+      { n: 'Section 1', h: 'Objectives & KPIs', b:
+        '<ul><li><i></i>Membership sign-ups in the 20–30 km band</li><li><i></i>60-day return rate above the 68% benchmark</li>' +
+        '<li><i></i>Share of trips originating beyond 15 km</li></ul>' },
+      { n: 'Section 2', h: 'Segment prioritisation', b: FINDINGS_TABLE },
+      { n: 'Section 3', h: 'Channel activation plan', b:
+        '<p>Weeks -4 to 0: roadside OOH along the M7 and Richmond Road, plus drive-time radio. Weeks 1–4: social retargeting of the catchment. Weeks 5–8: referral push through Parramatta community networks.</p>' + MAPLINK },
+      { n: 'Section 4', h: 'Opening weekend', b:
+        '<div class="pull"><b>10–11am Saturday</b><span>Plan queueing, staffing and fuel for the arrival window the data already shows.</span></div>' },
+      { n: 'Section 5', h: 'Measurement', b:
+        '<p>Re-run the six signals at week 8 against the same baseline. If the median trip shortens, the catchment is filling in from the near band and the media weight should follow it.</p>' }
+    ]
+  }
+};
+
+var id = new URLSearchParams(location.search).get('t') || 'campaign-strategy';
+var T = TEMPLATES[id] || TEMPLATES['campaign-strategy'];
+document.title = T.title;
+document.getElementById('docTitle').textContent = T.icon + '  ' + T.kind;
+document.getElementById('docMeta').textContent = 'Costco — Western Sydney launch · shared by Lumos';
+document.getElementById('bandKind').textContent = T.kind;
+document.getElementById('bandTitle').textContent = T.title;
+document.getElementById('bandIntro').textContent = T.intro;
+document.getElementById('doc').innerHTML = T.sections.map(function (s) {
+  return '<div class="sec"><div class="n">' + s.n + '</div><h2>' + s.h + '</h2>' + s.b + '</div>';
+}).join('');
+
+LumosShare.mount(document.getElementById('shareBtn'), { kind: 'document', title: T.title });
+</script>
