@@ -303,6 +303,17 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   // which next step the reader picked once the evidence is in
   const [nextTurn, setNextTurn] = useState<string | null>(null);
+  // Validation is the one moment Lumos is genuinely testing something, so it
+  // reasons first and then builds the case a chart at a time.
+  const [validateThinking, setValidateThinking] = useState(true);
+  const [evidenceShown, setEvidenceShown] = useState(0);
+  useEffect(() => {
+    if (hypothesis !== 'validated') { setValidateThinking(true); setEvidenceShown(0); return; }
+    setValidateThinking(true); setEvidenceShown(0);
+    const timers = [window.setTimeout(() => setValidateThinking(false), 3000)];
+    for (let i = 1; i <= 6; i++) timers.push(window.setTimeout(() => setEvidenceShown(i), 3000 + i * 280));
+    return () => timers.forEach(clearTimeout);
+  }, [hypothesis]);
   const [homeTab, setHomeTab] = useState<'brief' | 'upload' | 'compare'>('brief');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
@@ -1024,11 +1035,47 @@ export default function ChatPanel({
                 <>
                   <UserMessage text="Yes — validate this" />
                   <AIMessage text="Testing it now. I’ll compare six signals against a like-for-like grocery baseline — if this is destination shopping, the trip should be long, planned, repeated and chained to other big-box retail." />
-                  <AIMessage text="Here’s the evidence. Each one can drive the map — Show on map puts that filter on the geography." />
-                  <EvidenceGrid active={evidenceOnMap} onShowOnMap={(id) => onEvidenceShowOnMap?.(id)} />
-                  <KeyFindings />
-                  <AIMessage text="Would you like me to:" />
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5 mb-5">
+
+                  {validateThinking ? (
+                    <>
+                      <div className="mb-5 flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {[0, 150, 300].map((d) => (
+                            <div key={d} className="w-2 h-2 bg-[#7c6bf0] rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                          ))}
+                        </div>
+                        <span className="font-['Jua',sans-serif] text-[14px] text-[#999] italic">Testing the hypothesis against a like-for-like grocery baseline…</span>
+                      </div>
+                      <div className="mt-4 space-y-3 my-6">
+                        <StepIndicator active text="Pulling trip length and day-of-week distributions" />
+                        <StepIndicator active={false} text="Matching a like-for-like grocery baseline" />
+                        <StepIndicator active={false} text="Checking repeat visitation and co-visitation overlap" />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <CollapsibleReasoning
+                        summary="Tested six signals against a like-for-like grocery baseline — trip length, day of week, repeat rate, household size, co-visitation..."
+                        steps={[
+                          'Measuring trip length against the Greater Sydney median',
+                          'Splitting visits by day of week and comparing to category norm',
+                          'Counting households returning inside 60 days',
+                          'Testing household size as a rival explanation for basket size',
+                          'Cross-referencing IKEA and Bunnings visitation in the last 90 days',
+                        ]}
+                      />
+                      <AIMessage text="Here’s the evidence. Each one can drive the map — Show on map puts that filter on the geography." />
+                    </>
+                  )}
+
+                  <EvidenceGrid active={evidenceOnMap} onShowOnMap={(id) => onEvidenceShowOnMap?.(id)} visibleCount={evidenceShown} />
+                  {evidenceShown >= 6 && (
+                    <div className="lumos-reply-in">
+                      <KeyFindings />
+                      <AIMessage text="Would you like me to:" />
+                    </div>
+                  )}
+                  <div className={`grid grid-cols-1 xl:grid-cols-2 gap-2.5 mb-5 ${evidenceShown >= 6 ? 'lumos-reply-in' : 'hidden'}`}>
                     {NEXT_TURNS.map((n) => (
                       <button
                         key={n.id}

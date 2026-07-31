@@ -206,13 +206,18 @@ export const NEXT_TURNS = [
 
 // ── the grid ──────────────────────────────────────────────────────────────────
 
-export function EvidenceGrid({ active, onShowOnMap }: { active: string | null; onShowOnMap: (id: string) => void }) {
+export function EvidenceGrid({ active, onShowOnMap, visibleCount = EVIDENCE.length }: {
+  active: string | null;
+  onShowOnMap: (id: string) => void;
+  // charts arrive one at a time, so the reader watches the case being built
+  visibleCount?: number;
+}) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start my-5">
-      {EVIDENCE.map((ev, i) => (
+      {EVIDENCE.slice(0, visibleCount).map((ev, i) => (
         <div
           key={ev.id}
-          className={`flex flex-col rounded-2xl bg-white p-4 pb-3 border transition-shadow ${
+          className={`lumos-reply-in flex flex-col rounded-2xl bg-white p-4 pb-3 border transition-shadow ${
             active === ev.id ? 'border-[#6b3c72] shadow-[0_2px_12px_rgba(74,42,110,0.13)]' : 'border-[#e1d9ec]'
           }`}
         >
