@@ -198,5 +198,10 @@ document.getElementById('doc').innerHTML = T.sections.map(function (s) {
   return '<div class="sec"><div class="n">' + s.n + '</div><h2>' + s.h + '</h2>' + s.b + '</div>';
 }).join('');
 
+LumosShare.gate({
+  headline: 'Read the full document',
+  blurb: 'Leave your email to read every section, and we’ll send you a copy.',
+  cta: 'Read it'
+});
 LumosShare.mount(document.getElementById('shareBtn'), { kind: 'document', title: T.title });
 </script>

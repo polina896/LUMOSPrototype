@@ -437,6 +437,11 @@ window.addEventListener('load', function(){ map.invalidateSize(); });
 if (window.ResizeObserver) new ResizeObserver(function(){ map.invalidateSize(); })
   .observe(document.querySelector('.mapcol'));
 
+LumosShare.gate({
+  headline:'See the full findings',
+  blurb:'Leave your email to read the evidence, the key findings and the interactive map.',
+  cta:'View findings'
+});
 LumosShare.mount(document.getElementById('shareBtn'), {
   kind:'summary', title:'Costco — Western Sydney launch · Audience findings'
 });

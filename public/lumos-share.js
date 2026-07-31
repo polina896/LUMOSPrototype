@@ -60,6 +60,28 @@
     "\n.ls-send:disabled{background:#D9D2E2;cursor:not-allowed}",
     "\n.ls-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,10px);background:#211A2E;color:#fff;border-radius:11px;padding:11px 18px;",
     "font-family:'Baloo 2',system-ui,sans-serif;font-size:13px;font-weight:700;box-shadow:0 12px 34px rgba(0,0,0,.3);opacity:0;transition:.25s;z-index:9100;pointer-events:none}",
+    "\n.ls-ribbon{display:flex;align-items:center;gap:10px;padding:9px 26px;background:#F1E9FF;border-bottom:1px solid #E0D4F5;font-family:'Nunito Sans',system-ui,sans-serif}",
+    "\n.ls-ribbon .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Baloo 2',system-ui,sans-serif;font-size:10px;font-weight:800;flex:0 0 auto}",
+    "\n.ls-ribbon b{font-family:'Baloo 2',system-ui,sans-serif;font-size:12.5px;color:#4A2A6E}",
+    "\n.ls-ribbon i{font-style:normal;font-size:11.5px;color:#6B5B85;display:block}",
+    "\n.ls-ribbon .badge{margin-left:auto;font-family:'Baloo 2',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6B3C72;background:#fff;border:1px solid #E0D4F5;padding:4px 10px;border-radius:99px}",
+    "\n.ls-curtain{position:fixed;left:0;right:0;bottom:0;height:78vh;z-index:8000;display:flex;justify-content:center;align-items:flex-end;padding-bottom:7vh;background:linear-gradient(180deg,rgba(247,246,249,0) 0%,rgba(247,246,249,.88) 26%,#F7F6F9 46%)}",
+    "\n.ls-gate{width:min(430px,92vw);background:#fff;border:1px solid #E1D9EC;border-radius:18px;box-shadow:0 22px 60px rgba(33,26,46,.22);padding:24px 24px 20px;text-align:center;font-family:'Nunito Sans',system-ui,sans-serif}",
+    "\n.ls-gate .lock{width:38px;height:38px;border-radius:12px;background:#F5F0FB;display:grid;place-items:center;margin:0 auto 12px}",
+    "\n.ls-gate .lock svg{width:19px;height:19px;stroke:#6B3C72}",
+    "\n.ls-gate h3{font-family:'Baloo 2',system-ui,sans-serif;font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:12px;letter-spacing:-.01em}",
+    "\n.ls-gate p{font-size:13px;color:#7E7490;line-height:1.6;margin-bottom:16px}",
+    "\n.ls-gate form{display:flex;gap:8px}",
+    "\n.ls-gate input{flex:1;min-width:0;border:1px solid #E1D9EC;border-radius:11px;padding:11px 13px;font-family:inherit;font-size:13.5px;outline:none;transition:.15s}",
+    "\n.ls-gate input:focus{border-color:#6B3C72;box-shadow:0 0 0 3px rgba(107,60,114,.1)}",
+    "\n.ls-gate input.err{border-color:#D9534F;box-shadow:0 0 0 3px rgba(217,83,79,.12)}",
+    "\n.ls-gate button{border:none;border-radius:11px;background:#6B3C72;color:#fff;font-family:'Baloo 2',system-ui,sans-serif;font-size:13px;font-weight:700;padding:11px 17px;cursor:pointer;transition:.15s;white-space:nowrap}",
+    "\n.ls-gate button:hover{background:#4A2A6E}",
+    "\n.ls-gate .fine{font-size:11px;color:#A79FB6;margin-top:11px;line-height:1.5}",
+    "\n.ls-gate .who{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px}",
+    "\n.ls-gate .who .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Baloo 2',system-ui,sans-serif;font-size:10px;font-weight:800}",
+    "\n.ls-gate .who span{font-size:12.5px;color:#4A3E5C}",
+    "\nbody.ls-gated{overflow:hidden!important}",
     "\n.ls-toast.on{opacity:1;transform:translate(-50%,0)}"
   ].join('');
 
@@ -114,6 +136,8 @@
         '<div class="ls-f">' +
           '<button class="ls-link" id="lsCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
             '<path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg>Copy link</button>' +
+          '<button class="ls-link" id="lsPreview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>View shared file</button>' +
           '<button class="ls-send" id="lsSend" disabled>Share</button>' +
         '</div>' +
       '</div>';
@@ -209,9 +233,11 @@
     input.addEventListener('blur', function () { setTimeout(function () { sugg.classList.remove('on'); }, 120); });
 
     scrim.querySelector('#lsCopy').onclick = function () {
-      var url = location.href;
-      if (navigator.clipboard) navigator.clipboard.writeText(url).catch(function () {});
-      toast('Link copied — anyone at Costco with the link can view');
+      if (navigator.clipboard) navigator.clipboard.writeText(shareUrl()).catch(function () {});
+      toast('Link copied — recipients leave an email to see it all');
+    };
+    scrim.querySelector('#lsPreview').onclick = function () {
+      window.open(shareUrl(), '_blank', 'noopener');
     };
     send.onclick = function () {
       var names = picked.map(function (p) { return p.n; });
@@ -224,6 +250,74 @@
     setTimeout(function () { input.focus(); }, 120);
   }
 
+
+  // ── the recipient's side ───────────────────────────────────────────────────
+  // A shared link shows the top of the page and asks for an email for the rest.
+  function shareUrl() {
+    var u = new URL(location.href);
+    u.searchParams.set('shared', '1');
+    u.searchParams.set('from', 'Polina Nesterova');
+    return u.toString();
+  }
+  var UNLOCK_KEY = 'lumos-shared-unlocked';
+
+  function ribbon(from, unlocked) {
+    var r = document.createElement('div');
+    r.className = 'ls-ribbon';
+    r.innerHTML = '<span class="av" style="background:' + hue(from) + '">' + initials(from) + '</span>' +
+      '<span><b>' + from + '</b> shared this with you<i>Costco — Western Sydney launch · prepared by Lumos</i></span>' +
+      '<span class="badge">' + (unlocked ? 'Full access' : 'Preview') + '</span>';
+    document.body.insertBefore(r, document.body.firstChild);
+    return r;
+  }
+
+  function gate(opts) {
+    opts = opts || {};
+    injectOnce();
+    var q = new URLSearchParams(location.search);
+    if (q.get('shared') !== '1') return;                 // only on a shared link
+    var from = q.get('from') || 'A colleague';
+    var already = false;
+    try { already = !!localStorage.getItem(UNLOCK_KEY); } catch (e) {}
+
+    var rib = ribbon(from, already);
+    if (already) return;                                 // they have already left an email
+
+    document.body.classList.add('ls-gated');
+    var curtain = document.createElement('div');
+    curtain.className = 'ls-curtain';
+    curtain.innerHTML =
+      '<div class="ls-gate">' +
+        '<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">' +
+          '<rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>' +
+        '<h3>' + (opts.headline || 'See the full findings') + '</h3>' +
+        '<div class="who"><span class="av" style="background:' + hue(from) + '">' + initials(from) + '</span>' +
+          '<span>' + from + ' shared this with you</span></div>' +
+        '<p>' + (opts.blurb || 'Leave your email to read the evidence, the key findings and the interactive map.') + '</p>' +
+        '<form><input type="email" placeholder="you@company.com" autocomplete="email" required>' +
+        '<button type="submit">' + (opts.cta || 'View findings') + '</button></form>' +
+        '<div class="fine">No account needed. We’ll email you a copy so you can come back to it.</div>' +
+      '</div>';
+    document.body.appendChild(curtain);
+
+    var form = curtain.querySelector('form'), input = curtain.querySelector('input');
+    setTimeout(function () { input.focus(); }, 300);
+    input.addEventListener('input', function () { input.classList.remove('err'); });
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var v = input.value.trim();
+      if (!VALID.test(v)) { input.classList.add('err'); input.focus(); return; }
+      try { localStorage.setItem(UNLOCK_KEY, v); } catch (er) {}
+      document.body.classList.remove('ls-gated');
+      curtain.style.transition = 'opacity .3s';
+      curtain.style.opacity = '0';
+      setTimeout(function () { curtain.remove(); }, 320);
+      rib.querySelector('.badge').textContent = 'Full access';
+      toast('Unlocked — a copy is on its way to ' + v);
+      if (opts.onUnlock) opts.onUnlock(v);
+    };
+  }
+
   global.LumosShare = {
     mount: function (el, opts) {
       injectOnce();
@@ -234,6 +328,9 @@
         '<path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>Share';
       el.onclick = function () { open(opts); };
     },
-    open: function (opts) { injectOnce(); open(opts || {}); }
+    open: function (opts) { injectOnce(); open(opts || {}); },
+    gate: gate,
+    shareUrl: shareUrl,
+    reset: function () { try { localStorage.removeItem(UNLOCK_KEY); } catch (e) {} }
   };
 })(typeof window !== 'undefined' ? window : this);
