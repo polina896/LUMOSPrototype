@@ -8,6 +8,8 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{--plum:#4A2A6E;--plum2:#6B3C72;--violet:#7C4FC7;--ink:#1A1A1A;--ink2:#4A3E5C;
+        /* chart tokens — the figure code fills against these */
+        --acc:#6B3C72; --ctx:#8A8494;
         --muted:#7E7490;--muted2:#A79FB6;--line:#EBE5F1;--line2:#E1D9EC;--lilac:#EFE8F8;--lilac3:#F5F0FB;
         --disp:"Baloo 2",system-ui,sans-serif;--body:"Nunito",system-ui,sans-serif;--chat:"Jua",system-ui,sans-serif}
   body{font-family:var(--body);color:var(--ink);background:#F7F6F9}
@@ -185,7 +187,7 @@ function barPath(x,y,w,h,r){   // horizontal: rounded at the data end only
 }
 // columns, with optional second series (grouped) — 2px surface gap, ≤24px thick
 function columns(host,{data,max,fmt,series,labelEvery}){
-  const W=host.clientWidth||300, H=118, padB=20, padT=16, n=data.length;
+  const W=Math.max(host.clientWidth||0,320), H=118, padB=20, padT=16, n=data.length;
   const svg=el('svg',{width:'100%',height:H,viewBox:`0 0 ${W} ${H}`,class:'chart'});
   const plotH=H-padB-padT, band=W/n, two=!!series;
   svg.appendChild(el('line',{x1:0,y1:H-padB,x2:W,y2:H-padB,stroke:'var(--grid)','stroke-width':1}));
@@ -212,10 +214,22 @@ function columns(host,{data,max,fmt,series,labelEvery}){
   host.appendChild(svg);
 }
 // two horizontal bars: the audience against the metro baseline
+// Width of the longest label, so the gutter fits the copy instead of the copy
+// fitting the gutter. Cached canvas — measureText is cheap, getContext is not.
+let _mc;
+function textW(s, font){
+  _mc = _mc || document.createElement('canvas').getContext('2d');
+  _mc.font = font;
+  return _mc.measureText(s).width;
+}
+
 function pairBars(host,{rows,max,fmt}){
-  const W=host.clientWidth||300, rowH=30, H=rows.length*rowH+6;
+  const W=Math.max(host.clientWidth||0,320), rowH=30, H=rows.length*rowH+6;
   const svg=el('svg',{width:'100%',height:H,viewBox:`0 0 ${W} ${H}`,class:'chart'});
-  const labelW=74, barW=W-labelW-46;
+  const LABEL_FONT='700 11px Nunito, sans-serif';
+  const widest=Math.max(...rows.map(r=>textW(r.label,LABEL_FONT)));
+  // clamped so one long label can't squeeze the bars out of existence
+  const labelW=Math.min(Math.max(74,Math.ceil(widest)+10),Math.round(W*0.42)), barW=W-labelW-46;
   rows.forEach((r,i)=>{
     const y=i*rowH+4, h=16;
     const lb=el('text',{x:0,y:y+h-3,'font-size':11,fill:'#4A3E5C','font-family':'Nunito, sans-serif','font-weight':700});
@@ -242,7 +256,22 @@ function figure(host, opts){
     (opts.legend?'<span class="lg">'+opts.legend.map(function(l){return '<span><i style="background:'+l[0]+'"></i>'+l[1]+'</span>';}).join('')+'</span>':'')+
     '</div><div class="fig-b"></div>'+(opts.cap?'<div class="fig-cap">'+opts.cap+'</div>':'');
   host.appendChild(f);
-  if (opts.draw) opts.draw(f.querySelector('.fig-b'));
+  // Charts size themselves off the body's width, and at first paint that width
+  // is whatever the layout happens to be mid-flight — often near zero, which
+  // produced a chart authored at 30px and then stretched by the viewBox. Draw
+  // once, then redraw whenever the real width lands or changes.
+  if (opts.draw) {
+    var body=f.querySelector('.fig-b'), last=0;
+    var render=function(){
+      var w=body.clientWidth;
+      if (w<40 || w===last) return;      // not laid out yet, or nothing moved
+      last=w; body.innerHTML='';
+      opts.draw(body);
+    };
+    opts.draw(body);                      // something to look at immediately
+    if (window.ResizeObserver) new ResizeObserver(render).observe(body);
+    else window.addEventListener('resize', render);
+  }
   return f;
 }
 
